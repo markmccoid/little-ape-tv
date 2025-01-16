@@ -1,7 +1,8 @@
 import { Link, Tabs } from 'expo-router';
+import { Text } from 'react-native';
 
-import { HeaderButton } from '../../components/HeaderButton';
-import { TabBarIcon } from '../../components/TabBarIcon';
+import { HeaderButton } from '~/components/HeaderButton';
+import { TabBarIcon } from '~/components/TabBarIcon';
 
 export default function TabLayout() {
   return (
@@ -19,6 +20,13 @@ export default function TabLayout() {
               <HeaderButton />
             </Link>
           ),
+          headerLeft: () => {
+            return (
+              <Link href="/settings">
+                <Text>SET</Text>
+              </Link>
+            );
+          },
         }}
       />
       <Tabs.Screen
