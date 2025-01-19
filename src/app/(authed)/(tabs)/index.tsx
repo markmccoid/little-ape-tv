@@ -1,14 +1,18 @@
 import { Stack } from 'expo-router';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useAuth } from '~/authentication/AuthProvider';
 
 import { ScreenContent } from '~/components/ScreenContent';
 
 export default function Home() {
+  const { currentUser, logout } = useAuth();
   return (
     <>
       <Stack.Screen options={{ title: 'Tab One' }} />
       <View style={styles.container}>
-        <ScreenContent path="app/(tabs)/index.tsx" title="Tab One" />
+        <Pressable onPress={logout}>
+          <Text>Log Out {currentUser?.name}</Text>
+        </Pressable>
       </View>
     </>
   );
