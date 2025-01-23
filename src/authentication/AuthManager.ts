@@ -1,4 +1,5 @@
 import { MMKV } from 'react-native-mmkv';
+import { LocalUserStorage } from '~/store/localUserStorage';
 import uuid from 'react-native-uuid';
 
 export type User = {
@@ -18,7 +19,7 @@ export class AuthManager {
   private _initialized = false;
   private _allUsers: User[] = [];
   private _storage: MMKV = new MMKV();
-  private _storageAdapter: MMKV | undefined = undefined;
+  private _localUserStorage: LocalUserStorage | undefined; //MMKV | undefined = undefined;
   private _subscribers: Subscriber[] = [];
 
   constructor() {
@@ -41,22 +42,31 @@ export class AuthManager {
   private initialize() {
     const currUser = this.getItem('currentUser');
 
-    this._storageAdapter = this.initCurrentUserStorage(currUser as User | undefined);
+    this._localUserStorage = this.initCurrentUserStorage(currUser as User | undefined);
     this._currentUser = currUser as User | undefined;
     this._allUsers = this.getUsers();
     this._initialized = true;
     this.notifySubscribers();
   }
-
-  private initCurrentUserStorage = (currentUser: User | undefined): MMKV => {
+  private initCurrentUserStorage = (currentUser: User | undefined): LocalUserStorage => {
     if (!currentUser) {
-      return new MMKV({ id: `loggedout.placeholder` });
+      return new LocalUserStorage('loggedout.placeholder');
     }
-    const storage = new MMKV({ id: `${currentUser.id}.storage` });
-    storage.set('mmkvid', `${currentUser.id}.storage`);
+    const storage = new LocalUserStorage(`${currentUser.id}.storage`);
 
     return storage;
   };
+  //! OLD
+  // private initCurrentUserStorage = (currentUser: User | undefined): MMKV => {
+  //   if (!currentUser) {
+  //     return new MMKV({ id: `loggedout.placeholder` });
+  //   }
+  //   const storage = new MMKV({ id: `${currentUser.id}.storage` });
+  //   console.log('INIT', `${currentUser.id}.storage`);
+  //   storage.set('mmkvid', JSON.stringify(`${currentUser.id}.storage`));
+
+  //   return storage;
+  // };
 
   get initialized(): boolean {
     return this._initialized;
@@ -72,7 +82,7 @@ export class AuthManager {
 
   login(user: User) {
     this.setItem('currentUser', user);
-    this._storageAdapter = this.initCurrentUserStorage(user);
+    this._localUserStorage = this.initCurrentUserStorage(user);
     this._currentUser = user;
 
     this.notifySubscribers();
@@ -108,6 +118,7 @@ export class AuthManager {
     this.setItem('users', newUsers);
     this._allUsers = newUsers;
     this.notifySubscribers();
+    return { id: newUserId, name: newUserName };
   }
 
   removeUser(user: User) {
@@ -120,21 +131,21 @@ export class AuthManager {
     // Now we remove the user from the device
     this.deleteUserStorage(user);
     // If removed user was set as currentUser, logout
-    const currentUser = this.getItem('currentUser');
-    if ((currentUser.id = user.id)) {
+    const currentUser = this.getItem('currentUser') as User;
+    if (currentUser && currentUser.id === user.id) {
       this.logout();
     }
     this.notifySubscribers();
   }
-
+  // Remove the MMKV data that was persisted to the device
   private deleteUserStorage = (currentUser: User) => {
-    const tempStorage = new MMKV({ id: `${currentUser.id}.storage` });
+    const tempStorage = new MMKV({ id: `${currentUser.id}` });
     tempStorage.clearAll();
   };
 
   logout() {
     this.removeItem('currentUser');
-    this._storageAdapter = this.initCurrentUserStorage(undefined);
+    this._localUserStorage = this.initCurrentUserStorage(undefined);
     this._currentUser = undefined;
     this.notifySubscribers();
   }
@@ -143,8 +154,26 @@ export class AuthManager {
     return this.getItem('users') || [];
   };
 
-  get userStorage(): MMKV | undefined {
-    return this._storageAdapter;
+  get userStorage(): LocalUserStorage | undefined {
+    // const userStorageActions: UserStorageActions = {
+    //   getItem: (key) => {
+    //     if (!this._localUserStorage) throw new Error('Storage not initalized');
+    //     const value = this._localUserStorage.getString(key);
+    //     console.log('VALUE', value);
+    //     return value ? JSON.parse(value) : undefined;
+    //   },
+    //   setItem: (key, value) => {
+    //     if (!this._localUserStorage) throw new Error('Storage not initalized');
+    //     this._localUserStorage.set(key, JSON.stringify(value));
+    //   },
+    //   removeItem: (key) => {
+    //     if (!this._localUserStorage) throw new Error('Storage not initalized');
+    //     this._localUserStorage.delete(key);
+    //   },
+    //   mmkvStorage: this._localUserStorage,
+    // };
+    // return this._storageAdapter;
+    return this._localUserStorage;
   }
 
   private setItem = <K extends keyof StorageKeys>(key: K, value: StorageKeys[K]) => {

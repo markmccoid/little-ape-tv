@@ -24,7 +24,7 @@ export function useAuth() {
   return context;
 }
 
-const authManager = new AuthManager();
+export const authManager = new AuthManager();
 
 export const AuthProvider = ({ children }: any) => {
   const [, setUpdate] = useState({});
