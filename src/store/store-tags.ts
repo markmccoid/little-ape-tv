@@ -1,8 +1,10 @@
-import { Observable } from '@legendapp/state';
 import { authManager } from '~/authentication/AuthProvider';
 import uuid from 'react-native-uuid';
-import { setupPersistedObservable } from './persistUtil';
+import { createAndPersistObservable } from './createPersistedStore';
 
+//##########################
+//## SETUP TYPES -------------
+//##########################
 export type Tag = {
   id: string;
   name: string;
@@ -18,20 +20,9 @@ type AllTagsFunctions = {
   reset: () => void;
 };
 
-export let tags$: Observable<AllTags & AllTagsFunctions>;
-// export let tagFunctions: AllTagsFunctions;
-const initializeTags = () => {
-  tags$ = setupPersistedObservable<AllTags & AllTagsFunctions>(
-    { allTags: [], ...tagFunctions },
-    { id: authManager?.currentUser?.id, name: 'alltags' }
-  );
-  // tagFunctions = createTagFunctions(tags$);
-};
-
-initializeTags();
-authManager.subscribe(() => {
-  initializeTags();
-});
+//##########################
+//## SETUP FUNCTIONS -------------
+//##########################
 const tagFunctions: AllTagsFunctions = {
   addTag: (tagname) => {
     const allTags = tags$.allTags.peek() || [];
@@ -47,3 +38,23 @@ const tagFunctions: AllTagsFunctions = {
     tags$.allTags.set([]);
   },
 };
+
+//##########################
+//## SETUP OBSERVABLE -------------
+//##########################
+//~ Start by setting the initial state.  This will be the actual keys that are persisted
+//. which is all but the functions
+const initialState = { allTags: [], ...tagFunctions };
+// Setup Options -> id = the mmkv id, here the current user's id
+//                  name = the key name to store the data under
+const options = { id: authManager?.currentUser?.id, name: 'alltags' };
+// Create the observable
+export let tags$ = createAndPersistObservable<AllTags & AllTagsFunctions>(
+  { ...initialState },
+  options
+);
+// Auth change
+authManager.subscribe(() => {
+  // Recreate and persist a new observable when auth changes
+  tags$ = createAndPersistObservable<AllTags & AllTagsFunctions>({ ...initialState }, options);
+});

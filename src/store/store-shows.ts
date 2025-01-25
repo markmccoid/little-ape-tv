@@ -1,103 +1,44 @@
-import {
-  Observable,
-  observable,
-  ObservableParam,
-  ObservableSyncState,
-  observe,
-  syncState,
-} from '@legendapp/state';
-import { syncObservable } from '@legendapp/state/sync';
-import { ObservablePersistMMKV } from '@legendapp/state/persist-plugins/mmkv';
 import { authManager } from '~/authentication/AuthProvider';
 import uuid from 'react-native-uuid';
-import { MMKV } from 'react-native-mmkv';
-import { setupPersistedObservable } from './persistUtil';
+import { createAndPersistObservable } from './createPersistedStore';
 
-let currStorage = authManager.userStorage;
+export type Show = {
+  showId: string;
+  name: string;
+  tags?: string[];
+};
 
-// export type Tag = {
-//   id: string;
-//   name: string;
-//   position: number;
-// };
+type Shows = { shows: Show[] };
+type ShowFunctions = {
+  addShow: (showId: string, name: string, tags: string[]) => void;
+  removeShow: (showId: string) => void;
+  reset: () => void;
+};
 
-// type Shows = {
-//   id: string;
-//   tmdbId: number;
-//   title: string;
-//   // string of tag ids
-//   tags: string[];
-// };
+const showFunctions: ShowFunctions = {
+  addShow: (showId, name, tags) => {
+    const shows = shows$.shows.peek() || [];
+    const newShow = { showId, name, tags };
+    shows$.shows.set([...shows, newShow]);
+  },
+  removeShow: (showId) => {
+    const shows = shows$.shows.peek();
+    const newShows = shows.filter((el) => el.showId !== showId);
+    shows$.shows.set(newShows);
+  },
+  reset: () => {
+    shows$.shows.set([]);
+  },
+};
 
-// const tagFunctions: Omit<AllTags, 'allTags' | 'name'> = {
-//   addTag: (tagname) => {
-//     const allTags = tags$.allTags.peek() || [];
-//     const newTag = { id: uuid.v4(), name: tagname, position: allTags.length + 1 };
-//     tags$.allTags.set([...allTags, newTag]);
-//     currStorage?.setItem('tags', tags$.allTags.peek());
-//   },
-//   removeTag: (tagId) => {
-//     const allTags = tags$.allTags.peek();
-//     const newTags = allTags.filter((el) => el.id !== tagId);
-//     tags$.allTags.set(newTags);
-//     currStorage?.setItem('tags', newTags);
-//   },
-//   reset: () => {
-//     tags$.allTags.set([]);
-//     currStorage?.setItem('tags', []);
-//   },
-// };
+const initialState = {
+  shows: [],
+  ...showFunctions,
+};
+const options = { id: authManager?.currentUser?.id, name: 'shows' };
+export let shows$ = createAndPersistObservable<Shows & ShowFunctions>({ ...initialState }, options);
 
-// const initialize = () => {
-//   tags$ = observable<AllTags>({
-//     name: 'Mark',
-//     allTags: [],
-//     ...tagFunctions,
-//   });
-//   const customMMKVConfig = new ObservablePersistMMKV({ id: `${authManager?.currentUser?.id}` });
-//   syncObservable(tags$.allTags, {
-//     persist: {
-//       plugin: customMMKVConfig,
-//       name: 'alltags',
-//       options: {},
-//     },
-//   });
-//   syncObservable(tags$.name, {
-//     persist: {
-//       plugin: customMMKVConfig,
-//       name: 'tagname',
-//       options: {},
-//     },
-//   });
-//   observe(() => {
-//     console.log(`OBSERVED TAGS-${authManager?.currentUser?.name}`, tags$.allTags.peek());
-//   });
-// };
-
-//! Thoughts to tighten up the code:
-
-// type AllTags = {
-//   name: string;
-//   allTags: Tag[];
-// };
-
-// type AllTagsFunctions = {
-//   addTag: (tagname: string) => void;
-//   removeTag: (tagId: string) => void;
-//   reset: () => void;
-// };
-
-// export let tags$: Observable<AllTags>;
-// export let tagFunctions: AllTagsFunctions;
-// const initialize2 = () => {
-//   tags$ = setupPersistedObservable<AllTags>(
-//     { name: 'Mark', allTags: [] },
-//     { id: authManager?.currentUser?.id, name: 'alltags' }
-//   );
-//   tagFunctions = createTagFunctions(tags$);
-// };
-
-// initialize2();
-// authManager.subscribe(() => {
-//   initialize2();
-// });
+authManager.subscribe(() => {
+  // Recreate and persist a new observable when auth changes
+  shows$ = createAndPersistObservable<Shows & ShowFunctions>({ ...initialState }, options);
+});
