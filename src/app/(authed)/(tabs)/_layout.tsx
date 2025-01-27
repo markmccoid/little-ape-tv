@@ -1,5 +1,6 @@
 import { Link, Tabs } from 'expo-router';
 import { Text } from 'react-native';
+import { AddIcon, ViewTVShowIcon } from '~/components/common/icon';
 
 import { HeaderButton } from '~/components/HeaderButton';
 import { TabBarIcon } from '~/components/TabBarIcon';
@@ -13,8 +14,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Tab One',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: 'Shows',
+          tabBarIcon: ({ color }) => <ViewTVShowIcon color={color} size={25} />,
           headerRight: () => (
             <Link href="/modal" asChild>
               <HeaderButton />
@@ -30,10 +31,11 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="two"
+        name="search"
         options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: 'Add Show',
+          headerShown: false,
+          tabBarIcon: ({ color }) => <AddIcon color={color} size={25} />,
         }}
       />
     </Tabs>

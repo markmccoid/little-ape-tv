@@ -15,7 +15,7 @@ export default function Home() {
 
   return (
     <>
-      <Stack.Screen options={{ title: 'Tab One' }} />
+      <Stack.Screen options={{ title: 'Shows' }} />
       <TextInput
         value={tagin}
         onChangeText={(text) => setTagin(text)}
@@ -51,7 +51,14 @@ export default function Home() {
               <View key={el.showId} className="flex-row items-center gap-4">
                 <Text className="text-lg color-black">{el.name}</Text>
 
-                <Pressable onPress={() => shows$.removeShow(el.showId)}>
+                <Pressable
+                  style={({ pressed }) => ({
+                    backgroundColor: pressed ? 'red' : 'white',
+                    paddingHorizontal: 10, // Optional: Add some padding
+                    paddingVertical: 5, // Optional: Add some padding
+                    borderRadius: 5, // Optional: Rounded corners
+                  })}
+                  onPress={() => shows$.removeShow(el.showId)}>
                   <Text>RT</Text>
                 </Pressable>
               </View>
@@ -74,7 +81,12 @@ export default function Home() {
       </View>
 
       <View style={styles.container}>
-        <Pressable onPress={logout}>
+        <Pressable
+          onPress={logout}
+          style={({ pressed }) => {
+            console.log('PRESSS', pressed);
+            return [{ backgroundColor: pressed ? 'red' : 'white', borderWidth: 1 }];
+          }}>
           <Text>Log Out {currentUser?.name}</Text>
         </Pressable>
       </View>

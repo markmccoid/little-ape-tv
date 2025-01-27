@@ -6,11 +6,20 @@ import { View } from 'react-native';
 import { AuthProvider, useAuth } from '~/authentication/AuthProvider';
 import * as SplashScreen from 'expo-splash-screen';
 import { initTMDB } from '@markmccoid/tmdb_api';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
   initialRouteName: 'signin',
 };
+
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 10 * 60000, // n * 1 minute
+    },
+  },
+});
 
 const InitialLayout = () => {
   const router = useRouter();
@@ -73,8 +82,10 @@ const InitialLayout = () => {
 
 export default function RootLayout() {
   return (
-    <AuthProvider>
-      <InitialLayout />
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <InitialLayout />
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }
