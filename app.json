@@ -26,7 +26,7 @@
     },
     "orientation": "portrait",
     "icon": "./assets/little-ape-tv-icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/little-ape-tv-splash.png",
       "resizeMode": "contain",

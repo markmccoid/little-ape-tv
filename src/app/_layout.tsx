@@ -2,11 +2,14 @@ import '~/global.css';
 
 import { Slot, Stack, useRouter, useSegments } from 'expo-router';
 import { useEffect } from 'react';
-import { View } from 'react-native';
+import { View, useColorScheme } from 'react-native';
 import { AuthProvider, useAuth } from '~/authentication/AuthProvider';
 import * as SplashScreen from 'expo-splash-screen';
 import { initTMDB } from '@markmccoid/tmdb_api';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { CustomLightTheme, CustomDarkTheme } from '../utils/customColorTheme';
+// import { useColorScheme } from 'nativewind';
+import { ThemeProvider } from '@react-navigation/native';
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
@@ -81,10 +84,15 @@ const InitialLayout = () => {
 };
 
 export default function RootLayout() {
+  // const { colorScheme } = useColorScheme();
+  const colorScheme = useColorScheme();
+  console.log('colorScheme', colorScheme);
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <InitialLayout />
+        <ThemeProvider value={colorScheme === 'dark' ? CustomDarkTheme : CustomLightTheme}>
+          <InitialLayout />
+        </ThemeProvider>
       </AuthProvider>
     </QueryClientProvider>
   );
