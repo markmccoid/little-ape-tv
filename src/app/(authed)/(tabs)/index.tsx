@@ -2,16 +2,20 @@ import { Stack } from 'expo-router';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useAuth } from '~/authentication/AuthProvider';
 import { use$ } from '@legendapp/state/react';
-import { tags$ } from '~/store/store-tags';
-import { shows$ } from '~/store/store-shows';
+
+import { savedShows$, tags$ } from '~/store/store-shows';
 import { useEffect, useState } from 'react';
 
 export default function Home() {
-  const tags = use$(tags$.allTags);
+  const tags = use$(tags$.tagList);
   const [tagin, setTagin] = useState('');
   const [showIn, setShowIn] = useState('');
   const { currentUser, logout } = useAuth();
-  const shows = use$(shows$.shows);
+  const shows = use$(savedShows$.shows);
+  console.log(
+    'ALL SHOWS',
+    Object.keys(shows).map((key) => shows[key].name)
+  );
 
   return (
     <>
@@ -43,43 +47,6 @@ export default function Home() {
           );
         })}
 
-      <View>
-        <Text>Shows</Text>
-        {shows &&
-          shows.map((el) => {
-            return (
-              <View key={el.showId} className="flex-row items-center gap-4">
-                <Text className="text-lg color-black">{el.name}</Text>
-
-                <Pressable
-                  style={({ pressed }) => ({
-                    backgroundColor: pressed ? 'red' : 'white',
-                    paddingHorizontal: 10, // Optional: Add some padding
-                    paddingVertical: 5, // Optional: Add some padding
-                    borderRadius: 5, // Optional: Rounded corners
-                  })}
-                  onPress={() => shows$.removeShow(el.showId)}>
-                  <Text>RT</Text>
-                </Pressable>
-              </View>
-            );
-          })}
-      </View>
-      <View className="flex-col">
-        <TextInput
-          value={showIn}
-          onChangeText={(text) => setShowIn(text)}
-          className="mx-2 border bg-white p-1"
-        />
-        <View className="flex-row justify-start  p-1">
-          <Pressable
-            onPress={() => shows$.addShow(showIn, showIn, [])}
-            className="border bg-slate-500 p-1">
-            <Text className="text-white">Submit Show</Text>
-          </Pressable>
-        </View>
-      </View>
-
       <View style={styles.container}>
         <Pressable
           onPress={logout}
@@ -89,6 +56,19 @@ export default function Home() {
           }}>
           <Text>Log Out {currentUser?.name}</Text>
         </Pressable>
+      </View>
+      <View>
+        {shows &&
+          Object.keys(shows).map((key) => (
+            <View key={key}>
+              <Text>{shows[key].name}</Text>
+              <Pressable
+                onPress={() => savedShows$.removeShow(key)}
+                className="rounded-md border p-1">
+                <Text>Delete</Text>
+              </Pressable>
+            </View>
+          ))}
       </View>
     </>
   );

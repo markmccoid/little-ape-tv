@@ -5,7 +5,8 @@ import SearchContainer from '~/components/search/SearchContainer';
 export default function SearchRoute() {
   return (
     <View className="flex-1">
-      <Stack.Screen options={{ title: 'Add Show' }} />
+      {/* adding title so that it shows as the back button descriptor when going to details */}
+      <Stack.Screen options={{ title: 'Search' }} />
       <SearchContainer />
     </View>
   );

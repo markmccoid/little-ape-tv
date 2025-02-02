@@ -10,6 +10,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { CustomLightTheme, CustomDarkTheme } from '../utils/customColorTheme';
 // import { useColorScheme } from 'nativewind';
 import { ThemeProvider } from '@react-navigation/native';
+import { useReactQueryDevTools } from '@dev-plugins/react-query';
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
@@ -51,13 +52,13 @@ const InitialLayout = () => {
     if (!initialized) return;
     // Check to see if the route path is in Authed group
     const inAuthedGroup = segments[0] === '(authed)';
-
     // If not logged in (no currentUser) and trying to route to an Authed route
     // send back to signin page
     if (!currentUser && inAuthedGroup) {
       router.replace('/signin');
       return;
     }
+    console.log('IN BASE LAYOUT', segments[0]);
     // If logged in, but not routing to an Authed page
     // Send to root authed group "/"
     if (currentUser && !inAuthedGroup) {
@@ -86,7 +87,9 @@ const InitialLayout = () => {
 export default function RootLayout() {
   // const { colorScheme } = useColorScheme();
   const colorScheme = useColorScheme();
-  console.log('colorScheme', colorScheme);
+  //! Uncomment to use the react query dev tools
+  // useReactQueryDevTools(queryClient);
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>

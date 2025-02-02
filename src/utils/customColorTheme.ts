@@ -33,7 +33,7 @@ export const CustomLightTheme: CustomTheme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    primary: '#6a9c4f', // Base card color
+    primary: '#222222', // Base card color
     background: '#f0f5ec', // Light background (almost off-white)
     card: '#6a9c4f', // Card color (same as primary)
     text: '#222222', // Dark text for readability

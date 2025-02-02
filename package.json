@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@bacons/apple-colors": "^0.0.8",
+    "@dev-plugins/react-query": "^0.1.0",
     "@expo/vector-icons": "^14.0.0",
     "@legendapp/state": "^3.0.0-beta.23",
     "@markmccoid/tmdb_api": "^0.3.3",
@@ -29,6 +30,7 @@
     "expo-dev-launcher": "^5.0.17",
     "expo-font": "~13.0.3",
     "expo-haptics": "~14.0.1",
+    "expo-image": "~2.0.4",
     "expo-linking": "~7.0.4",
     "expo-router": "~4.0.6",
     "expo-splash-screen": "~0.29.20",

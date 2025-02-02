@@ -1,9 +1,11 @@
 import { MMKV } from 'react-native-mmkv';
-import { Tag } from './store-shows-local';
+import type { SavedShows } from '@/store/functions-shows';
+import type { Tag } from '@/store/functions-tags';
 
 type LocalStorageKeys = {
   mmkvid: string;
   tags: Tag[];
+  savedshows: SavedShows;
 };
 
 export class LocalUserStorage {
@@ -28,6 +30,13 @@ export class LocalUserStorage {
 
   public clearAll = (): void => {
     this._storage.clearAll();
+  };
+
+  public storageSize = (): number => {
+    return this._storage.size;
+  };
+  public storageTrim = () => {
+    this._storage.trim();
   };
 }
 /**

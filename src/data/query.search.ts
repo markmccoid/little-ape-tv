@@ -2,6 +2,9 @@ import { tvSearchByTitle } from '@markmccoid/tmdb_api';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { search$ } from '~/store/store-search';
 
+//~ ---------------------------------------------------------
+//~ TITLE SEARCH Hook
+//~ ---------------------------------------------------------
 export const useTitleSearch = (searchValue: string) => {
   const { data, fetchNextPage, hasNextPage, isLoading, error } = useInfiniteQuery({
     queryKey: ['searchByTitle', search$.searchVal.get()],
@@ -21,9 +24,9 @@ export const useTitleSearch = (searchValue: string) => {
   });
 
   const allPages = data?.pages?.map((page) => page.results).flat() || [];
-  console.log(
-    'allPages',
-    allPages?.map((show) => show.name)
-  );
+  // console.log(
+  //   'allPages',
+  //   allPages?.map((show) => show.name)
+  // );
   return { data: allPages, fetchNextPage, hasNextPage, isLoading, error };
 };

@@ -1,16 +1,13 @@
 import { View, Text, TextInput, Pressable, ScrollView } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '~/authentication/AuthProvider';
 import { Link } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { tags$ } from '~/store/store-tags';
-import { use$ } from '@legendapp/state/react';
 
 const SignInContainer = () => {
   const [newUser, setNewUser] = useState('');
   const auth = useAuth();
   const { top, bottom } = useSafeAreaInsets();
-  const tags = use$(tags$.allTags);
 
   return (
     <ScrollView className="flex-1 p-2" style={{ paddingTop: top }}>
@@ -23,10 +20,6 @@ const SignInContainer = () => {
         />
         <Pressable onPress={() => auth.register(newUser)}>
           <Text>Add User</Text>
-        </Pressable>
-
-        <Pressable onPress={() => tags$.allTags.set([])} className="border bg-yellow-300 p-1">
-          <Text>Clear Tags</Text>
         </Pressable>
 
         <View className="my-2">

@@ -1,44 +1,55 @@
 import { authManager } from '~/authentication/AuthProvider';
-import uuid from 'react-native-uuid';
-import { createAndPersistObservable } from './createPersistedStore';
+import { observable, Observable, syncState } from '@legendapp/state';
+import { createShowFunctions } from './functions-shows';
+import type { ShowFunctions, SavedShow, SavedShows } from './functions-shows';
+import { type TagFunctions, type Tag, createTagFunctions } from './functions-tags';
 
-export type Show = {
-  showId: string;
-  name: string;
-  tags?: string[];
-};
+//~ -----------------------------------------------
+//~ Observer Creation
+//~ -----------------------------------------------
+// Default values
+const defaultShowsValue = {};
+const defaultTagListValue: Tag[] = [];
 
-type Shows = { shows: Show[] };
-type ShowFunctions = {
-  addShow: (showId: string, name: string, tags: string[]) => void;
-  removeShow: (showId: string) => void;
-  reset: () => void;
-};
+//-- Load any stored item from MMKV
+const savedShows = authManager.userStorage?.getItem('savedshows');
+const storedTags = authManager.userStorage?.getItem('tags');
 
-const showFunctions: ShowFunctions = {
-  addShow: (showId, name, tags) => {
-    const shows = shows$.shows.peek() || [];
-    const newShow = { showId, name, tags };
-    shows$.shows.set([...shows, newShow]);
-  },
-  removeShow: (showId) => {
-    const shows = shows$.shows.peek();
-    const newShows = shows.filter((el) => el.showId !== showId);
-    shows$.shows.set(newShows);
-  },
-  reset: () => {
-    shows$.shows.set([]);
-  },
-};
+// Create the initial state, if nothing loaded from MMKV then the default will be used
+const initialState: { shows: SavedShows } = { shows: savedShows || defaultShowsValue };
+const tagInitialState: { tagList: Tag[] } = { tagList: storedTags || defaultTagListValue };
 
-const initialState = {
-  shows: [],
-  ...showFunctions,
-};
-const options = { id: authManager?.currentUser?.id, name: 'shows' };
-export let shows$ = createAndPersistObservable<Shows & ShowFunctions>({ ...initialState }, options);
+//~ ==================
+//~ --- savedShow$ --------
+//~ Create the Observable, minus the functions
+//~ ==================
+export const savedShows$ = observable<{ shows: SavedShows } & ShowFunctions>({
+  ...initialState,
+  ...({} as ShowFunctions),
+});
+//~ Add the function by running a function that accepts observable to create functions with.
+savedShows$.set({ ...initialState, ...createShowFunctions(savedShows$) });
 
+//~ ==================
+//~ --- tags$ --------
+//~ ==================
+export const tags$ = observable<{ tagList: Tag[] } & TagFunctions>({
+  ...tagInitialState,
+  ...({} as TagFunctions),
+});
+//~ Add the functions
+tags$.set({ ...tagInitialState, ...createTagFunctions(tags$) });
+
+//-- ===================
+//-- Handle Auth Change
+//-- ===================
 authManager.subscribe(() => {
-  // Recreate and persist a new observable when auth changes
-  shows$ = createAndPersistObservable<Shows & ShowFunctions>({ ...initialState }, options);
+  //-- Load any stored item from MMKV
+  const savedShows = authManager.userStorage?.getItem('savedshows');
+  //~ set the loaded shows or initial value
+  savedShows$.shows.set(savedShows || defaultShowsValue);
+
+  //~ LOAD Tags
+  const tagList = authManager.userStorage?.getItem('tags');
+  tags$.tagList.set(tagList || []);
 });
