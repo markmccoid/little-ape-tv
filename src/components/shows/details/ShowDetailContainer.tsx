@@ -13,14 +13,21 @@ type Props = {
 };
 const ShowDetailContainer = ({ showId }: Props) => {
   if (!showId) return null;
-  // const local = use$(savedShows$.shows[showId]);
-  // console.log('Local Show', local);
-  const { data, isLoading } = useMovieDetails(parseInt(showId));
-  console.log('IS LOCAL', isLoading, data?.name, data?.popularity);
+  const { data, isLoading, status } = useMovieDetails(parseInt(showId));
+
   const handleSaveShow = () => {
-    console.log('SAVE SHOW', showId, data?.name);
-    if (!data?.name || !showId) return;
-    savedShows$.addShow(showId, data?.name, data?.posterURL || '');
+    if (!data?.id || !data?.name || !showId) return;
+
+    savedShows$.addShow({
+      tmdbId: data.id.toString(),
+      name: data.name,
+      posterURL: data.posterURL,
+      avgEpisodeRunTime: data.avgEpisodeRunTime,
+      backdropURL: data.backdropURL,
+      genres: data.genres,
+      imdbId: data.imdbId,
+      tvdbId: data.tvdbId,
+    });
   };
 
   return (

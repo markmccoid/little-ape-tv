@@ -1,5 +1,5 @@
 import { MMKV } from 'react-native-mmkv';
-import { LocalUserStorage } from '~/store/localUserStorage';
+import { LocalUserStorage } from '~/authentication/LocalUserStorage';
 import uuid from 'react-native-uuid';
 
 export type User = {
@@ -40,6 +40,8 @@ export class AuthManager {
   };
 
   private initialize() {
+    // Forcing a single user
+    this.setItem('currentUser', { id: '001', name: 'default.user' });
     const currUser = this.getItem('currentUser');
 
     this._localUserStorage = this.initCurrentUserStorage(currUser as User | undefined);
@@ -50,7 +52,7 @@ export class AuthManager {
   }
   private initCurrentUserStorage = (currentUser: User | undefined): LocalUserStorage => {
     if (!currentUser) {
-      return new LocalUserStorage('loggedout.placeholder');
+      return new LocalUserStorage('default.user');
     }
     const storage = new LocalUserStorage(`${currentUser.id}.storage`);
 

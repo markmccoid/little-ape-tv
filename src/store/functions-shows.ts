@@ -9,16 +9,17 @@ export type SavedShow = {
   imdbId?: string;
   tvdbId?: number;
   name: string;
-  posterURL: string;
+  posterURL?: string;
   backdropURL?: string;
   avgEpisodeRunTime?: number;
   imdbEpisodesURL?: string;
   userRating?: number;
-  tags?: string[];
+  userTags?: string[];
   genres?: string[];
   isStoredLocally: true;
 };
 
+type AddShowParms = Omit<SavedShow, 'userRating' | 'useTags'>;
 type ShowId = string;
 export type SavedShows = Record<ShowId, SavedShow>;
 
@@ -26,7 +27,7 @@ export type SavedShows = Record<ShowId, SavedShow>;
 //~ Show Function Start
 //~ -----------------------------------------------
 export type ShowFunctions = {
-  addShow: (showId: string, name: string, posterURL: string) => void;
+  addShow: (newShow: AddShowParms) => void;
   removeShow: (showId: string) => void;
   reset: () => void;
 };
@@ -39,21 +40,18 @@ export const createShowFunctions = (
   >
 ): ShowFunctions => {
   return {
-    addShow: (showId, name, posterURL) => {
-      const newShow: SavedShow = { tmdbId: showId, name, posterURL, isStoredLocally: true };
-      savedShows$.shows[showId].set({ ...newShow, tags: ['TestTag', 'T2'] });
+    addShow: (newShow) => {
+      //! Need to deal with undefined posterURL and backdropURL
+      savedShows$.shows[newShow.tmdbId].set({ ...newShow, isStoredLocally: true });
       //-- Store to MMKV
-      authManager.userStorage?.setItem('savedshows', savedShows$.shows.peek());
     },
     removeShow: (showId) => {
       savedShows$.shows[showId].delete();
       //-- Store to MMKV
-      authManager.userStorage?.setItem('savedshows', savedShows$.shows.peek());
     },
     reset: () => {
       savedShows$.shows.set({});
       //-- Store to MMKV
-      authManager.userStorage?.setItem('savedshows', {});
     },
   };
 };

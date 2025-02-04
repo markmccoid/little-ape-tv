@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { AuthManager, User } from './AuthManager';
 import { MMKV } from 'react-native-mmkv';
+import { LocalUserStorage } from '~/authentication/LocalUserStorage';
 
 type AuthProps = {
   initialized: AuthManager['initialized'];
@@ -11,7 +12,7 @@ type AuthProps = {
   updateUser: AuthManager['updateUser'];
   currentUser: AuthManager['currentUser'];
   allUsers: AuthManager['allUsers'];
-  userStorage: MMKV | undefined;
+  userStorage: LocalUserStorage | undefined;
 };
 
 const AuthContext = createContext<AuthProps | undefined>(undefined);

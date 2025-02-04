@@ -11,7 +11,7 @@ export function getMMKV(id: string) {
   console.log(
     'MMKV Keys:',
     keys,
-    mmkv.getString('savedshows') //!== 'undefined'
+    mmkv.getString('savedshows') // !== 'undefined'
       ? mmkv.getString('savedshows') //JSON.parse(JSON.stringify(mmkv.getString('savedshows')))
       : 'EMPTY'
   );
