@@ -58,7 +58,6 @@ const InitialLayout = () => {
       router.replace('/signin');
       return;
     }
-    console.log('IN BASE LAYOUT', segments[0]);
     // If logged in, but not routing to an Authed page
     // Send to root authed group "/"
     if (currentUser && !inAuthedGroup) {

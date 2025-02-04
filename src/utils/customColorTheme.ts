@@ -35,7 +35,7 @@ export const CustomLightTheme: CustomTheme = {
     ...DefaultTheme.colors,
     primary: '#222222', // Base card color
     background: '#f0f5ec', // Light background (almost off-white)
-    card: '#6a9c4f', // Card color (same as primary)
+    card: '#7bb55b', //'#6a9c4f', // Card color (same as primary)
     text: '#222222', // Dark text for readability
     border: '#b3c7a8', // Light border
     notification: '#d8504b', // Bright color for notifications
@@ -52,7 +52,7 @@ export const CustomDarkTheme: CustomTheme = {
     ...DarkTheme.colors,
     primary: '#a0c188', // A lighter shade of the base for better visibility on dark background
     background: '#1e1e1e', // Dark background
-    card: '#4b663c', // Darkened version of base color for cards
+    card: '#415934', //'#4b663c', // Darkened version of base color for cards
     text: '#ffffff', // White text for contrast
     border: '#3d5435', // Darker border that still provides definition
     notification: '#ff847a', // Brighter red for contrast

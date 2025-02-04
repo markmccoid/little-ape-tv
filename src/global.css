@@ -1,3 +1,27 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --color-primary: #222222; /* primary - Base card color (from light theme) */
+  --color-background: #f0f5ec; /* background - Light background */
+  --color-text: #222222; /* text - Dark text for readability */
+  --color-border: #b3c7a8; /* border - Light border */
+  --color-button: #9fb6db; /*  Retaining original value as no direct equivalent exists */
+  --color-button-text: #040316; /* Retaining original value as no direct equivalent exists */
+  --color-overlay: rgba(0, 0, 0, .05); /* Retaining original value */
+  --color-card: #7bb55b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-primary: #a0c188; /* primary - A lighter shade of the base for better visibility on dark background */
+    --color-background: #2f3633; /* background - Dark background */
+    --color-text: #ffffff; /* text - White text for contrast */
+    --color-border: #3d5435; /* border - Darker border that still provides definition */
+    --color-button: #9fb6db; /* Retaining original value as no direct equivalent exists */
+    --color-button-text: #040316; /* Retaining original value as no direct equivalent exists */
+    --color-overlay: rgba(0, 0, 0, .05); /* Retaining original value */
+    --color-card: #415934;
+  }
+}

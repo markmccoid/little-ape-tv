@@ -1,6 +1,6 @@
 import { Link, Tabs } from 'expo-router';
 import { Text } from 'react-native';
-import { AddIcon, ViewTVShowIcon } from '~/components/common/icon';
+import { AddIcon, SettingsIcon, ViewTVShowIcon } from '~/components/common/Icons';
 
 import { HeaderButton } from '~/components/HeaderButton';
 import { TabBarIcon } from '~/components/TabBarIcon';
@@ -23,8 +23,8 @@ export default function TabLayout() {
           ),
           headerLeft: () => {
             return (
-              <Link href="/settings">
-                <Text>SET</Text>
+              <Link href="/settings" className="ml-3">
+                <SettingsIcon size={25} />
               </Link>
             );
           },

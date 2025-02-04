@@ -10,6 +10,26 @@ module.exports = {
       borderWidth: {
         hairline: hairlineWidth(),
       },
+      colors: {
+        primary: {
+          DEFAULT: 'var(--color-primary)',
+        },
+        secondary: {
+          DEFAULT: 'var(--color-secondary)',
+        },
+        background: {
+          DEFAULT: 'var(--color-background)',
+        },
+        accent: {
+          DEFAULT: 'var(--color-accent)',
+        },
+        text: 'var(--color-text)',
+        card: 'var(--color-card)',
+        border: 'var(--color-border)',
+        button: 'var(--color-button)',
+        buttontext: 'var(--color-button-text)',
+        overlay: 'var(--color-overlay)',
+      },
     },
   },
   plugins: [],
