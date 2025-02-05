@@ -1,9 +1,7 @@
 import { Link, Tabs } from 'expo-router';
-import { Text } from 'react-native';
 import { AddIcon, SettingsIcon, ViewTVShowIcon } from '~/components/common/Icons';
 
 import { HeaderButton } from '~/components/HeaderButton';
-import { TabBarIcon } from '~/components/TabBarIcon';
 
 export default function TabLayout() {
   return (

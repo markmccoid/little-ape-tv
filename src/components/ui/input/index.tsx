@@ -7,22 +7,16 @@ interface SearchInputProps {
   placeholder?: string;
   onChange: (value: string) => void;
   setIsFocused: (value: boolean) => void;
-  initialValue: string | undefined;
+  value: string | undefined;
   className?: string;
 }
 
 const SearchInput = forwardRef(
   (
-    {
-      placeholder = 'Search...',
-      onChange,
-      setIsFocused,
-      initialValue,
-      className,
-    }: SearchInputProps,
+    { placeholder = 'Search...', onChange, setIsFocused, value, className }: SearchInputProps,
     ref
   ) => {
-    const [inputValue, setInputValue] = useState(initialValue || '');
+    const [inputValue, setInputValue] = useState(value || '');
     const inputRef = useRef<TextInput>(null);
 
     useImperativeHandle(ref, () => ({
@@ -35,8 +29,9 @@ const SearchInput = forwardRef(
       },
     }));
     React.useEffect(() => {
-      setInputValue(initialValue || '');
-    }, [initialValue]);
+      setInputValue(value || '');
+    }, [value]);
+
     const handleInputChange = (text: string) => {
       setInputValue(text);
       onChange(text);
@@ -53,16 +48,15 @@ const SearchInput = forwardRef(
         <TextInput
           ref={inputRef}
           className={` ${className}`}
-          value={inputValue}
           onChangeText={handleInputChange}
           style={{ fontSize: 18 }}
           placeholder={placeholder}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           // autoCapitalize="none"
+          value={value}
           autoCorrect={false}
           autoFocus
-          inputAccessoryViewID="searchInputVID"
         />
         {inputValue !== '' && (
           <Pressable

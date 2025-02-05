@@ -15,7 +15,7 @@ const SettingsContainer = () => {
       </Pressable>
       <View style={{ backgroundColor: 'blue', padding: 10, margin: 10 }}>
         <Pressable
-          onPress={() => router.push('/(authed)/settings/page2')}
+          onPress={() => router.push('/(authed)/settings/tagsetup')}
           className="bg-white p-1 active:bg-red-500">
           <Text className="p-1 text-lg">Go To page2</Text>
         </Pressable>
@@ -27,7 +27,7 @@ const SettingsContainer = () => {
           style={{ backgroundColor: AC.systemFill }}>
           <Form.HStack>
             <Pressable
-              onPress={() => router.push('/(authed)/settings/page2')}
+              onPress={() => router.push('/(authed)/settings/tagsetup')}
               className="flex-row justify-end ">
               <IconSymbol name="tag.fill" color={AC.label} />
               <Form.Text>Tags</Form.Text>
@@ -38,7 +38,7 @@ const SettingsContainer = () => {
           <Form.Text
             // className="border bg-white"
             hint="Enter a tag"
-            onPress={() => router.push('/(authed)/settings/page2')}
+            onPress={() => router.push('/(authed)/settings/tagsetup')}
             systemImage="tag.fill">
             Go To page2
             <IconSymbol name="chevron.right" color={AC.systemGreen} />

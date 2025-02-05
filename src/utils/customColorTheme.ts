@@ -14,8 +14,8 @@ type CustomTheme = Theme & {
     // secondaryForeground: string;
     // muted: string;
     // mutedForeground: string;
-    // button: string;
-    // buttontext: string;
+    button: string;
+    buttontext: string;
     // textInverted: string;
     // textInput: string;
     // cardInverted: string;
@@ -33,16 +33,30 @@ export const CustomLightTheme: CustomTheme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    primary: '#222222', // Base card color
+    primary: '#a0c188', // Base card color
     background: '#f0f5ec', // Light background (almost off-white)
     card: '#7bb55b', //'#6a9c4f', // Card color (same as primary)
     text: '#222222', // Dark text for readability
+    button: '#2a5298',
+    buttontext: '#ffffff',
     border: '#b3c7a8', // Light border
     notification: '#d8504b', // Bright color for notifications
     // header: '#f5fcf2', // Light color for header
     deleteRed: '#a61000',
     includeGreen: '#6cb043',
     imdbYellow: '#ECC233',
+
+    // // Additional recommended colors
+    // secondary: '#2f80ed', // Secondary brand color (contrasting blue)
+    // success: '#4caf50', // Success states
+    // danger: '#f44336', // Error/destructive actions
+    // warning: '#ff9800', // Warning states
+    // info: '#2196f3', // Informational states
+    // muted: '#757575', // Secondary text/disabled states
+    // inputBackground: '#ffffff', // Form input backgrounds
+    // inputText: '#1a1a1a', // Form input text
+    // inputPlaceholder: '#9e9e9e', // Input placeholder text
+    // icon: '#424242', // Default icon color
   },
 };
 
@@ -54,6 +68,8 @@ export const CustomDarkTheme: CustomTheme = {
     background: '#1e1e1e', // Dark background
     card: '#415934', //'#4b663c', // Darkened version of base color for cards
     text: '#ffffff', // White text for contrast
+    button: '#2a5298',
+    buttontext: '#ffffff',
     border: '#3d5435', // Darker border that still provides definition
     notification: '#ff847a', // Brighter red for contrast
     // header: '#191919'

@@ -8,30 +8,14 @@ import { search$ } from '~/store/store-search';
 import SearchItem from './SearchItem';
 import SearchInput from './SearchInput';
 import SearchResults from './SearchResults';
+import { useCustomTheme } from '~/utils/customColorTheme';
 
 const SearchContainer = () => {
   const { top } = useSafeAreaInsets();
-  // const [searchValue, setSearchValue] = React.useState('');
-  // const searchVal = use$(search$.searchVal);
-
-  // // Debounce the setSearchValue function
-  // const debouncedSetSearchValue = useCallback(
-  //   debounce((text) => {
-  //     search$.searchVal.set(text);
-  //   }, 500),
-  //   []
-  // );
-
-  // Apply debounce on text change
-  // const handleSearchChange = (text: string) => {
-  //   setSearchValue(text);
-  //   debouncedSetSearchValue(text);
-  // };
-
-  // console.log('data', data);
+  const { colors } = useCustomTheme();
   return (
     <View className="flex-1">
-      <View style={{ paddingTop: top, backgroundColor: '#6a9c4f' }}>
+      <View style={{ paddingTop: top, backgroundColor: colors.card }}>
         <SearchInput />
       </View>
 

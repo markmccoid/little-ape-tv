@@ -11,6 +11,7 @@ import { CustomLightTheme, CustomDarkTheme } from '../utils/customColorTheme';
 // import { useColorScheme } from 'nativewind';
 import { ThemeProvider } from '@react-navigation/native';
 import { useReactQueryDevTools } from '@dev-plugins/react-query';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
@@ -90,12 +91,14 @@ export default function RootLayout() {
   // useReactQueryDevTools(queryClient);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <ThemeProvider value={colorScheme === 'dark' ? CustomDarkTheme : CustomLightTheme}>
-          <InitialLayout />
-        </ThemeProvider>
-      </AuthProvider>
-    </QueryClientProvider>
+    <GestureHandlerRootView>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <ThemeProvider value={colorScheme === 'dark' ? CustomDarkTheme : CustomLightTheme}>
+            <InitialLayout />
+          </ThemeProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    </GestureHandlerRootView>
   );
 }
