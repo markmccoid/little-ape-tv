@@ -4,12 +4,16 @@ import { tags$ } from '~/store/store-shows';
 import { use$ } from '@legendapp/state/react';
 import Sortable, { SortableGridRenderItem } from 'react-native-sortables';
 import { Tag } from '~/store/functions-tags';
-import { DeleteIcon } from '~/components/common/Icons';
+import { DeleteIcon, EditIcon } from '~/components/common/Icons';
+import { useCustomTheme } from '~/utils/customColorTheme';
+import showConfirmationPrompt from '~/components/common/showConfirmationPrompt';
+import TagItem from './TagItem';
+import { BounceInRight } from 'react-native-reanimated';
 
 const TagContainer = () => {
   const [newTag, setNewTag] = useState('');
   const tags = use$(tags$.tagList);
-  console.log(tags);
+  const { colors } = useCustomTheme();
   const handleNewTagPrompt = () => {
     Alert.prompt(
       'Enter New Tag',
@@ -43,37 +47,18 @@ const TagContainer = () => {
     );
   };
 
-  const updateTagPositions = (tags: Tag[], sortedIds: string[]) => {
-    const updatedTags = sortedIds
-      .map((id, index) => {
-        const tag = tags.find((tag) => tag.id === id);
-        if (tag) {
-          return { ...tag, position: index + 1 }; // Update position (starting from 1)
-        } else {
-          console.warn(`Tag with ID ${id} not found in the original tags array.`);
-          return null; // Or handle the missing tag as appropriate for your application
-        }
-      })
-      .filter((tag) => tag !== null); // Remove any nulls caused by missing IDs
-
-    return updatedTags;
-  };
-  const renderItem = useCallback<SortableGridRenderItem<Tag>>(({ item }) => {
-    return (
-      <View className="flex-row items-center justify-between rounded-xl border bg-green-500 p-2">
-        <Text>{item.name}</Text>
-        <Sortable.Pressable onPress={() => tags$.removeTag(item.id)}>
-          <DeleteIcon size={20} />
-        </Sortable.Pressable>
-      </View>
-    );
-  }, []);
+  const renderItem = useCallback<SortableGridRenderItem<Tag>>(
+    ({ item }) => <TagItem key={item.id} tagItem={item} />,
+    []
+  );
   return (
-    <View>
-      <Text>TagContainer</Text>
-      <Pressable onPress={handleNewTagPrompt}>
-        <Text>ADD TAG</Text>
-      </Pressable>
+    <View className="mx-2">
+      <View className="my-2 flex-row items-center">
+        {/* <Text>TagContainer</Text> */}
+        <Pressable onPress={handleNewTagPrompt} className="rounded-md bg-button px-2 py-2">
+          <Text className="text-lg text-white">Add A New Tag</Text>
+        </Pressable>
+      </View>
       <Sortable.Grid
         columns={1}
         data={tags}
@@ -81,7 +66,11 @@ const TagContainer = () => {
         rowGap={10}
         columnGap={10}
         onDragEnd={(parms) => tags$.updateTagPositions(parms.indexToKey)}
+        enableActiveItemSnap={false}
+        activeItemScale={0.95}
         // showDropIndicator
+        // itemEntering={BounceInRight}
+        hapticsEnabled={true}
       />
     </View>
   );

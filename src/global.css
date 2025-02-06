@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --color-primary: #a0c188; /* primary - Base card color (from light theme) */
+  --color-primary: #193703; /* primary - Base card color (from light theme) */
   --color-background: #f0f5ec; /* background - Light background */
   --color-text: #222222; /* text - Dark text for readability */
   --color-border: #b3c7a8; /* border - Light border */

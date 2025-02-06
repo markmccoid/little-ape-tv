@@ -8,7 +8,7 @@ const IMG_WIDTH = (width - 30) / 2;
 const IMG_HEIGHT = IMG_WIDTH * 1.5;
 
 type Props = {
-  searchItem: TVSearchResultItem;
+  searchItem: TVSearchResultItem & { isStoredLocally: boolean };
 };
 const SearchItem = ({ searchItem }: Props) => {
   // console.log('searchItem', searchItem);
@@ -16,7 +16,11 @@ const SearchItem = ({ searchItem }: Props) => {
   return (
     <Link
       href={{ pathname: '/(authed)/(tabs)/search/[showid]', params: { showId: searchItem.id } }}
-      style={{ width: IMG_WIDTH }}>
+      style={{
+        width: IMG_WIDTH,
+        borderWidth: 2,
+        borderColor: searchItem.isStoredLocally ? 'red' : 'black',
+      }}>
       <Image
         source={searchItem.posterURL}
         contentFit="cover"

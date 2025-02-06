@@ -16,6 +16,7 @@ export type AllTags = {
 };
 export type TagFunctions = {
   addTag: (tagname: string) => void;
+  editTag: (tagId: string, newTagname: string) => void;
   removeTag: (tagId: string) => void;
   updateTagPositions: (tagIdOrder?: string[]) => void;
   reset: () => void;
@@ -35,6 +36,19 @@ export const createTagFunctions = (
     const tagList = tags$.tagList.peek() || [];
     const newTag = { id: uuid.v4(), name: tagname, position: tagList.length + 1 };
     tags$.tagList.set([...tagList, newTag]);
+    authManager.userStorage?.setItem('tags', tags$.tagList.peek());
+  },
+  editTag: (tagId, newTagName) => {
+    // const tagList = tags$.tagList.peek() || [];
+    // let tagToEdit = tagList.find((tag) => tag.id === tagId);
+    let index = 0;
+    for (let tag of tags$.tagList.get()) {
+      if (tag.id === tagId) {
+        tags$.tagList[index].set({ ...tag, name: newTagName });
+        break;
+      }
+      index++;
+    }
     authManager.userStorage?.setItem('tags', tags$.tagList.peek());
   },
   removeTag: (tagId) => {

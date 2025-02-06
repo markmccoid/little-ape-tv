@@ -11,9 +11,7 @@ module.exports = {
         hairline: hairlineWidth(),
       },
       colors: {
-        primary: {
-          DEFAULT: 'var(--color-primary)',
-        },
+        primary: 'var(--color-primary)',
         secondary: {
           DEFAULT: 'var(--color-secondary)',
         },

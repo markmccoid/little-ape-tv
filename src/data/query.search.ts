@@ -1,6 +1,7 @@
 import { tvSearchByTitle } from '@markmccoid/tmdb_api';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { search$ } from '~/store/store-search';
+import { savedShows$ } from '~/store/store-shows';
 
 //~ ---------------------------------------------------------
 //~ TITLE SEARCH Hook
@@ -14,7 +15,7 @@ export const useTitleSearch = (searchValue: string) => {
     },
     enabled: search$.searchVal.get().length > 1,
     initialPageParam: 1,
-    staleTime: 1000,
+    staleTime: 0,
     getNextPageParam: (lastPage) => {
       if (lastPage && lastPage.page < lastPage.totalPages) {
         return lastPage.page + 1;
@@ -24,9 +25,7 @@ export const useTitleSearch = (searchValue: string) => {
   });
 
   const allPages = data?.pages?.map((page) => page.results).flat() || [];
-  // console.log(
-  //   'allPages',
-  //   allPages?.map((show) => show.name)
-  // );
-  return { data: allPages, fetchNextPage, hasNextPage, isLoading, error };
+  const taggedShows = savedShows$.tagShows(allPages);
+
+  return { data: taggedShows, fetchNextPage, hasNextPage, isLoading, error };
 };
