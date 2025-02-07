@@ -1,12 +1,12 @@
+import { savedShows$ } from '~/store/store-shows';
 //~ -----------------------------------------------
 //~ Show Function Start
 
-import { Observable, whenReady } from '@legendapp/state';
+import { Observable } from '@legendapp/state';
 import { TVSearchResultItem } from '@markmccoid/tmdb_api';
 import { queryClient } from '~/app/_layout';
-import { authManager } from '~/authentication/AuthProvider';
 import { search$ } from './store-search';
-import { savedShows$ } from './store-shows';
+// import { savedShows$ } from './store-shows';
 import { InfiniteData } from '@tanstack/react-query';
 //~ -----------------------------------------------
 export type SavedShow = {
@@ -21,10 +21,10 @@ export type SavedShow = {
   userRating?: number;
   userTags?: string[];
   genres?: string[];
-  isStoredLocally: true;
+  isStoredLocally: boolean;
 };
 
-type AddShowParms = Omit<SavedShow, 'userRating' | 'useTags'>;
+type AddShowParms = Omit<SavedShow, 'userRating' | 'useTags' | 'isStoredLocally'>;
 type ShowId = string;
 export type SavedShows = Record<ShowId, SavedShow>;
 
@@ -50,15 +50,14 @@ export const createShowFunctions = (
   return {
     addShow: (newShow) => {
       //! Need to deal with undefined posterURL and backdropURL
-      console.log('Adding', newShow);
       savedShows$.shows[newShow.tmdbId].set({ ...newShow, isStoredLocally: true });
       //Retag items in search
-      reTagSearch();
+      reTagSearch(savedShows$);
     },
     removeShow: (showId) => {
       savedShows$.shows[showId].delete();
       //Retag items in search
-      reTagSearch();
+      reTagSearch(savedShows$);
     },
     reset: () => {
       savedShows$.shows.set({});
@@ -75,9 +74,15 @@ export const createShowFunctions = (
   };
 };
 
-function reTagSearch() {
+function reTagSearch(
+  savedShows$: Observable<
+    {
+      shows: SavedShows;
+    } & ShowFunctions
+  >
+) {
   queryClient.setQueryData(
-    ['searchByTitle', search$.searchVal.peek()],
+    ['searchByTitle', search$.searchVal.peek() || 'discover'],
     (
       oldData:
         | InfiniteData<
