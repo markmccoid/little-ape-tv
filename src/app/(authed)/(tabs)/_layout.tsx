@@ -10,22 +10,11 @@ export default function TabLayout() {
         tabBarActiveTintColor: 'black',
       }}>
       <Tabs.Screen
-        name="index"
+        name="(home)"
         options={{
           title: 'Shows',
+          headerShown: false,
           tabBarIcon: ({ color }) => <ViewTVShowIcon color={color} size={25} />,
-          headerRight: () => (
-            <Link href="/modal" asChild>
-              <HeaderButton />
-            </Link>
-          ),
-          headerLeft: () => {
-            return (
-              <Link href="/settings" className="ml-3">
-                <SettingsIcon size={25} />
-              </Link>
-            );
-          },
         }}
       />
       <Tabs.Screen

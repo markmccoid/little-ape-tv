@@ -35,11 +35,11 @@ export const CustomLightTheme: CustomTheme = {
     ...DefaultTheme.colors,
     primary: '#193703', // will be text color in React Native headers
     background: '#f0f5ec', // Light background (almost off-white)
-    card: '#7bb55b', //'#6a9c4f', // Card color (same as primary)
+    card: '#c5d5c0', //'#a8c4a8', //'#7bb55b', //'#6a9c4f', // Card color (same as primary)
     text: '#222222', // Dark text for readability
     button: '#2a5298',
     buttontext: '#ffffff',
-    border: '#b3c7a8', // Light border
+    border: '#606B5A', // Light border
     notification: '#d8504b', // Bright color for notifications
     // header: '#f5fcf2', // Light color for header
     deleteRed: '#a61000',
@@ -70,7 +70,7 @@ export const CustomDarkTheme: CustomTheme = {
     text: '#ffffff', // White text for contrast
     button: '#2a5298',
     buttontext: '#ffffff',
-    border: '#3d5435', // Darker border that still provides definition
+    border: '#99D66F', // Darker border that still provides definition
     notification: '#ff847a', // Brighter red for contrast
     // header: '#191919'
     deleteRed: '#e85a49',

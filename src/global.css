@@ -10,7 +10,7 @@
   --color-button: #2a5298; /*  Retaining original value as no direct equivalent exists */
   --color-button-text: #040316; /* Retaining original value as no direct equivalent exists */
   --color-overlay: rgba(0, 0, 0, .05); /* Retaining original value */
-  --color-card: #7bb55b;
+  --color-card: #caf7c3;
 }
 
 @media (prefers-color-scheme: dark) {

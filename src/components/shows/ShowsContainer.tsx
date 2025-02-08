@@ -1,6 +1,6 @@
 import React from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View, Dimensions } from 'react-native';
-import { Stack } from 'expo-router';
+import { Link, Stack } from 'expo-router';
 import { useAuth } from '~/authentication/AuthProvider';
 import { savedShows$ } from '~/store/store-shows';
 import { useShows } from '~/data/query.shows';
@@ -26,7 +26,13 @@ const ShowsContainer = () => {
             <View className="mr-[10]">
               <Image source={item.posterURL} style={{ width: IMG_WIDTH, height: IMG_HEIGHT }} />
               <Text>{item.name}</Text>
-
+              <Link
+                href={{
+                  pathname: '/(authed)/(tabs)/(home)/[showId]',
+                  params: { showId: item.tmdbId },
+                }}>
+                <Text>DETAIL</Text>
+              </Link>
               <Pressable
                 onPress={() => savedShows$.removeShow(item.tmdbId)}
                 className="rounded-md border p-1">
