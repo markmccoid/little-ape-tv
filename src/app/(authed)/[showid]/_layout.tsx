@@ -1,11 +1,7 @@
 import { Link, Stack, useRouter } from 'expo-router';
-import { SymbolView } from 'expo-symbols';
-import { View, Text, Pressable } from 'react-native';
-import { SettingsIcon } from '~/components/common/Icons';
-import { HeaderButton } from '~/components/HeaderButton';
 import { useCustomTheme } from '~/utils/customColorTheme';
 
-export default function HomeLayout() {
+export default function ShowIdLayout() {
   const { colors } = useCustomTheme();
   const router = useRouter();
 
@@ -16,6 +12,7 @@ export default function HomeLayout() {
         options={{
           headerShown: true,
         }}
+        getId={({ params }) => params.showid}
       />
     </Stack>
   );

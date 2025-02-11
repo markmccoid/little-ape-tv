@@ -62,7 +62,7 @@ const InitialLayout = () => {
     // If logged in, but not routing to an Authed page
     // Send to root authed group "/"
     if (currentUser && !inAuthedGroup) {
-      router.replace('/(authed)/(tabs)/home');
+      router.replace('/(authed)/(tabs)/(home)');
       return;
     }
     // All other routes will fall through to the <Slot />

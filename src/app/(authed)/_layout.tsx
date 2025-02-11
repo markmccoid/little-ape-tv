@@ -14,6 +14,11 @@ export default function AuthedLayout() {
         name="settings"
         options={{ headerShown: false, presentation: 'fullScreenModal' }}
       />
+      <Stack.Screen
+        name="[showid]"
+        options={{ headerShown: false }}
+        getId={({ params }) => params?.showid}
+      />
       <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
     </Stack>
   );

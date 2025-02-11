@@ -29,11 +29,11 @@ export default function HomeLayout() {
           },
         }}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name="[showId]"
         options={{ headerShown: false, title: 'Show Detail' }}
         getId={({ params }) => params?.showId}
-      />
+      /> */}
     </Stack>
   );
 }

@@ -1,12 +1,9 @@
-import { View, Text, Dimensions, Pressable } from 'react-native';
+import { View, Text, Dimensions, Pressable, TouchableOpacity } from 'react-native';
 import React from 'react';
 import { TVSearchResultItem } from '@markmccoid/tmdb_api';
 import { Image } from 'expo-image';
-import { Link } from 'expo-router';
-import { AddIcon, DeleteIcon } from '../common/Icons';
-import { savedShows$ } from '~/store/store-shows';
+import { Link, useRouter } from 'expo-router';
 import { useCustomTheme } from '~/utils/customColorTheme';
-import { SymbolView } from 'expo-symbols';
 import SearchItemButtonAnim from './SearchItemButtonAnim';
 const { width, height } = Dimensions.get('window');
 const IMG_WIDTH = (width - 30) / 2;
@@ -16,11 +13,13 @@ type Props = {
   searchItem: TVSearchResultItem & { isStoredLocally: boolean };
 };
 const SearchItem = ({ searchItem }: Props) => {
-  const { colors } = useCustomTheme();
+  const router = useRouter();
+
   return (
     <View className="mb-[25]">
-      <Link
-        href={{ pathname: '/(authed)/(tabs)/search/[showid]', params: { showId: searchItem.id } }}>
+      {/* <Link href={{ pathname: `/[showid]`, params: { showid: searchItem.id }, key={searchItem.id} }}> */}
+      <TouchableOpacity
+        onPress={() => router.push({ pathname: `/[showid]`, params: { showid: searchItem.id } })}>
         <View
           style={{
             width: IMG_WIDTH,
@@ -32,11 +31,13 @@ const SearchItem = ({ searchItem }: Props) => {
             style={{ width: IMG_WIDTH, height: IMG_HEIGHT }}
           />
         </View>
-      </Link>
+      </TouchableOpacity>
+      {/* </Link> */}
       {/* Title and Add/Remove Button */}
+      <Text>{searchItem.isStoredLocally ? 'STORED' : 'NOT'}</Text>
       <SearchItemButtonAnim searchItem={searchItem} />
     </View>
   );
 };
 
-export default SearchItem;
+export default React.memo(SearchItem);

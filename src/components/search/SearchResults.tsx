@@ -16,7 +16,7 @@ const SearchResults = () => {
       <FlatList
         data={data}
         className="pt-2"
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => item.id.toString() + item.isStoredLocally}
         contentContainerClassName="px-[10]"
         columnWrapperClassName="flex-row justify-between flex-1"
         renderItem={({ item }) => <SearchItem searchItem={item} />}

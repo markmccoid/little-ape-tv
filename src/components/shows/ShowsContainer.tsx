@@ -28,8 +28,8 @@ const ShowsContainer = () => {
               <Text>{item.name}</Text>
               <Link
                 href={{
-                  pathname: '/(authed)/(tabs)/(home)/[showId]',
-                  params: { showId: item.tmdbId },
+                  pathname: '/[showid]',
+                  params: { showid: item.tmdbId },
                 }}>
                 <Text>DETAIL</Text>
               </Link>

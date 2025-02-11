@@ -34,7 +34,7 @@ const SearchInput = () => {
   };
   return (
     <View className="mx-2 mb-[8] mt-[2]  flex-row items-center justify-between">
-      <Pressable onPress={() => router.push('/(authed)/(tabs)')} className="pr-2">
+      <Pressable onPress={() => router.replace('/(authed)/(tabs)/(home)')} className="pr-2">
         <SymbolView name="house.fill" tintColor={colors.text} size={30} />
       </Pressable>
       <Input
