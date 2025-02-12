@@ -1,5 +1,12 @@
 import React, { startTransition, useState } from 'react';
-import { TouchableOpacity, ActivityIndicator, View, Text, InteractionManager } from 'react-native';
+import {
+  TouchableOpacity,
+  ActivityIndicator,
+  View,
+  Text,
+  InteractionManager,
+  Pressable,
+} from 'react-native';
 import showConfirmationPrompt from '@/components/common/showConfirmationPrompt';
 
 import { SymbolView } from 'expo-symbols';
@@ -40,14 +47,14 @@ const ShowDeleteButton = ({ showId }: Props) => {
       {isProcessing && <ActivityIndicator size="small" />}
 
       {!isProcessing && (
-        <TouchableOpacity
+        <Pressable
           disabled={isProcessing}
           onPress={handleDelete}
           className={`mr-[-10] flex flex-row items-center px-2 pl-1 ${
             isProcessing ? 'opacity-50' : ''
-          }`}>
+          } active:scale-95`}>
           <SymbolView name="trash" tintColor={colors.deleteRed} size={30} />
-        </TouchableOpacity>
+        </Pressable>
       )}
     </>
   );

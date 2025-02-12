@@ -12,6 +12,8 @@ import { CustomLightTheme, CustomDarkTheme } from '../utils/customColorTheme';
 import { ThemeProvider } from '@react-navigation/native';
 import { useReactQueryDevTools } from '@dev-plugins/react-query';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Asul_400Regular, Asul_700Bold } from '@expo-google-fonts/asul';
+import { useFonts } from '@expo-google-fonts/asul';
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
@@ -30,7 +32,7 @@ const InitialLayout = () => {
   const router = useRouter();
   const { currentUser, initialized } = useAuth();
   const segments = useSegments();
-
+  const [fontsLoaded, error] = useFonts({ Asul_700Bold });
   //~~ ------------------------------------------------------
   //~ Initialize TMDB API
   //~ handle any app initialization
@@ -50,7 +52,7 @@ const InitialLayout = () => {
   //~ making sure we only allow authorized users to get to authed routes
   //~~ ------------------------------------------------------
   useEffect(() => {
-    if (!initialized) return;
+    if (!initialized || !fontsLoaded) return;
     // Check to see if the route path is in Authed group
     const inAuthedGroup = segments[0] === '(authed)';
     // If not logged in (no currentUser) and trying to route to an Authed route
@@ -66,16 +68,16 @@ const InitialLayout = () => {
       return;
     }
     // All other routes will fall through to the <Slot />
-  }, [currentUser, initialized, segments]);
+  }, [currentUser, initialized, segments, fontsLoaded]);
 
   //~~ ------------------------------------------------------
   //~~ Hide splashscreen when loaded
   //~~ ------------------------------------------------------
   useEffect(() => {
-    if (initialized) {
+    if (initialized && fontsLoaded) {
       SplashScreen.hideAsync();
     }
-  }, [initialized]);
+  }, [initialized, fontsLoaded]);
 
   return (
     <View style={{ flex: 1 }}>

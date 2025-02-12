@@ -102,4 +102,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SearchItemButtonAnim;
+export default React.memo(SearchItemButtonAnim);

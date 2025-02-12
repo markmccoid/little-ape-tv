@@ -17,6 +17,7 @@
   "dependencies": {
     "@bacons/apple-colors": "^0.0.8",
     "@dev-plugins/react-query": "^0.1.0",
+    "@expo-google-fonts/asul": "^0.2.3",
     "@expo/vector-icons": "^14.0.0",
     "@legendapp/state": "^3.0.0-beta.23",
     "@markmccoid/tmdb_api": "^0.3.5",

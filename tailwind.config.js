@@ -7,6 +7,9 @@ module.exports = {
   presets: [require('nativewind/preset')],
   theme: {
     extend: {
+      fontFamily: {
+        'Asul-Bold': ['Asul_700Bold', 'sans-serif'],
+      },
       borderWidth: {
         hairline: hairlineWidth(),
       },

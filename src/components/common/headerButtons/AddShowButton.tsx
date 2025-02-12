@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TouchableOpacity, View, Text, ActivityIndicator } from 'react-native';
+import { TouchableOpacity, View, Text, ActivityIndicator, Pressable } from 'react-native';
 import { SymbolView } from 'expo-symbols';
 import { useCustomTheme } from '~/utils/customColorTheme';
 
@@ -18,14 +18,14 @@ const ShowButtonAdd = ({ addShow }: Props) => {
   };
 
   return (
-    <TouchableOpacity
+    <Pressable
       disabled={isProcessing}
       onPress={handleAdd}
       className={`mr-[-10] flex flex-row items-center px-2 pl-1 ${
         isProcessing ? 'opacity-50' : ''
-      }`}>
+      } active:scale-95 `}>
       <SymbolView name="plus.app" tintColor={colors.text} size={30} />
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 

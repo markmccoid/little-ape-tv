@@ -9,6 +9,7 @@ import { useNavigation } from 'expo-router';
 import BackHeaderButton from '~/components/common/headerButtons/BackHeaderButton';
 import AddShowButton from '~/components/common/headerButtons/AddShowButton';
 import DeleteShowButton from '~/components/common/headerButtons/DeleteShowButton';
+import { AnimatePresence, MotiView } from 'moti';
 
 const { width, height } = Dimensions.get('window');
 
@@ -41,12 +42,39 @@ const ShowDetailContainer = ({ showId }: Props) => {
     const options: NativeStackNavigationOptions = {
       title: data?.name || '...',
       headerLeft: () => <BackHeaderButton />,
-      headerRight: () =>
-        data?.isStoredLocally ? (
-          <DeleteShowButton showId={data?.id} />
-        ) : (
-          <AddShowButton addShow={handleSaveShow} />
-        ),
+      headerRight: () => (
+        <View className="relative h-[35] w-[35]">
+          <AnimatePresence>
+            {data?.isStoredLocally ? (
+              <MotiView
+                className="absolute bottom-0 left-0 right-0 top-0"
+                key="delete"
+                from={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{
+                  type: 'timing',
+                  duration: 300,
+                }}>
+                <DeleteShowButton showId={showId} />
+              </MotiView>
+            ) : (
+              <MotiView
+                className="absolute"
+                key="add"
+                from={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{
+                  type: 'timing',
+                  duration: 300,
+                }}>
+                <AddShowButton addShow={handleSaveShow} />
+              </MotiView>
+            )}
+          </AnimatePresence>
+        </View>
+      ),
     };
     navigation.setOptions(options);
   }, [data]);
