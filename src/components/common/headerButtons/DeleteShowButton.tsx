@@ -50,10 +50,12 @@ const ShowDeleteButton = ({ showId }: Props) => {
         <Pressable
           disabled={isProcessing}
           onPress={handleDelete}
-          className={`mr-[-10] flex flex-row items-center px-2 pl-1 ${
+          className={`mr-[-10] flex flex-row items-center justify-center px-2 pl-1 ${
             isProcessing ? 'opacity-50' : ''
           } active:scale-95`}>
-          <SymbolView name="trash" tintColor={colors.deleteRed} size={30} />
+          {/* View is so we have a white BG for the - sign */}
+          <View className="absolute h-[20] w-[20]  rounded-full bg-white " />
+          <SymbolView name="minus.circle.fill" tintColor={colors.deleteRed} size={35} />
         </Pressable>
       )}
     </>

@@ -7,16 +7,17 @@ import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
 
 const ShowIdHome = () => {
   const { showid } = useLocalSearchParams();
+
   // const router = useRouter();
   // const navigation = useNavigation();
   // const show = savedShows$.shows[showid as string].get();
 
   return (
-    <View>
+    <View className="flex-1">
       {/* <Text>OUTSIDE ShowIdHome - {show.name}</Text> */}
-      <Link href={{ pathname: '/[showid]', params: { showid: '194583' } }} push>
+      {/* <Link href={{ pathname: '/[showid]', params: { showid: '194583' } }} push>
         <Text>GO TO 194583</Text>
-      </Link>
+      </Link> */}
       <ShowDetailContainer key={showid as string} showId={showid as string} />
     </View>
   );

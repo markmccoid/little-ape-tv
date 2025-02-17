@@ -21,10 +21,12 @@ const ShowButtonAdd = ({ addShow }: Props) => {
     <Pressable
       disabled={isProcessing}
       onPress={handleAdd}
-      className={`mr-[-10] flex flex-row items-center px-2 pl-1 ${
+      className={`relative mr-[-10] flex flex-row items-center justify-center px-2${
         isProcessing ? 'opacity-50' : ''
       } active:scale-95 `}>
-      <SymbolView name="plus.app" tintColor={colors.text} size={30} />
+      {/* View is so we have a white BG for the + sign */}
+      <View className="absolute h-[20] w-[20]  rounded-full bg-white " />
+      <SymbolView name="plus.circle.fill" tintColor={colors.includeGreen} size={35} />
     </Pressable>
   );
 };

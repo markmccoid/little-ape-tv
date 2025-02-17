@@ -21,11 +21,13 @@ const ShowsContainer = () => {
       <View className="flex-1">
         <Animated.FlatList
           data={shows}
-          className="mx-[10]"
+          className="mx-[10] pt-[10]"
+          columnWrapperClassName="flex-row justify-between flex-1"
           // contentContainerClassName="flex-row justify-center flex-wrap border"
           keyExtractor={(item) => item.tmdbId}
           renderItem={renderShow}
           numColumns={2}
+          showsVerticalScrollIndicator={false}
         />
       </View>
     </>

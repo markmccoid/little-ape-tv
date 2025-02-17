@@ -4,13 +4,13 @@
 
 :root {
   --color-primary: #193703; /* primary - Base card color (from light theme) */
-  --color-background: #f0f5ec; /* background - Light background */
+  --color-background: #e3efd9; /* background - Light background */
   --color-text: #222222; /* text - Dark text for readability */
   --color-border: #b3c7a8; /* border - Light border */
   --color-button: #2a5298; /*  Retaining original value as no direct equivalent exists */
   --color-button-text: #040316; /* Retaining original value as no direct equivalent exists */
   --color-overlay: rgba(0, 0, 0, .05); /* Retaining original value */
-  --color-card: #caf7c3;
+  --color-card: #f9f9f5;
 }
 
 @media (prefers-color-scheme: dark) {

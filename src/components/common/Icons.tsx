@@ -19,6 +19,10 @@ type Props = {
   style?: TextStyle;
 };
 
+export const TagPlusIcon = ({ size = 25, color, style }: Props) => {
+  return <MaterialCommunityIcons name="tag-plus" color={color} size={size} style={style} />;
+};
+
 export const ViewMovieIcon = ({ size, color = undefined, style = {} }: Props) => {
   return <MaterialIcons name="movie" size={size} color={color} style={style} />;
 };

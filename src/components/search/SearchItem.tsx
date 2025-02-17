@@ -3,12 +3,13 @@ import React, { useEffect } from 'react';
 import { TVSearchResultItem } from '@markmccoid/tmdb_api';
 import { Image } from 'expo-image';
 import { Link, useRouter } from 'expo-router';
-import { useCustomTheme } from '~/utils/customColorTheme';
 import SearchItemButtonAnim from './SearchItemButtonAnim';
+
 const { width, height } = Dimensions.get('window');
 const IMG_WIDTH = (width - 30) / 2;
 const IMG_HEIGHT = IMG_WIDTH * 1.5;
 const missingPosterURI = require('../../../assets/missingPoster.png');
+
 type Props = {
   searchItem: TVSearchResultItem & { isStoredLocally: boolean };
 };
@@ -18,8 +19,9 @@ const SearchItem = ({ searchItem }: Props) => {
   return (
     <View className="mb-[25]">
       {/* <Link href={{ pathname: `/[showid]`, params: { showid: searchItem.id }, key={searchItem.id} }}> */}
-      <TouchableOpacity
-        onPress={() => router.push({ pathname: `/[showid]`, params: { showid: searchItem.id } })}>
+      <Pressable
+        onPress={() => router.push({ pathname: `/[showid]`, params: { showid: searchItem.id } })}
+        className="rounded-lg border-green-600 active:border-hairline">
         <View
           style={{
             width: IMG_WIDTH,
@@ -40,7 +42,7 @@ const SearchItem = ({ searchItem }: Props) => {
             style={{ width: IMG_WIDTH, height: IMG_HEIGHT }}
           />
         </View>
-      </TouchableOpacity>
+      </Pressable>
       {/* </Link> */}
       {/* Title and Add/Remove Button */}
       <SearchItemButtonAnim searchItem={searchItem} />

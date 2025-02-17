@@ -34,6 +34,7 @@ export type SavedShows = Record<ShowId, SavedShow>;
 export type ShowFunctions = {
   addShow: (newShow: AddShowParms) => void;
   removeShow: (showId: string) => void;
+  updateShowTags: (showId: string, tagId: string, action: 'add' | 'remove') => void;
   tagShows: (
     showResults: TVSearchResultItem[]
   ) => (TVSearchResultItem & { isStoredLocally: boolean })[];
@@ -62,6 +63,18 @@ export const createShowFunctions = (
     reset: () => {
       savedShows$.shows.set({});
       //-- Store to MMKV
+    },
+    updateShowTags: (showId, tagId, action) => {
+      savedShows$.shows[showId].userTags.set((prev) => {
+        console.log('PREV', prev);
+        let newTagArray: string[] = [];
+        if (action === 'add') {
+          newTagArray = Array.from(new Set([...(prev || []), tagId]));
+        } else if (action === 'remove') {
+          newTagArray = prev?.filter((el) => el !== tagId) || [];
+        }
+        return newTagArray;
+      });
     },
     tagShows: (showResults) => {
       const savedShows = savedShows$.shows.peek();

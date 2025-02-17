@@ -34,8 +34,8 @@ export const CustomLightTheme: CustomTheme = {
   colors: {
     ...DefaultTheme.colors,
     primary: '#193703', // will be text color in React Native headers
-    background: '#f0f5ec', // Light background (almost off-white)
-    card: '#c5d5c0', //'#a8c4a8', //'#7bb55b', //'#6a9c4f', // Card color (same as primary)
+    background: '#e3efd9', // Light background (almost off-white)
+    card: '#f9f9f5', //'#a8c4a8', //'#7bb55b', //'#6a9c4f', // Card color (same as primary)
     text: '#222222', // Dark text for readability
     button: '#2a5298',
     buttontext: '#ffffff',

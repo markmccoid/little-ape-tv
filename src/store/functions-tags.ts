@@ -19,6 +19,9 @@ export type TagFunctions = {
   editTag: (tagId: string, newTagname: string) => void;
   removeTag: (tagId: string) => void;
   updateTagPositions: (tagIdOrder?: string[]) => void;
+  matchTagIds: (
+    tagIds: string[] | undefined
+  ) => { id: string; name: string; state: 'include' | 'off' }[] | [];
   reset: () => void;
 };
 
@@ -80,6 +83,19 @@ export const createTagFunctions = (
     }
     tags$.tagList.set(updatedTags);
     authManager.userStorage?.setItem('tags', tags$.tagList.peek());
+  },
+  matchTagIds: (tagIds = []) => {
+    // Take in a list of tags that are stored on a show
+    // Return all of the tags with a new key called "state"
+    // to tell if the tag is included or off for this show.
+    const allTags = tags$.tagList.get() ?? [];
+    return allTags
+      .map((tag): { id: string; name: string; state: 'include' | 'off' } => {
+        const item = tagIds.find((item) => item === tag.id);
+        if (!item) return { id: tag.id, name: tag.name, state: 'off' };
+        return { id: tag.id, name: tag.name, state: 'include' };
+      })
+      .filter((el) => el);
   },
   reset: () => {
     tags$.tagList.set([]);

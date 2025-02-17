@@ -11,6 +11,7 @@ export default function ShowIdLayout() {
         name="index"
         options={{
           headerShown: true,
+          // headerTransparent: true,
         }}
         getId={({ params }) => params.showid}
       />

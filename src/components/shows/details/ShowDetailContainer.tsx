@@ -1,6 +1,6 @@
-import { View, Text, Dimensions, Pressable, BackHandler } from 'react-native';
+import { View, Text, Dimensions, Image as RNImage, ScrollView, StyleSheet } from 'react-native';
 import React, { useCallback, useLayoutEffect } from 'react';
-import { useMovieDetails } from '~/data/query.shows';
+import { useOMDBData, useShowDetails } from '~/data/query.shows';
 import { use$ } from '@legendapp/state/react';
 import { savedShows$ } from '~/store/store-shows';
 import { Image } from 'expo-image';
@@ -10,16 +10,20 @@ import BackHeaderButton from '~/components/common/headerButtons/BackHeaderButton
 import AddShowButton from '~/components/common/headerButtons/AddShowButton';
 import DeleteShowButton from '~/components/common/headerButtons/DeleteShowButton';
 import { AnimatePresence, MotiView } from 'moti';
-
+import DetailHeader from './DetailHeader';
+import ShowTagContainer from './tags/ShowTagContainer';
+import { useHeaderHeight } from '@react-navigation/elements';
 const { width, height } = Dimensions.get('window');
 
 type Props = {
   showId: string;
 };
 const ShowDetailContainer = ({ showId }: Props) => {
-  const navigation = useNavigation();
   if (!showId) return null;
-  const { data, isLoading, status } = useMovieDetails(parseInt(showId));
+  const navigation = useNavigation();
+  // const headerHeight = useHeaderHeight();
+  const { data, isLoading, status } = useShowDetails(parseInt(showId));
+  // const { data: omdbData, isLoading: omdbIsLoading } = useOMDBData(data?.imdbId);
 
   //~ Save Function, make sure to update if data changes.
   const handleSaveShow = useCallback(() => {
@@ -80,19 +84,31 @@ const ShowDetailContainer = ({ showId }: Props) => {
   }, [data]);
 
   return (
-    <View>
-      <Text>ShowDetailContainer for {showId}</Text>
-      <Image source={data?.posterURL} style={{ width: width / 2.3, height: (width / 2.3) * 1.5 }} />
-      <Text>{data?.avgEpisodeRunTime}</Text>
-      <Text className="bg-red-500 text-lg">{data?.isStoredLocally ? 'LOCAL' : ''}</Text>
-      <Pressable onPress={handleSaveShow}>
-        <Text>ADD</Text>
-      </Pressable>
-      <Pressable
-        onPress={() => savedShows$.removeShow(showId)}
-        className="border bg-yellow-300 p-1">
-        <Text>DELETE</Text>
-      </Pressable>
+    <View className={`relative w-full flex-1`}>
+      <MotiView
+        key={data?.isStoredLocally ? 'add' : 'delete'}
+        from={{ opacity: 0 }}
+        animate={{ opacity: data?.isStoredLocally ? 0.15 : 0 }}
+        style={[StyleSheet.absoluteFill]}>
+        <Image source={data?.backdropURL} style={[StyleSheet.absoluteFill]} />
+      </MotiView>
+
+      <ScrollView className="flex-1 flex-col pt-2 ">
+        {/* Image W/ OMDB Details */}
+        <View className="mx-2 flex-row">
+          <View>
+            <DetailHeader showData={data} />
+          </View>
+          <View className="ml-2 flex-1">
+            <Text className="">{data?.overview}</Text>
+          </View>
+        </View>
+
+        {/* Show Tags - If null passed for showId, this container will not show */}
+        <View className="my-2">
+          <ShowTagContainer showId={data?.tmdbId} />
+        </View>
+      </ScrollView>
     </View>
   );
 };
