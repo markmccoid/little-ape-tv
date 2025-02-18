@@ -24,7 +24,6 @@ const ShowDetailContainer = ({ showId }: Props) => {
   // const headerHeight = useHeaderHeight();
   const { data, isLoading, status } = useShowDetails(parseInt(showId));
   // const { data: omdbData, isLoading: omdbIsLoading } = useOMDBData(data?.imdbId);
-
   //~ Save Function, make sure to update if data changes.
   const handleSaveShow = useCallback(() => {
     if (!data?.id || !data?.name || !showId) return;
@@ -105,8 +104,11 @@ const ShowDetailContainer = ({ showId }: Props) => {
         </View>
 
         {/* Show Tags - If null passed for showId, this container will not show */}
-        <View className="my-2">
+        <View className="my-2 ">
           <ShowTagContainer showId={data?.tmdbId} />
+        </View>
+        <View className="">
+          <Text className="text-xl">Next Section</Text>
         </View>
       </ScrollView>
     </View>

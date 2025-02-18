@@ -8,6 +8,7 @@ import { queryClient } from '~/app/_layout';
 import { search$ } from './store-search';
 // import { savedShows$ } from './store-shows';
 import { InfiniteData } from '@tanstack/react-query';
+import { formatEpoch } from '~/utils/utils';
 //~ -----------------------------------------------
 export type SavedShow = {
   tmdbId: string;
@@ -18,9 +19,17 @@ export type SavedShow = {
   backdropURL?: string;
   avgEpisodeRunTime?: number;
   imdbEpisodesURL?: string;
-  userRating?: number;
-  userTags?: string[];
   genres?: string[];
+  // User specific
+  userRating?: number;
+  favorite?: number; // Epoch date number
+  userTags?: string[];
+  dateAddedEpoch: number;
+  // Stores the streaming data for a show (allows for search)
+  streaming: {
+    dateAddedEpoch: number;
+    providers: number[];
+  };
   isStoredLocally: boolean;
 };
 
@@ -34,6 +43,7 @@ export type SavedShows = Record<ShowId, SavedShow>;
 export type ShowFunctions = {
   addShow: (newShow: AddShowParms) => void;
   removeShow: (showId: string) => void;
+  toggleFavoriteShow: (showId: string, action: 'toggle' | 'off' | 'on') => void;
   updateShowTags: (showId: string, tagId: string, action: 'add' | 'remove') => void;
   tagShows: (
     showResults: TVSearchResultItem[]
@@ -51,7 +61,11 @@ export const createShowFunctions = (
   return {
     addShow: (newShow) => {
       //! Need to deal with undefined posterURL and backdropURL
-      savedShows$.shows[newShow.tmdbId].set({ ...newShow, isStoredLocally: true });
+      savedShows$.shows[newShow.tmdbId].set({
+        ...newShow,
+        isStoredLocally: true,
+        dateAddedEpoch: formatEpoch(Date.now()),
+      });
       //Retag items in search
       reTagSearch(savedShows$);
     },
@@ -60,13 +74,20 @@ export const createShowFunctions = (
       //Retag items in search
       reTagSearch(savedShows$);
     },
-    reset: () => {
-      savedShows$.shows.set({});
-      //-- Store to MMKV
+    toggleFavoriteShow: (showId, action) => {
+      action = action ?? 'toggle';
+      const favoriteState = savedShows$.shows[showId]?.favorite.peek();
+      if (action === 'toggle') {
+        const newState = favoriteState ? undefined : formatEpoch(Date.now());
+        savedShows$.shows[showId].favorite.set(newState);
+      } else {
+        savedShows$.shows[showId].favorite.set(
+          action === 'off' ? undefined : formatEpoch(Date.now())
+        );
+      }
     },
     updateShowTags: (showId, tagId, action) => {
       savedShows$.shows[showId].userTags.set((prev) => {
-        console.log('PREV', prev);
         let newTagArray: string[] = [];
         if (action === 'add') {
           newTagArray = Array.from(new Set([...(prev || []), tagId]));
@@ -83,6 +104,10 @@ export const createShowFunctions = (
         ...show,
         isStoredLocally: showIds.has(show.id.toString()),
       }));
+    },
+    reset: () => {
+      savedShows$.shows.set({});
+      //-- Store to MMKV
     },
   };
 };

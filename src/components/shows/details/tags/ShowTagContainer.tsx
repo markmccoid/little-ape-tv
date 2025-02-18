@@ -14,20 +14,23 @@ import Animated, {
 import { LayoutChangeEvent, Pressable, View, Text, StyleSheet } from 'react-native';
 import { useCustomTheme } from '~/utils/customColorTheme';
 import { MotiView } from 'moti';
-import { TagPlusIcon } from '~/components/common/Icons';
+import { HeartIcon, TagPlusIcon } from '~/components/common/Icons';
+import ShadowBackground from '~/components/common/ShadowBackground';
+import { SymbolView } from 'expo-symbols';
 
 type Props = {
   showId: string | undefined;
 };
 const ShowTagContainer = ({ showId }: Props) => {
   if (!showId) return;
+  const isFavorited = use$(savedShows$.shows[showId].favorite);
   const { colors } = useCustomTheme();
   const matchedTags = use$(tags$.matchTagIds(savedShows$.shows[showId].userTags.get()));
   const [showTags, toggleShowTags] = useReducer((el) => !el, false);
   const [containerHeight, setContainerHeight] = useState(0);
   const [isMeasured, setIsMeasured] = useState(false);
   const toHeight = useSharedValue(0);
-  const tagCloudRef = useRef(null); // Create the ref
+
   //~ Toggle state (add/remove tags)
   const toggleTagState = (tagId: string) => {
     const foundTag = matchedTags.find((el) => el.id === tagId);
@@ -52,11 +55,17 @@ const ShowTagContainer = ({ showId }: Props) => {
     return {
       height: toHeight.value,
       opacity: interpolate(toHeight.value, [containerHeight, 0], [1, 0]),
+      marginTop: interpolate(toHeight.value, [containerHeight, 0], [10, 0]),
     };
   }, [isMeasured, showTags]);
 
   return (
-    <View className="mx-2 ">
+    <MotiView
+      className="relative mx-2"
+      from={{ marginBottom: 0 }}
+      animate={{ marginBottom: showTags ? 20 : 0 }}
+      transition={{ type: 'timing', duration: 500 }}
+      exit={{ marginBottom: 0 }}>
       {/* Only used to get a height for the Tag list */}
       {!isMeasured && (
         <View onLayout={onLayout} className="absolute  opacity-0">
@@ -121,19 +130,36 @@ const ShowTagContainer = ({ showId }: Props) => {
           itemLayoutAnimation={LinearTransition}
         />
       </View>
+      <Pressable
+        onPress={() => savedShows$.toggleFavoriteShow(showId, 'toggle')}
+        className={`absolute bottom-[-20] z-30 ${showTags ? 'pointer-events-auto' : 'pointer-events-none'} `}
+        disabled={!showTags}>
+        <MotiView
+          key="A"
+          from={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: showTags ? 100 : 0, scale: showTags ? 1 : 0 }}
+          transition={{ type: 'timing', duration: 500 }}
+          exit={{ opacity: 0 }}>
+          <SymbolView
+            name="heart.circle.fill"
+            type="palette"
+            colors={[isFavorited ? 'red' : 'white', colors.primary]}
+            size={35}
+          />
+        </MotiView>
+      </Pressable>
       <Animated.View
         style={[
           tagViewStyle,
           {
             overflow: 'hidden', // Ensure contents are clipped
-            backgroundColor: '#f0f0f0',
+            // backgroundColor: '#f0f0f0',
             borderRadius: 10,
             borderWidth: StyleSheet.hairlineWidth,
             paddingVertical: showTags ? 8 : 0,
-            marginTop: showTags ? 10 : 0,
-            // opacity: showAddTag ? 1 : 0, // Combine opacity for smooth transitions
           },
         ]}>
+        <ShadowBackground />
         <TagCloudEnhanced>
           {matchedTags?.map((el) => (
             <TagItem
@@ -148,7 +174,7 @@ const ShowTagContainer = ({ showId }: Props) => {
           ))}
         </TagCloudEnhanced>
       </Animated.View>
-    </View>
+    </MotiView>
   );
 };
 
