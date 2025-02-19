@@ -17,6 +17,7 @@ import { MotiView } from 'moti';
 import { HeartIcon, TagPlusIcon } from '~/components/common/Icons';
 import ShadowBackground from '~/components/common/ShadowBackground';
 import { SymbolView } from 'expo-symbols';
+import SetFavoriteButton from './SetFavoriteButton';
 
 type Props = {
   showId: string | undefined;
@@ -130,7 +131,11 @@ const ShowTagContainer = ({ showId }: Props) => {
           itemLayoutAnimation={LinearTransition}
         />
       </View>
-      <Pressable
+      <View
+        className={`absolute bottom-[-20] z-30 ${showTags ? 'pointer-events-auto' : 'pointer-events-none'}`}>
+        <SetFavoriteButton showId={showId} isFavorited={!!isFavorited} isDisplayed={showTags} />
+      </View>
+      {/* <Pressable
         onPress={() => savedShows$.toggleFavoriteShow(showId, 'toggle')}
         className={`absolute bottom-[-20] z-30 ${showTags ? 'pointer-events-auto' : 'pointer-events-none'} `}
         disabled={!showTags}>
@@ -147,7 +152,7 @@ const ShowTagContainer = ({ showId }: Props) => {
             size={35}
           />
         </MotiView>
-      </Pressable>
+      </Pressable> */}
       <Animated.View
         style={[
           tagViewStyle,

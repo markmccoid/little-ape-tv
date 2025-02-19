@@ -20,21 +20,25 @@ export const useShows = () => {
 export const useShowDetails = (showId: number) => {
   // Load show if saved locally from legend state
   const localShow = use$(savedShows$.shows[showId]);
-
   // This query will immediately return the placeholder data if available (locally saved show)
   // Then pull details from tmdb_api and merge with localShow if available.
-  return useQuery<Partial<SavedShow> & Partial<TVShowDetails>, Error>({
+  const { data, ...rest } = useQuery<Partial<SavedShow> & Partial<TVShowDetails>, Error>({
     queryKey: ['movidedetails', showId, localShow?.isStoredLocally || false],
     queryFn: async () => {
       const showDetails = await tvGetShowDetails(showId);
       // merge with placeholder data. This type must match the placehodlerData type
       const data = showDetails.data;
 
-      return { ...data, ...localShow };
+      return { ...data };
+      // return { ...data, ...localShow };
     },
     // if locally saved show
     placeholderData: localShow,
   });
+  // We needed to merge the local data outside of the useQuery function so that
+  // changes to local data update immediately.  Otherwise only cache data is returned
+  // until useQuery reads from API again
+  return { data: { ...data, ...localShow }, ...rest };
 };
 
 //~ ------------------------------------------------------
