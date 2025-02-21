@@ -4,14 +4,44 @@ import { SavedShow } from '~/store/functions-shows';
 import { useQuery } from '@tanstack/react-query';
 import { savedShows$ } from '~/store/store-shows';
 import axios from 'axios';
+import { filterCriteria$ } from '~/store/store-filterCriteria';
 
 //~ ------------------------------------------------------
 //~ useShows - FILTERED SAVED Shows
 //~ ------------------------------------------------------
 export const useShows = () => {
+  // Need to bring in a filter
   const savedShowsObj = use$(savedShows$.shows);
+  const {
+    includeTags = [],
+    excludeTags = [],
+    includeGenres = [],
+    excludeGenres = [],
+  } = use$(filterCriteria$.baseFilters);
+  console.log('Include G', includeGenres);
+  console.log('Exclude G', excludeGenres);
   const savedShows = Object.keys(savedShowsObj).map((key) => savedShowsObj[key]);
-  return savedShows;
+  // If no tags are chosen in either includeTags or excludeTags, return all records
+  if (includeTags.length === 0 && excludeTags.length === 0) {
+    return savedShows;
+  }
+
+  const filteredShows: SavedShow[] = savedShows.filter((show) => {
+    // Handle undefined userTags
+    const userTags = show.userTags || []; // Treat undefined as an empty array
+
+    // Check if show includes all includeTags
+    // NOTE: if includeTags is an empty array, .every will always return true.
+    const includesAllIncludeTags = includeTags.every((tag) => userTags.includes(tag));
+    // Check if show includes any excludeTags
+    const includesAnyExcludeTags = excludeTags.some((tag) => userTags.includes(tag));
+
+    // Return true if it includes all include tags and does NOT include any exclude tags
+    return includesAllIncludeTags && !includesAnyExcludeTags;
+  });
+  // console.log(savedShowsObj);
+
+  return filteredShows;
 };
 
 //~ ------------------------------------------------------

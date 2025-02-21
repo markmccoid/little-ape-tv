@@ -16,7 +16,7 @@ export default function HomeLayout() {
         options={{
           headerShown: true,
           headerRight: () => (
-            <Link href="/modal" asChild>
+            <Link href="./filtermodal" asChild>
               <HeaderButton />
             </Link>
           ),
@@ -29,11 +29,14 @@ export default function HomeLayout() {
           },
         }}
       />
-      {/* <Stack.Screen
-        name="[showId]"
-        options={{ headerShown: false, title: 'Show Detail' }}
-        getId={({ params }) => params?.showId}
-      /> */}
+      <Stack.Screen
+        name="filtermodal"
+        options={{
+          headerShown: true,
+          title: 'Filter Shows',
+          presentation: 'modal',
+        }}
+      />
     </Stack>
   );
 }

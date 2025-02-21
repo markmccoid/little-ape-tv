@@ -109,6 +109,7 @@ const ShowDetailContainer = ({ showId }: Props) => {
         </View>
         <View className="">
           <Text className="text-xl">Next Section</Text>
+          {data?.genres.map((el) => <Text className="text-xl">{el}</Text>)}
         </View>
       </ScrollView>
     </View>

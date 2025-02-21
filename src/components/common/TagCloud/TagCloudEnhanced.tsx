@@ -7,8 +7,8 @@ import { UnTagIcon } from '../Icons';
 type Props = {
   tagId: string;
   state: 'off' | 'include' | 'exclude';
-  onToggleTag: (tagId: string) => void;
-  onLongPress?: (tagId: string) => void;
+  onToggleTag: (tagId: string, newState: Props['state']) => void;
+  onLongPress?: (tagId: string, newState: Props['state']) => void;
   tagName: string;
   size: string;
   type: 'boolean' | 'threestate';
@@ -58,11 +58,12 @@ export const TagItem = ({
   const handleStateChange = (tagId: string) => {
     const prevState = localState;
     setIsProcessing(true);
-    setLocalState(cycleState(localState, type));
+    const newState = cycleState(localState, type);
+    setLocalState(newState);
 
     setTimeout(() => {
       try {
-        onToggleTag(tagId);
+        onToggleTag(tagId, newState);
       } catch (error) {
         console.log('Error setting Genre Tag');
         setLocalState(prevState);
@@ -71,9 +72,25 @@ export const TagItem = ({
     setTimeout(() => setIsProcessing(false), 0);
   };
 
+  const handleLongPress = (tagId: string) => {
+    // Long press -> allows user to long press to get to exclude
+    // any other state other than "off" will be turned to "off"
+    // "off" -> "exclude"
+    // "exclude" => "off"
+    // "include" => "off"
+    if (!onLongPress) return;
+    if (localState === 'off') {
+      setLocalState('exclude');
+      onLongPress(tagId, 'exclude');
+    } else {
+      setLocalState('off');
+      onLongPress(tagId, 'off');
+    }
+  };
+
   return (
     <TouchableOpacity
-      onLongPress={onLongPress ? () => onLongPress(tagId) : undefined}
+      onLongPress={onLongPress ? () => handleLongPress(tagId) : undefined}
       activeOpacity={0.8}
       className="border border-border text-center"
       // className="border border-border py-[5] px-[7] m-[5] text-center"

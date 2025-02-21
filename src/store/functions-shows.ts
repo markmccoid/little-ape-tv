@@ -1,4 +1,4 @@
-import { savedShows$ } from '~/store/store-shows';
+import { genres$ } from '~/store/store-genres';
 //~ -----------------------------------------------
 //~ Show Function Start
 
@@ -68,11 +68,28 @@ export const createShowFunctions = (
       });
       //Retag items in search
       reTagSearch(savedShows$);
+      // Add new item to genres list
+      genres$.genreList.set(
+        Array.from(new Set([...(newShow?.genres || []), ...genres$.genreList.peek()]))
+      );
     },
     removeShow: (showId) => {
       savedShows$.shows[showId].delete();
       //Retag items in search
       reTagSearch(savedShows$);
+      // Need to resync list of genres in genres$.  Can't just filter out, must recalc
+      const savedShowsObj = savedShows$.shows.peek();
+
+      genres$.genreList.set(
+        Array.from(
+          new Set(
+            Object.keys(savedShowsObj)
+              .map((key) => savedShowsObj[key]?.genres)
+              .flatMap((el) => el)
+              .filter((el): el is string => typeof el === 'string')
+          )
+        )
+      );
     },
     toggleFavoriteShow: (showId, action) => {
       action = action ?? 'toggle';
