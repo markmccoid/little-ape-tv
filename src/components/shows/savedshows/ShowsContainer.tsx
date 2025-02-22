@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useDeferredValue } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View, Dimensions } from 'react-native';
 import { Link, Stack } from 'expo-router';
 import { useAuth } from '~/authentication/AuthProvider';
@@ -9,7 +9,8 @@ import { SavedShow } from '~/store/functions-shows';
 import ShowItem from './ShowItem';
 
 const ShowsContainer = () => {
-  const shows = useShows();
+  const showsInit = useShows();
+  const shows = useDeferredValue(showsInit); // Defers updates
 
   const renderShow = useCallback(({ item }: { item: SavedShow }) => {
     return <ShowItem show={item} />;

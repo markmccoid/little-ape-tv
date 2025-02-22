@@ -122,9 +122,11 @@ const ShowItem = ({ show }: Props) => {
         }}
       />
 
-      <Animated.View style={buttonStyle}>
-        <SetFavoriteButton showId={show.tmdbId} isFavorited={!!show.favorite} />
-      </Animated.View>
+      {currIndex === 1 && (
+        <Animated.View style={buttonStyle}>
+          <SetFavoriteButton showId={show.tmdbId} isFavorited={!!show.favorite} />
+        </Animated.View>
+      )}
 
       {/* Future Home of dynamic Info screen.  Maybe button (circle) in corner of image when long press
           reveals more info screen */}
@@ -133,4 +135,4 @@ const ShowItem = ({ show }: Props) => {
   );
 };
 
-export default ShowItem;
+export default React.memo(ShowItem);

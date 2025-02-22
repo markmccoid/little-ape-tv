@@ -2,6 +2,8 @@ import uuid from 'react-native-uuid';
 import { observable } from '@legendapp/state';
 import { tags$ } from './store-shows';
 import { Tag } from './functions-tags';
+import { genres$ } from './store-genres';
+import { use$ } from '@legendapp/state/react';
 
 //**
 // store-settings contains
@@ -43,6 +45,8 @@ export type FilterStatus = {
 export type FilterCriteria = {
   baseFilters: BaseFilters;
   nameFilter: NameFilter;
+  actionClearTags: () => void;
+  actionClearGenres: () => void;
 };
 
 //~ - - - - - - - - - - - - - - - - - -
@@ -51,6 +55,18 @@ export type FilterCriteria = {
 export const filterCriteria$ = observable<FilterCriteria>({
   baseFilters: {},
   nameFilter: { showName: '' },
+  actionClearTags: () => {
+    filterCriteria$.baseFilters.assign({
+      includeTags: [],
+      excludeTags: [],
+    });
+  },
+  actionClearGenres: () => {
+    filterCriteria$.baseFilters.assign({
+      includeGenres: [],
+      excludeGenres: [],
+    });
+  },
 });
 
 // ---------------------------------------
@@ -60,8 +76,10 @@ export const filterCriteria$ = observable<FilterCriteria>({
 //~ Adds the state property to the tagList items so we know what is off/include/exclude
 //~ so we can set the ui correctly.
 //~ ------------------------------------------------
-export const getFilterTags = () => {
-  const { excludeTags = [], includeTags = [] } = filterCriteria$.baseFilters.peek();
+export const useFilterTags = () => {
+  const includeTags = use$(filterCriteria$.baseFilters.includeTags) || [];
+  const excludeTags = use$(filterCriteria$.baseFilters.excludeTags) || [];
+  // const { excludeTags = [], includeTags = [] } = filterCriteria$.baseFilters.get();
   const tagList = tags$.tagList.peek();
 
   return tagList.map((tag) => {
@@ -75,76 +93,75 @@ export const getFilterTags = () => {
   }) as (Tag & { state: 'off' | 'include' | 'exclude' })[];
 };
 
+export const useFilterGenres = () => {
+  const includeGenres = use$(filterCriteria$.baseFilters.includeGenres) || [];
+  const excludeGenres = use$(filterCriteria$.baseFilters.excludeGenres) || [];
+
+  const genreList = genres$.genreList.peek();
+  return genreList.map((genre) => {
+    if (includeGenres.includes(genre)) {
+      return { genre, state: 'include' };
+    }
+    if (excludeGenres.includes(genre)) {
+      return { genre, state: 'exclude' };
+    }
+    return { genre, state: 'off' };
+  }) as { genre: string; state: 'off' | 'include' | 'exclude' }[];
+};
+
 //~ ------------------------------------------------
 //~ Updates both the includeTags and excludeTags arrays in filterCriteria.baseFitlers
 //~ ------------------------------------------------
-export const fcUpdateTags = (tagId: string, newState: 'off' | 'include' | 'exclude') => {
-  const { excludeTags, includeTags } = filterCriteria$.baseFilters.peek();
+export const fcUpdateTagsGenres = (
+  items: string,
+  newState: 'off' | 'include' | 'exclude',
+  itemType: 'genres' | 'tags'
+) => {
+  const { excludeGenres, includeGenres, excludeTags, includeTags } =
+    filterCriteria$.baseFilters.peek();
+  let includeItems = includeGenres;
+  let excludeItems = excludeGenres;
+  let includeKey = 'includeGenres';
+  let excludeKey = 'excludeGenres';
+  if (itemType === 'tags') {
+    includeItems = includeTags;
+    excludeItems = excludeTags;
+    includeKey = 'includeTags';
+    excludeKey = 'excludeTags';
+  }
+  console.log('Include ,Key', includeKey, includeItems, itemType);
   // Based on new state of tagId, we need to either clear from both include and exclude buckets
   // or add to one and remove from the other
   type StateFunc = (
-    includeTags: string[],
-    excludeTags: string[],
-    tagId: string
+    includeItems: string[],
+    excludeItems: string[],
+    itemId: string
   ) => { newInclude: string[]; newExclude: string[] };
 
   // Setup object that has the three state functions and then use the newState
   // to dynamically call the correct one for the newState of the tagId passed
   // Effectively adding and/or removing from one list or another.
   type StateFunctions = {
-    includeTag: StateFunc;
-    excludeTag: StateFunc;
-    offTag: StateFunc;
+    includeItems: StateFunc;
+    excludeItems: StateFunc;
+    offItems: StateFunc;
   };
   const upFunctions: StateFunctions = {
-    includeTag: handleincludeTag,
-    excludeTag: handleexcludeTag,
-    offTag: handleoffTag,
+    includeItems: handleincludeState,
+    excludeItems: handleexcludeState,
+    offItems: handleoffState,
   };
 
-  const stateUpdateFunc = `${newState}Tag`;
-  const newTags = upFunctions[stateUpdateFunc](includeTags, excludeTags, tagId);
+  const stateUpdateFunc = `${newState}Items`;
+  const newItems = upFunctions[stateUpdateFunc](includeItems, excludeItems, items);
 
   filterCriteria$.baseFilters.assign({
-    includeTags: newTags.newInclude,
-    excludeTags: newTags.newExclude,
+    [includeKey]: newItems.newInclude,
+    [excludeKey]: newItems.newExclude,
   });
 };
-
-export const fcUpdateGenres = (genres: string, newState: 'off' | 'include' | 'exclude') => {
-  const { excludeGenres, includeGenres } = filterCriteria$.baseFilters.peek();
-  // Based on new state of tagId, we need to either clear from both include and exclude buckets
-  // or add to one and remove from the other
-  type StateFunc = (
-    includeGenres: string[],
-    excludeGenres: string[],
-    tagId: string
-  ) => { newInclude: string[]; newExclude: string[] };
-
-  // Setup object that has the three state functions and then use the newState
-  // to dynamically call the correct one for the newState of the tagId passed
-  // Effectively adding and/or removing from one list or another.
-  type StateFunctions = {
-    includeGenres: StateFunc;
-    excludeGenres: StateFunc;
-    offGenres: StateFunc;
-  };
-  const upFunctions: StateFunctions = {
-    includeGenres: handleincludeTag,
-    excludeGenres: handleexcludeTag,
-    offGenres: handleoffTag,
-  };
-
-  const stateUpdateFunc = `${newState}Genres`;
-  const newGenres = upFunctions[stateUpdateFunc](includeGenres, excludeGenres, genres);
-
-  filterCriteria$.baseFilters.assign({
-    includeGenres: newGenres.newInclude,
-    excludeGenres: newGenres.newExclude,
-  });
-};
-// Tag update helpers
-const handleincludeTag = (
+// Tag/Genre update helpers
+const handleincludeState = (
   includeTags: string[] = [],
   excludeTags: string[] = [],
   tagId: string
@@ -153,7 +170,7 @@ const handleincludeTag = (
   const newExclude = excludeTags.filter((el) => el !== tagId);
   return { newInclude, newExclude };
 };
-const handleexcludeTag = (
+const handleexcludeState = (
   includeTags: string[] = [],
   excludeTags: string[] = [],
   tagId: string
@@ -162,7 +179,7 @@ const handleexcludeTag = (
   const newInclude = includeTags.filter((el) => el !== tagId);
   return { newInclude, newExclude };
 };
-const handleoffTag = (includeTags: string[] = [], excludeTags: string[] = [], tagId: string) => {
+const handleoffState = (includeTags: string[] = [], excludeTags: string[] = [], tagId: string) => {
   const newInclude = includeTags.filter((el) => el !== tagId);
   const newExclude = excludeTags.filter((el) => el !== tagId);
   return { newInclude, newExclude };

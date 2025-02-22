@@ -12,32 +12,44 @@ import { filterCriteria$ } from '~/store/store-filterCriteria';
 export const useShows = () => {
   // Need to bring in a filter
   const savedShowsObj = use$(savedShows$.shows);
-  const {
-    includeTags = [],
-    excludeTags = [],
-    includeGenres = [],
-    excludeGenres = [],
-  } = use$(filterCriteria$.baseFilters);
-  console.log('Include G', includeGenres);
-  console.log('Exclude G', excludeGenres);
+  const includeTags = use$(filterCriteria$.baseFilters.includeTags) || [];
+  const excludeTags = use$(filterCriteria$.baseFilters.excludeTags) || [];
+  const includeGenres = use$(filterCriteria$.baseFilters.includeGenres) || [];
+  const excludeGenres = use$(filterCriteria$.baseFilters.excludeGenres) || [];
+
   const savedShows = Object.keys(savedShowsObj).map((key) => savedShowsObj[key]);
   // If no tags are chosen in either includeTags or excludeTags, return all records
-  if (includeTags.length === 0 && excludeTags.length === 0) {
+  if (
+    !includeTags?.length &&
+    !excludeTags?.length &&
+    !includeGenres?.length &&
+    !excludeGenres?.length
+  ) {
     return savedShows;
   }
 
   const filteredShows: SavedShow[] = savedShows.filter((show) => {
     // Handle undefined userTags
     const userTags = show.userTags || []; // Treat undefined as an empty array
+    const showGenres = show.genres || [];
 
-    // Check if show includes all includeTags
+    //~ Check Tags
     // NOTE: if includeTags is an empty array, .every will always return true.
     const includesAllIncludeTags = includeTags.every((tag) => userTags.includes(tag));
     // Check if show includes any excludeTags
     const includesAnyExcludeTags = excludeTags.some((tag) => userTags.includes(tag));
 
+    //~~ Check Genres
+    const includesAllGenres = includeGenres.every((genre) => showGenres.includes(genre));
+    const includesAnyExcludeGenres = excludeGenres.some((genre) => showGenres.includes(genre));
     // Return true if it includes all include tags and does NOT include any exclude tags
-    return includesAllIncludeTags && !includesAnyExcludeTags;
+    return (
+      show.name,
+      includesAllIncludeTags &&
+        !includesAnyExcludeTags &&
+        includesAllGenres &&
+        !includesAnyExcludeGenres
+    );
   });
   // console.log(savedShowsObj);
 

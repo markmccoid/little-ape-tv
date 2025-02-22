@@ -99,7 +99,7 @@ const ShowDetailContainer = ({ showId }: Props) => {
             <DetailHeader showData={data} />
           </View>
           <View className="ml-2 flex-1">
-            <Text className="">{data?.overview}</Text>
+            <Text className="dark:text-text">{data?.overview}</Text>
           </View>
         </View>
 
@@ -108,8 +108,12 @@ const ShowDetailContainer = ({ showId }: Props) => {
           <ShowTagContainer showId={data?.tmdbId} />
         </View>
         <View className="">
-          <Text className="text-xl">Next Section</Text>
-          {data?.genres.map((el) => <Text className="text-xl">{el}</Text>)}
+          <Text className="text-x dark:text-text">Next Section</Text>
+          {data?.genres.map((el) => (
+            <Text key={el} className="text-xl dark:text-text">
+              {el}
+            </Text>
+          ))}
         </View>
       </ScrollView>
     </View>
