@@ -1,14 +1,16 @@
-import { View, Text } from 'react-native';
+import { View, Text, ScrollView } from 'react-native';
 import React from 'react';
 import TagFilter from './TagFilter';
 import GenreFilter from './GenreFilter';
+import SegmentedControls from './SegmentedControls';
 
 const FilterContainer = () => {
   return (
-    <View>
+    <ScrollView>
+      <SegmentedControls />
       <TagFilter />
       <GenreFilter />
-    </View>
+    </ScrollView>
   );
 };
 

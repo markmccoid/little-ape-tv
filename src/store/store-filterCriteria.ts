@@ -129,7 +129,6 @@ export const fcUpdateTagsGenres = (
     includeKey = 'includeTags';
     excludeKey = 'excludeTags';
   }
-  console.log('Include ,Key', includeKey, includeItems, itemType);
   // Based on new state of tagId, we need to either clear from both include and exclude buckets
   // or add to one and remove from the other
   type StateFunc = (

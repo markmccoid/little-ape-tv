@@ -10,6 +10,7 @@ import ShowItem from './ShowItem';
 
 const ShowsContainer = () => {
   const showsInit = useShows();
+  // Defers the render of the shows.  Seems to let things like the filter screen update more smoothly
   const shows = useDeferredValue(showsInit); // Defers updates
 
   const renderShow = useCallback(({ item }: { item: SavedShow }) => {
@@ -35,10 +36,4 @@ const ShowsContainer = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 24,
-  },
-});
 export default ShowsContainer;
