@@ -20,7 +20,7 @@
     "@expo-google-fonts/asul": "^0.2.3",
     "@expo/vector-icons": "^14.0.0",
     "@legendapp/state": "^3.0.0-beta.23",
-    "@markmccoid/tmdb_api": "^0.3.5",
+    "@markmccoid/tmdb_api": "^0.3.8",
     "@react-native-segmented-control/segmented-control": "2.5.4",
     "@react-navigation/native": "^7.0.3",
     "@tanstack/react-query": "^5.64.2",

@@ -14,6 +14,8 @@ import DetailHeader from './DetailHeader';
 import ShowTagContainer from './tags/ShowTagContainer';
 import { useHeaderHeight } from '@react-navigation/elements';
 import HiddenContainerAnimated from '~/components/common/HiddenContainer/HiddenContainerAnimated';
+import WatchProviderContainer from './watchProviders/WatchProviderContainer';
+import DetailRecommendations from './DetailRecommendations';
 const { width, height } = Dimensions.get('window');
 
 type Props = {
@@ -25,7 +27,8 @@ const ShowDetailContainer = ({ showId }: Props) => {
 
   const navigation = useNavigation();
   // const headerHeight = useHeaderHeight();
-  const { data, isLoading, status } = useShowDetails(parseInt(showId));
+  const { data, isLoading, status, isPlaceholderData, isError } = useShowDetails(parseInt(showId));
+
   // const { data: omdbData, isLoading: omdbIsLoading } = useOMDBData(data?.imdbId);
   //~ Save Function, make sure to update if data changes.
   const handleSaveShow = useCallback(() => {
@@ -97,11 +100,11 @@ const ShowDetailContainer = ({ showId }: Props) => {
 
       <ScrollView className="flex-1 flex-col pt-2 ">
         {/* Image W/ OMDB Details */}
-        <View className={`mx-2 max-h-[300] flex-row overflow-hidden`}>
+        <View className={`mx-2 max-h-[300] flex-row`}>
           <View>
             <DetailHeader showData={data} />
           </View>
-          <View className="ml-1 flex-1 flex-col">
+          <View className="ml-1 flex-1 flex-col overflow-hidden">
             <ScrollView className="mb-1 h-1/3 flex-shrink rounded-lg border-hairline bg-[#ffffff77] p-1">
               <Text className="dark:text-text">{data?.overview}</Text>
               <Text className="dark:text-text">{data?.overview}</Text>
@@ -126,24 +129,12 @@ const ShowDetailContainer = ({ showId }: Props) => {
         </View>
 
         {/* Show Information */}
-        <HiddenContainerAnimated title="Where To Watch">
-          <View className="p-2">
-            {data?.genres.map((el) => (
-              <Text key={el} className="text-xl dark:text-text">
-                {el}
-              </Text>
-            ))}
-          </View>
+        <HiddenContainerAnimated title="Where To Watch" extraHeight={10}>
+          <WatchProviderContainer showId={data?.tmdbId} />
         </HiddenContainerAnimated>
         <View className="h-2" />
         <HiddenContainerAnimated title="Recommendations">
-          <View>
-            {data?.genres.map((el) => (
-              <Text key={el} className="text-xl dark:text-text">
-                {el}
-              </Text>
-            ))}
-          </View>
+          <DetailRecommendations recommendations={data?.recommendations} />
         </HiddenContainerAnimated>
       </ScrollView>
     </View>

@@ -28,7 +28,6 @@ const TagContainer = () => {
           text: 'OK',
           onPress: (name) => {
             if (name) {
-              console.log('NAME', name);
               try {
                 tags$.addTag(name);
               } catch (e) {

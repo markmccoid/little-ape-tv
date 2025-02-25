@@ -4,6 +4,10 @@ import { TVSearchResultItem } from '@markmccoid/tmdb_api';
 import { Image } from 'expo-image';
 import { Link, useRouter } from 'expo-router';
 import SearchItemButtonAnim from './SearchItemButtonAnim';
+import useImageSize from '~/utils/useImageSize';
+import { search$ } from '~/store/store-search';
+import { use$ } from '@legendapp/state/react';
+import { settings$ } from '~/store/store-settings';
 
 const { width, height } = Dimensions.get('window');
 const IMG_WIDTH = (width - 30) / 2;
@@ -12,10 +16,12 @@ const missingPosterURI = require('../../../assets/missingPoster.png');
 
 type Props = {
   searchItem: TVSearchResultItem & { isStoredLocally: boolean };
+  numColumns: 2 | 3;
 };
-const SearchItem = ({ searchItem }: Props) => {
+const SearchItem = ({ searchItem, numColumns }: Props) => {
   const router = useRouter();
 
+  const { imageHeight, imageWidth } = useImageSize(numColumns);
   return (
     <View className="mb-[25]">
       {/* <Link href={{ pathname: `/[showid]`, params: { showid: searchItem.id }, key={searchItem.id} }}> */}
@@ -24,13 +30,13 @@ const SearchItem = ({ searchItem }: Props) => {
         className="rounded-lg border-green-600 active:border-hairline">
         <View
           style={{
-            width: IMG_WIDTH,
+            width: imageWidth,
           }}
           className="overflow-hidden rounded-lg border-hairline">
           {!searchItem?.posterURL && (
             <View className="absolute top-0 z-10 w-full px-[4] py-[2] ">
               <Text
-                className="font-Asul-Bold flex-1 text-center text-xl font-medium"
+                className="flex-1 text-center font-Asul-Bold text-xl font-medium"
                 numberOfLines={2}>
                 {searchItem.name}
               </Text>
@@ -39,7 +45,7 @@ const SearchItem = ({ searchItem }: Props) => {
           <Image
             source={searchItem.posterURL || missingPosterURI}
             contentFit="cover"
-            style={{ width: IMG_WIDTH, height: IMG_HEIGHT }}
+            style={{ width: imageWidth, height: imageHeight }}
           />
         </View>
       </Pressable>

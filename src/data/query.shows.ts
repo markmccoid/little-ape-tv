@@ -1,5 +1,10 @@
 import { use$ } from '@legendapp/state/react';
-import { tvGetShowDetails, TVSearchResultItem, TVShowDetails } from '@markmccoid/tmdb_api';
+import {
+  tvGetShowDetails,
+  tvGetWatchProviders,
+  TVSearchResultItem,
+  TVShowDetails,
+} from '@markmccoid/tmdb_api';
 import { SavedShow } from '~/store/functions-shows';
 import { useQuery } from '@tanstack/react-query';
 import { savedShows$ } from '~/store/store-shows';
@@ -81,10 +86,12 @@ export const useShowDetails = (showId: number) => {
   const { data, ...rest } = useQuery<Partial<SavedShow> & Partial<TVShowDetails>, Error>({
     queryKey: ['movidedetails', showId, localShow?.isStoredLocally || false],
     queryFn: async () => {
-      const showDetails = await tvGetShowDetails(showId);
+      const showDetails = await tvGetShowDetails(showId, ['recommendations']);
+
+      // const showDetails = await tvGetShowDetails(showId, ['recommendations', 'videos', 'images']);
       // merge with placeholder data. This type must match the placehodlerData type
       const data = showDetails.data;
-
+      // console.log('data url', showDetails.apiCall);
       return { ...data };
       // return { ...data, ...localShow };
     },
@@ -95,6 +102,74 @@ export const useShowDetails = (showId: number) => {
   // changes to local data update immediately.  Otherwise only cache data is returned
   // until useQuery reads from API again
   return { data: { ...data, ...localShow }, ...rest };
+};
+
+//~ ------------------------------------------------------
+//~ useWatchProviders
+//~ ------------------------------------------------------
+export type ProviderInfo = {
+  provider: string;
+  logoURL: string;
+  providerId: number;
+  displayPriority: number;
+};
+export type WatchProvidersType = {
+  justWatchLink: string;
+  stream: ProviderInfo[];
+  rent: ProviderInfo[];
+  buy: ProviderInfo[];
+};
+export type WatchProviderOnly = {
+  type: 'stream' | 'rent' | 'buy' | 'justWatchLink';
+  title: string;
+  providers: ProviderInfo[] | undefined;
+};
+export const useWatchProviders = (showId: string, region: string = 'US') => {
+  return useQuery({
+    queryKey: ['watchProviders', showId],
+    queryFn: async () => {
+      const tempData = await tvGetWatchProviders(parseInt(showId), [region]);
+
+      const data = tempData.data.results.US;
+      const watchProviders: WatchProviderOnly[] = [
+        { type: 'stream', title: 'Stream', providers: data?.stream },
+        { type: 'rent', title: 'Rent', providers: data?.rent },
+        { type: 'buy', title: 'Buy', providers: data?.buy },
+      ];
+      return { watchProviders, justWatchLink: data?.justWatchLink };
+    },
+  });
+};
+
+type movieRecommendationsResults = {
+  id: number;
+  title: string;
+  releaseDate: { date: Date; epoch: number; formatted: string };
+  overview: string;
+  posterURL: string;
+  backdropURL: string;
+  genres: string[];
+  popularity: number;
+  voteAverage: number;
+  voteCount: number;
+};
+export const useShowRecommendations = (movieId: number) => {
+  console.log('Query movie recs');
+  const { data, isLoading, ...rest } = useQuery({
+    queryKey: ['movierecommendations', movieId],
+    queryFn: async () => {
+      const resp = await movieGetRecommendations(movieId);
+      return resp.data.results as movieRecommendationsResults[];
+    },
+    staleTime: 600000,
+  });
+
+  // Tag the data
+  const finalData = (data || []).map((movie) => ({
+    ...movie,
+    existsInSaved: useMovieStore.getState().shows.some((savedMovie) => savedMovie.id === movie.id),
+  }));
+  return { data: finalData, isLoading, ...rest };
 };
 
 //~ ------------------------------------------------------

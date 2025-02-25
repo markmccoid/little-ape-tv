@@ -20,6 +20,7 @@ type Props = {
   extraHeight?: number;
   style?: ViewStyle;
   startOpen?: boolean;
+  setOpenStatus?: (isOpen: boolean) => void;
 };
 
 const HiddenContainerAnimated: React.FC<Props> = ({
@@ -29,6 +30,7 @@ const HiddenContainerAnimated: React.FC<Props> = ({
   extraHeight = 0,
   staticHeight = 0,
   startOpen = false,
+  setOpenStatus = (isOpen) => {},
 }) => {
   const [viewContents, setViewContents] = useState(startOpen);
   const [isMounted, setIsMounted] = useState(false);
@@ -46,20 +48,12 @@ const HiddenContainerAnimated: React.FC<Props> = ({
   //~ - - - - - -
 
   React.useEffect(() => {
+    setOpenStatus(viewContents);
     setIsMounted(true);
   }, []);
 
   return (
-    <View
-      // style={{
-      //   flex: 1,
-      //   backgroundColor: '#ffffff85',
-      //   borderTopColor: '#777',
-      //   borderBottomColor: '#777',
-      //   borderBottomWidth: StyleSheet.hairlineWidth, //viewContents ? StyleSheet.hairlineWidth : StyleSheet.hairlineWidth,
-      //   borderTopWidth: StyleSheet.hairlineWidth,
-      // }}
-      className="flex-1 border-b-hairline border-t-hairline bg-[#ffffff85]">
+    <View className="flex-1 border-b-hairline border-t-hairline bg-[#ffffff85]">
       {/* Is only here to measure the height of the children so we know 
             what the hieght is for our animation
         */}
@@ -69,17 +63,13 @@ const HiddenContainerAnimated: React.FC<Props> = ({
         </View>
       )}
       <Pressable
-        // style={({ pressed }) => [
-        //   {
-        //     flex: 1,
-        //     borderBottomColor: '#777',
-        //     borderBottomWidth: 1,
-        //     backgroundColor: '#ffffff77',
-        //     opacity: pressed ? 0.6 : 1,
-        //   },
-        // ]}
         className="flex-1 border-b-hairline bg-[rgba(255,255,255,0.4)] py-2"
-        onPress={() => setViewContents((prev) => !prev)}>
+        onPress={() => {
+          setViewContents((prev) => {
+            setOpenStatus(!prev);
+            return !prev;
+          });
+        }}>
         <View className="flex-row items-center justify-between">
           <View className="pl-4">
             <Text style={{ fontSize: 20, fontWeight: 'bold', marginRight: 15 }}>{title}</Text>

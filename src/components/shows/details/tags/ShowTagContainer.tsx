@@ -56,13 +56,17 @@ const ShowTagContainer = ({ showId }: Props) => {
     return {
       height: toHeight.value,
       opacity: interpolate(toHeight.value, [containerHeight, 0], [1, 0]),
-      marginTop: interpolate(toHeight.value, [containerHeight, 0], [10, 0]),
+      marginTop: interpolate(
+        toHeight.value,
+        [containerHeight, 0],
+        [containerHeight === 0 ? 0 : 10, 0]
+      ),
     };
   }, [isMeasured, showTags]);
 
   return (
     <MotiView
-      className="relative mx-2"
+      className="relative mx-2 border-0"
       from={{ marginBottom: 0 }}
       animate={{ marginBottom: showTags ? 20 : 0 }}
       transition={{ type: 'timing', duration: 500 }}
@@ -88,7 +92,7 @@ const ShowTagContainer = ({ showId }: Props) => {
       <View className="flex-row items-center">
         <Pressable onPress={toggleShowTags} className="">
           <Animated.View
-            className="mr-1 flex-row items-center rounded-lg border-hairline px-3 py-1"
+            className="mr-1 flex-row items-center rounded-lg px-3 py-1"
             layout={LinearTransition.duration(300)}
             style={{ width: 'auto', backgroundColor: colors.primary }}>
             <MotiView
@@ -160,7 +164,7 @@ const ShowTagContainer = ({ showId }: Props) => {
             overflow: 'hidden', // Ensure contents are clipped
             // backgroundColor: '#f0f0f0',
             borderRadius: 10,
-            borderWidth: StyleSheet.hairlineWidth,
+            borderWidth: showTags ? StyleSheet.hairlineWidth : 0,
             paddingVertical: showTags ? 8 : 0,
           },
         ]}>
