@@ -60,7 +60,7 @@ const SearchItemButtonAnim = ({ searchItem }: Props) => {
   });
 
   const handleAddPress = () => {
-    savedShows$.addShow(prepareAddShow(searchItem));
+    savedShows$.addShow(searchItem.id.toString());
     setIsStoredLocally(true);
   };
 

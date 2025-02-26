@@ -14,6 +14,12 @@ const IMG_WIDTH = (width - 30) / 2;
 const IMG_HEIGHT = IMG_WIDTH * 1.5;
 const missingPosterURI = require('../../../assets/missingPoster.png');
 
+// type SearchItemData = {
+//   id: string;
+//   name: string;
+//   posterURL: string;
+//   isStoredLocally: boolean
+// }
 type Props = {
   searchItem: TVSearchResultItem & { isStoredLocally: boolean };
   numColumns: 2 | 3;

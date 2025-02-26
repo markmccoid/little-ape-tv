@@ -1,11 +1,19 @@
-import { View, Text, Dimensions, Image as RNImage, ScrollView, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  Dimensions,
+  Image as RNImage,
+  ScrollView,
+  StyleSheet,
+  Pressable,
+} from 'react-native';
 import React, { useCallback, useLayoutEffect, useState } from 'react';
 import { useOMDBData, useShowDetails } from '~/data/query.shows';
 import { use$ } from '@legendapp/state/react';
 import { savedShows$ } from '~/store/store-shows';
 import { Image } from 'expo-image';
 import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
-import { useNavigation } from 'expo-router';
+import { useRouter, useNavigation } from 'expo-router';
 import BackHeaderButton from '~/components/common/headerButtons/BackHeaderButton';
 import AddShowButton from '~/components/common/headerButtons/AddShowButton';
 import DeleteShowButton from '~/components/common/headerButtons/DeleteShowButton';
@@ -16,6 +24,7 @@ import { useHeaderHeight } from '@react-navigation/elements';
 import HiddenContainerAnimated from '~/components/common/HiddenContainer/HiddenContainerAnimated';
 import WatchProviderContainer from './watchProviders/WatchProviderContainer';
 import DetailRecommendations from './DetailRecommendations';
+import { HomeIcon } from '~/components/common/Icons';
 const { width, height } = Dimensions.get('window');
 
 type Props = {
@@ -24,7 +33,7 @@ type Props = {
 
 const ShowDetailContainer = ({ showId }: Props) => {
   if (!showId) return null;
-
+  const router = useRouter();
   const navigation = useNavigation();
   // const headerHeight = useHeaderHeight();
   const { data, isLoading, status, isPlaceholderData, isError } = useShowDetails(parseInt(showId));
@@ -33,17 +42,7 @@ const ShowDetailContainer = ({ showId }: Props) => {
   //~ Save Function, make sure to update if data changes.
   const handleSaveShow = useCallback(() => {
     if (!data?.id || !data?.name || !showId) return;
-
-    savedShows$.addShow({
-      tmdbId: data.id.toString(),
-      name: data.name,
-      posterURL: data.posterURL,
-      avgEpisodeRunTime: data.avgEpisodeRunTime,
-      backdropURL: data.backdropURL,
-      genres: data.genres,
-      imdbId: data.imdbId,
-      tvdbId: data.tvdbId,
-    });
+    savedShows$.addShow(data.id.toString());
   }, [data]);
 
   // Set title and left/right header buttons
@@ -91,12 +90,21 @@ const ShowDetailContainer = ({ showId }: Props) => {
   return (
     <View className={`relative w-full flex-1`}>
       <MotiView
+        from={{ translateY: 50 }}
+        animate={{ translateY: 0 }}
+        transition={{ delay: 300 }}
+        className="absolute bottom-[2] left-[20%] z-10">
+        <Pressable onPress={() => router.dismissAll()}>
+          <HomeIcon size={25} />
+        </Pressable>
+      </MotiView>
+      {/* <MotiView
         key={data?.isStoredLocally ? 'add' : 'delete'}
         from={{ opacity: 0 }}
         animate={{ opacity: data?.isStoredLocally ? 0.15 : 0 }}
         style={[StyleSheet.absoluteFill]}>
         <Image source={data?.backdropURL} style={[StyleSheet.absoluteFill]} />
-      </MotiView>
+      </MotiView> */}
 
       <ScrollView className="flex-1 flex-col pt-2 ">
         {/* Image W/ OMDB Details */}

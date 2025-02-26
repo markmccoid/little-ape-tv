@@ -14,7 +14,7 @@ import Animated, {
 import { LayoutChangeEvent, Pressable, View, Text, StyleSheet } from 'react-native';
 import { useCustomTheme } from '~/utils/customColorTheme';
 import { MotiView } from 'moti';
-import { HeartIcon, TagPlusIcon } from '~/components/common/Icons';
+import { HeartIcon, TagIcon, TagPlusIcon } from '~/components/common/Icons';
 import ShadowBackground from '~/components/common/ShadowBackground';
 import { SymbolView } from 'expo-symbols';
 import SetFavoriteButton from './SetFavoriteButton';

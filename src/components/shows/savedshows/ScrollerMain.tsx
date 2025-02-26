@@ -39,7 +39,9 @@ const ScrollerMain = ({ show, imageWidth, imageHeight, index, scrollX }: Props) 
   return (
     <Animated.View style={[animStyle]}>
       <Pressable
-        onPress={() => router.push({ pathname: `/[showid]`, params: { showid: show.tmdbId } })}
+        onPress={() =>
+          router.push({ pathname: `/[showid]`, params: { showid: parseInt(show.tmdbId) } })
+        }
         className="rounded-lg border-hairline border-primary active:border-hairline">
         <View
           style={{

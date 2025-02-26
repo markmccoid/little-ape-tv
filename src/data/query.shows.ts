@@ -6,7 +6,7 @@ import {
   TVShowDetails,
 } from '@markmccoid/tmdb_api';
 import { SavedShow } from '~/store/functions-shows';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, QueryClient } from '@tanstack/react-query';
 import { savedShows$ } from '~/store/store-shows';
 import axios from 'axios';
 import { filterCriteria$ } from '~/store/store-filterCriteria';

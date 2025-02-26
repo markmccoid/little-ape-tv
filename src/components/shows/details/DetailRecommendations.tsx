@@ -28,7 +28,7 @@ const tagRecommendations = (recommended: TVShowRecommendations[]) => {
 //~ DetailRecommendations Component
 const DetailRecommendations = ({ recommendations }: Props) => {
   const { imageHeight } = useImageSize(3);
-  if (!recommendations) return <View style={{ height: imageHeight }} />;
+  if (!recommendations) return <View style={{ height: imageHeight, marginBottom: 25 }} />;
 
   recommendations = tagRecommendations(recommendations);
   // console.log('In Recommendations');

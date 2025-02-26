@@ -3,12 +3,18 @@ import { genres$ } from '~/store/store-genres';
 //~ Show Function Start
 
 import { Observable } from '@legendapp/state';
-import { TVSearchResultItem } from '@markmccoid/tmdb_api';
+import {
+  tvGetShowDetails,
+  TVSearchResultItem,
+  TVShowDetails,
+  TVShowDetailsBase,
+} from '@markmccoid/tmdb_api';
 import { queryClient } from '~/app/_layout';
 import { search$ } from './store-search';
 // import { savedShows$ } from './store-shows';
 import { InfiniteData } from '@tanstack/react-query';
 import { formatEpoch } from '~/utils/utils';
+
 //~ -----------------------------------------------
 export type SavedShow = {
   tmdbId: string;
@@ -26,7 +32,7 @@ export type SavedShow = {
   userTags?: string[];
   dateAddedEpoch: number;
   // Stores the streaming data for a show (allows for search)
-  streaming: {
+  streaming?: {
     dateAddedEpoch: number;
     providers: number[];
   };
@@ -41,7 +47,7 @@ export type SavedShows = Record<ShowId, SavedShow>;
 //~ Show Function Start
 //~ -----------------------------------------------
 export type ShowFunctions = {
-  addShow: (newShow: AddShowParms) => void;
+  addShow: (showId: string) => Promise<void>;
   removeShow: (showId: string) => void;
   toggleFavoriteShow: (showId: string, action: 'toggle' | 'off' | 'on') => void;
   updateShowTags: (showId: string, tagId: string, action: 'add' | 'remove') => void;
@@ -59,18 +65,36 @@ export const createShowFunctions = (
   >
 ): ShowFunctions => {
   return {
-    addShow: (newShow) => {
+    addShow: async (showId) => {
       //! Need to deal with undefined posterURL and backdropURL
-      savedShows$.shows[newShow.tmdbId].set({
-        ...newShow,
+      const data = await getShowDetails(parseInt(showId));
+      savedShows$.shows[showId].set({
         isStoredLocally: true,
+        tmdbId: data.id.toString(),
+        imdbId: data.imdbId,
+        tvdbId: data.tvdbId,
+        name: data.name,
+        posterURL: data.posterURL,
+        backdropURL: data.backdropURL,
+        avgEpisodeRunTime: data.avgEpisodeRunTime,
+        imdbEpisodesURL: data.imdbEpisodesURL,
+        genres: data.genres,
+        // User specific
+        userRating: 0,
         dateAddedEpoch: formatEpoch(Date.now()),
+        // Stores the streaming data for a show (allows for search)
+        // streaming?: {
+        //   dateAddedEpoch: formatEpoch(Date.now()),
+        //   providers: []
+        // };
       });
+      console.log('Show Added', showId, data.name);
+
       //Retag items in search
       reTagSearch(savedShows$);
-      // Add new item to genres list
+      // Add genres from this new show to our master list of genres
       genres$.genreList.set(
-        Array.from(new Set([...(newShow?.genres || []), ...genres$.genreList.peek()]))
+        Array.from(new Set([...(data?.genres || []), ...genres$.genreList.peek()]))
       );
     },
     removeShow: (showId) => {
@@ -175,3 +199,20 @@ function reTagSearch(
     }
   );
 }
+
+//~ ------------------------------------------------------
+//~ getShowDetail - GET DETAILS For a Show, used in Add A Show
+//~ ------------------------------------------------------
+export const getShowDetails = async (showId: number) => {
+  // Expectation is this will always return NULL as we use this
+  // in adding function so we will assume this data is not already stored
+  // and always query and use "false" as last part of query key
+  const queryKey = ['movidedetails', showId, false];
+  let data: TVShowDetails | undefined = queryClient.getQueryData(queryKey);
+  console.log('DATA from getShowDetails', data);
+  if (!data) {
+    const result = await tvGetShowDetails(showId, ['recommendations']);
+    data = result.data;
+  }
+  return data;
+};
