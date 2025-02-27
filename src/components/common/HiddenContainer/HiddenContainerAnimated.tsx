@@ -88,6 +88,7 @@ const HiddenContainerAnimated: React.FC<Props> = ({
       </Pressable>
 
       <MotiView
+        // from={{ height: !isMounted || viewContents ? (startOpen ? autoHeight : 0) : autoHeight }}
         from={{ height: !isMounted || viewContents ? 0 : autoHeight }}
         animate={{ height: !isMounted || viewContents ? autoHeight : 0 }}
         transition={{ type: 'timing', duration: 500 }}

@@ -1,5 +1,6 @@
 import { use$ } from '@legendapp/state/react';
 import {
+  tvGetShowCredits,
   tvGetShowDetails,
   tvGetWatchProviders,
   TVSearchResultItem,
@@ -86,7 +87,12 @@ export const useShowDetails = (showId: number) => {
   const { data, ...rest } = useQuery<Partial<SavedShow> & Partial<TVShowDetails>, Error>({
     queryKey: ['movidedetails', showId, localShow?.isStoredLocally || false],
     queryFn: async () => {
-      const showDetails = await tvGetShowDetails(showId, ['recommendations']);
+      const showDetails = await tvGetShowDetails(showId, [
+        'recommendations',
+        'videos',
+        'images',
+        'credits',
+      ]);
 
       // const showDetails = await tvGetShowDetails(showId, ['recommendations', 'videos', 'images']);
       // merge with placeholder data. This type must match the placehodlerData type
@@ -102,6 +108,23 @@ export const useShowDetails = (showId: number) => {
   // changes to local data update immediately.  Otherwise only cache data is returned
   // until useQuery reads from API again
   return { data: { ...data, ...localShow }, ...rest };
+};
+
+//~ ------------------------------------------------------
+//~ useShowCast
+//~ ------------------------------------------------------
+export const useShowCast = (showId: string | undefined) => {
+  if (!showId) return;
+  const { data, isLoading, ...rest } = useQuery({
+    queryKey: ['showcast', showId],
+    queryFn: async () => {
+      const resp = await tvGetShowCredits(showId);
+      return resp.data.cast;
+    },
+    staleTime: 600000,
+  });
+
+  return { data, isLoading, ...rest };
 };
 
 //~ ------------------------------------------------------

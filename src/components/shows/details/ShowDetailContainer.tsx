@@ -8,10 +8,8 @@ import {
   Pressable,
 } from 'react-native';
 import React, { useCallback, useLayoutEffect, useState } from 'react';
-import { useOMDBData, useShowDetails } from '~/data/query.shows';
-import { use$ } from '@legendapp/state/react';
+import { useShowDetails } from '~/data/query.shows';
 import { savedShows$ } from '~/store/store-shows';
-import { Image } from 'expo-image';
 import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
 import { useRouter, useNavigation } from 'expo-router';
 import BackHeaderButton from '~/components/common/headerButtons/BackHeaderButton';
@@ -25,6 +23,8 @@ import HiddenContainerAnimated from '~/components/common/HiddenContainer/HiddenC
 import WatchProviderContainer from './watchProviders/WatchProviderContainer';
 import DetailRecommendations from './DetailRecommendations';
 import { HomeIcon } from '~/components/common/Icons';
+import CastContainer from './cast/CastContainer';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 const { width, height } = Dimensions.get('window');
 
 type Props = {
@@ -35,6 +35,7 @@ const ShowDetailContainer = ({ showId }: Props) => {
   if (!showId) return null;
   const router = useRouter();
   const navigation = useNavigation();
+  const { bottom } = useSafeAreaInsets();
   // const headerHeight = useHeaderHeight();
   const { data, isLoading, status, isPlaceholderData, isError } = useShowDetails(parseInt(showId));
 
@@ -93,7 +94,7 @@ const ShowDetailContainer = ({ showId }: Props) => {
         from={{ translateY: 50 }}
         animate={{ translateY: 0 }}
         transition={{ delay: 300 }}
-        className="absolute bottom-[2] left-[20%] z-10">
+        className="absolute bottom-[2] right-[20%] z-10">
         <Pressable onPress={() => router.dismissAll()}>
           <HomeIcon size={25} />
         </Pressable>
@@ -106,7 +107,9 @@ const ShowDetailContainer = ({ showId }: Props) => {
         <Image source={data?.backdropURL} style={[StyleSheet.absoluteFill]} />
       </MotiView> */}
 
-      <ScrollView className="flex-1 flex-col pt-2 ">
+      <ScrollView
+        className="flex-1 flex-col pt-2"
+        contentContainerStyle={{ paddingBottom: bottom + 20 }}>
         {/* Image W/ OMDB Details */}
         <View className={`mx-2 max-h-[300] flex-row`}>
           <View>
@@ -141,8 +144,14 @@ const ShowDetailContainer = ({ showId }: Props) => {
           <WatchProviderContainer showId={data?.tmdbId} />
         </HiddenContainerAnimated>
         <View className="h-2" />
+        {/* Recommendations */}
         <HiddenContainerAnimated title="Recommendations">
           <DetailRecommendations recommendations={data?.recommendations} />
+        </HiddenContainerAnimated>
+        <View className="h-2" />
+        {/* Cast */}
+        <HiddenContainerAnimated title="Cast" startOpen>
+          <CastContainer showId={data?.tmdbId} cast={data?.credits} />
         </HiddenContainerAnimated>
       </ScrollView>
     </View>
