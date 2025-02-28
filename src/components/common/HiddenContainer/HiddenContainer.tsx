@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import { StyleSheet, Text, View, Pressable } from "react-native";
-import { CollapseUpIcon, EraserIcon, ExpandDownIcon } from "@/components/common/Icons";
-import { useCustomTheme } from "@/lib/colorThemes";
+import React, { useState } from 'react';
+import { StyleSheet, Text, View, Pressable } from 'react-native';
+import { CollapseUpIcon, EraserIcon, ExpandDownIcon } from '@/components/common/Icons';
+import { useCustomTheme } from '~/utils/customColorTheme';
 
 /**
  * Component will take a component as a child and toggle displaying or hiding
@@ -25,29 +25,28 @@ const HiddenContainer = ({
   return (
     <View
       style={{
-        backgroundColor: "#ffffff85",
-        borderTopColor: "#777",
-        borderBottomColor: "#aaa",
+        backgroundColor: '#ffffff85',
+        borderTopColor: '#777',
+        borderBottomColor: '#aaa',
         borderBottomWidth: viewContents ? 1 : 0,
         borderTopWidth: 1,
         marginVertical: 5,
         borderWidth: 1,
-        borderColor: "red",
+        borderColor: 'red',
         flex: 1,
-      }}
-    >
-      <View className="flex-1 flex-row border-b border-gray-600 justify-start items-center pl-[2]">
+      }}>
+      <View className="flex-1 flex-row items-center justify-start border-b border-gray-600 pl-[2]">
         {leftIconFunction && (
           <Pressable onPress={leftIconFunction}>
-            <EraserIcon color={!!titleInfo ? colors.deleteRed : "black"} />
+            <EraserIcon color={!!titleInfo ? colors.deleteRed : 'black'} />
           </Pressable>
         )}
 
         <Pressable
           style={({ pressed }) => [
             {
-              flexDirection: "row",
-              justifyContent: "space-between",
+              flexDirection: 'row',
+              justifyContent: 'space-between',
               paddingVertical: 5,
               // borderBottomColor: "#777",
               // borderBottomWidth: 1,
@@ -56,35 +55,31 @@ const HiddenContainer = ({
               paddingHorizontal: 20,
               paddingLeft: 5,
               borderWidth: 2,
-              borderColor: "blue",
+              borderColor: 'blue',
               flex: 1,
             },
           ]}
-          onPress={() => setViewContents((prev) => !prev)}
-        >
-          <View className="flex-row justify-between items-center flex-1 ">
+          onPress={() => setViewContents((prev) => !prev)}>
+          <View className="flex-1 flex-row items-center justify-between ">
             <View
               style={{
                 paddingRight: 5,
-                width: "25%",
-              }}
-            >
+                width: '25%',
+              }}>
               <Text
-                style={{ flex: 1, fontSize: 18, fontWeight: "bold", borderWidth: 1 }}
-                numberOfLines={1}
-              >
+                style={{ flex: 1, fontSize: 18, fontWeight: 'bold', borderWidth: 1 }}
+                numberOfLines={1}>
                 {title}
               </Text>
             </View>
             <View
               style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
                 paddingRight: 5,
                 flex: 1,
-              }}
-            >
+              }}>
               <Text className="flex-1" numberOfLines={1} lineBreakMode="tail">
                 {titleInfo}
               </Text>

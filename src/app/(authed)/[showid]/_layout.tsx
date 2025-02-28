@@ -15,6 +15,13 @@ export default function ShowIdLayout() {
         }}
         getId={({ params }) => params.showid}
       />
+      <Stack.Screen
+        name="seasonslist"
+        options={{
+          presentation: 'modal',
+          title: 'Seasons',
+        }}
+      />
     </Stack>
   );
 }

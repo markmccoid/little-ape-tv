@@ -2,6 +2,7 @@ import { use$ } from '@legendapp/state/react';
 import {
   tvGetShowCredits,
   tvGetShowDetails,
+  tvGetShowSeasonDetails,
   tvGetWatchProviders,
   TVSearchResultItem,
   TVShowDetails,
@@ -9,8 +10,9 @@ import {
 import { SavedShow } from '~/store/functions-shows';
 import { useQuery, QueryClient } from '@tanstack/react-query';
 import { savedShows$ } from '~/store/store-shows';
-import axios from 'axios';
+import axios, { all } from 'axios';
 import { filterCriteria$ } from '~/store/store-filterCriteria';
+import { sortBy } from 'lodash';
 
 //~ ------------------------------------------------------
 //~ useShows - FILTERED SAVED Shows
@@ -79,6 +81,9 @@ export const useShows = () => {
 //~ ------------------------------------------------------
 //~ useShowDetail - GET DETAILS For a Shows
 //~ ------------------------------------------------------
+export type UseShowDetailsReturn = ReturnType<typeof useShowDetails>;
+export type ShowDetailsData = UseShowDetailsReturn['data'];
+
 export const useShowDetails = (showId: number) => {
   // Load show if saved locally from legend state
   const localShow = use$(savedShows$.shows[showId]);
@@ -110,6 +115,43 @@ export const useShowDetails = (showId: number) => {
   return { data: { ...data, ...localShow }, ...rest };
 };
 
+//*=================================
+//*- Get TV Show Season Details from TMDB Api
+//*=================================
+export const useShowSeasonData = (showId: string, seasonNumbers: number[]) => {
+  // console.log('useseasons', showId, seasonNumbers);
+  if (!showId || !seasonNumbers) return [];
+  return useQuery({
+    queryKey: ['seasons', showId, seasonNumbers],
+    queryFn: async () => {
+      // Return details for each season
+      // console.log('IN FETCH');
+      const allSeasons = await Promise.all(
+        seasonNumbers.map(async (season) => {
+          // Need to pull off just the data piece.
+          return tvGetShowSeasonDetails(parseInt(showId), season).then((resp) => {
+            return resp.data;
+          });
+        })
+      );
+      const sortedSeasons = sortBy(allSeasons, ['seasonNumber']);
+      return sortedSeasons;
+    },
+  });
+};
+
+export const getTVShowSeasonDataAPI = async (tvShowId: number, seasonNumbers: number[]) => {
+  const seasonData = await Promise.all(
+    seasonNumbers.map(async (season) => {
+      // Need to pull off just the data piece.
+      return tvGetShowSeasonDetails(tvShowId, season).then((resp) => {
+        console.log(resp.apiCall);
+        // return resp.data
+      });
+    })
+  );
+  return seasonData;
+};
 //~ ------------------------------------------------------
 //~ useShowCast
 //~ ------------------------------------------------------

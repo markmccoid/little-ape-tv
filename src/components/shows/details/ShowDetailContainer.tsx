@@ -7,7 +7,7 @@ import {
   StyleSheet,
   Pressable,
 } from 'react-native';
-import React, { useCallback, useLayoutEffect, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { useShowDetails } from '~/data/query.shows';
 import { savedShows$ } from '~/store/store-shows';
 import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
@@ -25,6 +25,7 @@ import DetailRecommendations from './DetailRecommendations';
 import { HomeIcon } from '~/components/common/Icons';
 import CastContainer from './cast/CastContainer';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import HiddenContainer from '~/components/common/HiddenContainer/HiddenContainer';
 const { width, height } = Dimensions.get('window');
 
 type Props = {
@@ -38,8 +39,8 @@ const ShowDetailContainer = ({ showId }: Props) => {
   const { bottom } = useSafeAreaInsets();
   // const headerHeight = useHeaderHeight();
   const { data, isLoading, status, isPlaceholderData, isError } = useShowDetails(parseInt(showId));
+  // console.log('DetailContainer', showId, data.id);
 
-  // const { data: omdbData, isLoading: omdbIsLoading } = useOMDBData(data?.imdbId);
   //~ Save Function, make sure to update if data changes.
   const handleSaveShow = useCallback(() => {
     if (!data?.id || !data?.name || !showId) return;
@@ -134,6 +135,16 @@ const ShowDetailContainer = ({ showId }: Props) => {
           </View>
         </View>
 
+        <View className="mx-2 mt-2 flex-row justify-start">
+          <Pressable
+            onPress={() =>
+              router.push({ pathname: `/[showid]/seasonslist`, params: { showid: showId } })
+            }
+            className="border bg-green-700 px-2 py-1">
+            <Text>Seasons</Text>
+          </Pressable>
+        </View>
+
         {/* Show Tags - If null passed for showId, this container will not show */}
         <View className="my-2 ">
           <ShowTagContainer showId={data?.tmdbId} />
@@ -150,6 +161,9 @@ const ShowDetailContainer = ({ showId }: Props) => {
         </HiddenContainerAnimated>
         <View className="h-2" />
         {/* Cast */}
+        {/* <HiddenContainer title="Cast" leftIconFunction={() => console.log('LEFT')} startOpen>
+          <CastContainer showId={data?.tmdbId} cast={data?.credits} />
+        </HiddenContainer> */}
         <HiddenContainerAnimated title="Cast" startOpen>
           <CastContainer showId={data?.tmdbId} cast={data?.credits} />
         </HiddenContainerAnimated>
