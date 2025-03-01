@@ -1,48 +1,24 @@
 import React, { useCallback } from 'react';
-import { SectionList, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { SectionList, View, Text, StyleSheet, Pressable, Linking } from 'react-native';
 import { Image } from 'expo-image';
 import getItemLayout from 'react-native-get-item-layout-section-list';
+import { Episode, TVShowSeasonDetails } from '@markmccoid/tmdb_api';
+import { getEpisodeIMDBURL } from '~/data/query.shows';
+import { useLocalSearchParams } from 'expo-router';
 
 // Define fixed heights for performance
-const SECTION_HEADER_HEIGHT = 40;
+const SECTION_HEADER_HEIGHT = 70;
 const ITEM_HEIGHT = 120;
 
-interface Props {
+type Props = {
   seasons: TVShowSeasonDetails[];
-  onPressEpisode: (episode: Episode) => void;
-}
-
-type TVShowSeasonDetails = {
-  id: number;
-  seasonNumber: number;
-  name: string;
-  overview: string;
-  posterURL: string;
-  airDate: DateObject;
-  episodes: Episode[];
 };
 
-type Episode = {
-  id: number;
-  seasonNumber: number;
-  episodeNumber: number;
-  name: string;
-  overview: string;
-  airDate: DateObject;
-  stillURL: string;
-  runTime: number;
-};
-
-type DateObject = {
-  date?: Date;
-  epoch: number;
-  formatted: string;
-};
-
-const TVShowSectionList: React.FC<Props> = ({ seasons, onPressEpisode }) => {
+const TVShowSectionList: React.FC<Props> = ({ seasons }) => {
+  const { showid } = useLocalSearchParams();
   // Map seasons to SectionList sections
   const sections = seasons.map((season) => ({
-    title: season.name,
+    title: season.seasonNumber === 0 ? season.name : `Season ${season.seasonNumber}`,
     data: season.episodes,
   }));
 
@@ -51,51 +27,78 @@ const TVShowSectionList: React.FC<Props> = ({ seasons, onPressEpisode }) => {
     getSectionHeaderHeight: SECTION_HEADER_HEIGHT,
   });
 
+  //==============================================
   // Render section header (season name)
+  //==============================================
   const renderSectionHeader = useCallback(({ section }: { section: { title: string } }) => {
     // console.log('header', section.title);
     return (
       <View
-        className="flex-row items-center bg-[#ffffffdd]"
+        className="flex-row  justify-start border-b-hairline bg-[#6a9c4fee] px-3 pt-2"
         style={{ height: SECTION_HEADER_HEIGHT }}>
         <Text className="text-xl font-bold">{section.title}</Text>
       </View>
     );
   }, []);
 
-  // Render each episode item
+  //==============================================
+  // Render Episode Items
+  //==============================================
   const renderItem = useCallback(({ item, index }: { item: Episode; index: number }) => {
     // console.log('ITEM', index);
     return (
-      <TouchableOpacity
+      <Pressable
         style={{ height: ITEM_HEIGHT }}
-        onPress={() => console.log(item)}
-        className="border-b-hairline">
+        className="border-b-hairline bg-white"
+        onPress={async () => {
+          const { imdbId } = await getEpisodeIMDBURL(
+            parseInt(showid as string),
+            item.seasonNumber,
+            item.episodeNumber
+          );
+
+          if (imdbId === null) {
+            return null;
+          }
+          Linking.openURL(`imdb:///title/${imdbId}`).catch((err) => {
+            Linking.openURL('https://apps.apple.com/us/app/imdb-movies-tv-shows/id342792525');
+          });
+        }}>
         <View className="mt-2 flex-row items-center px-2">
           <Image
             source={item.stillURL}
-            style={styles.image}
-            className="rounded-xl border-hairline"
+            // style={styles.image}
+            style={{
+              width: 100,
+              height: 100,
+              borderWidth: StyleSheet.hairlineWidth,
+              borderColor: '#ccc',
+              borderRadius: 12,
+            }}
             placeholder={require('../../../../../assets/missingPoster.png')}
           />
           {/* <Text>
             {item.episodeNumber}-{item.name}
           </Text>
           <Image source={{ uri: item.stillURL }} style={styles.image} /> */}
-          <View className="ml-2  flex-1">
-            <Text className="text-lg font-semibold" numberOfLines={1}>
+          <View className="mx-2  flex-1">
+            <Text className="text-lg font-semibold text-text" numberOfLines={1}>
               {item.episodeNumber}. {item.name}
             </Text>
-            <Text style={styles.overview} numberOfLines={3} ellipsizeMode="tail">
+            <Text
+              style={styles.overview}
+              className="text-text"
+              numberOfLines={3}
+              ellipsizeMode="tail">
               {item.overview}
             </Text>
-            <View style={styles.footer}>
+            <View className="mt-2 flex-row justify-between">
               <Text style={styles.footerText}>{item?.airDate?.formatted}</Text>
               <Text style={styles.footerText}>{item?.runTime} min</Text>
             </View>
           </View>
         </View>
-      </TouchableOpacity>
+      </Pressable>
     );
   }, []);
 

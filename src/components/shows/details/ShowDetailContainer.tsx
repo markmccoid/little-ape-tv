@@ -39,7 +39,7 @@ const ShowDetailContainer = ({ showId }: Props) => {
   const { bottom } = useSafeAreaInsets();
   // const headerHeight = useHeaderHeight();
   const { data, isLoading, status, isPlaceholderData, isError } = useShowDetails(parseInt(showId));
-  // console.log('DetailContainer', showId, data.id);
+  // console.log('DetailContainer Show Id', showId);
 
   //~ Save Function, make sure to update if data changes.
   const handleSaveShow = useCallback(() => {
@@ -128,9 +128,7 @@ const ShowDetailContainer = ({ showId }: Props) => {
               {data?.lastAirDate?.formatted && (
                 <Text>Last Episode: {data?.lastAirDate?.formatted}</Text>
               )}
-              <Text>
-                Seasons/Episodes - {data?.numberOfSeasons}/{data?.numberOfEpisodes}
-              </Text>
+              <Text>{`${data?.numberOfSeasons} Seasons / ${data?.numberOfEpisodes} Episodes`}</Text>
             </View>
           </View>
         </View>

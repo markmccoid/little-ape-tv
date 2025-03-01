@@ -2,10 +2,12 @@ import { use$ } from '@legendapp/state/react';
 import {
   tvGetShowCredits,
   tvGetShowDetails,
+  tvGetShowEpisodeExternalIds,
   tvGetShowSeasonDetails,
   tvGetWatchProviders,
   TVSearchResultItem,
   TVShowDetails,
+  TVShowSeasonDetails,
 } from '@markmccoid/tmdb_api';
 import { SavedShow } from '~/store/functions-shows';
 import { useQuery, QueryClient } from '@tanstack/react-query';
@@ -121,7 +123,7 @@ export const useShowDetails = (showId: number) => {
 export const useShowSeasonData = (showId: string, seasonNumbers: number[]) => {
   // console.log('useseasons', showId, seasonNumbers);
   if (!showId || !seasonNumbers) return [];
-  return useQuery({
+  return useQuery<TVShowSeasonDetails[], Error>({
     queryKey: ['seasons', showId, seasonNumbers],
     queryFn: async () => {
       // Return details for each season
@@ -135,23 +137,28 @@ export const useShowSeasonData = (showId: string, seasonNumbers: number[]) => {
         })
       );
       const sortedSeasons = sortBy(allSeasons, ['seasonNumber']);
+      if (sortedSeasons[0].seasonNumber === 0) {
+        const holdSeasonZero = sortedSeasons[0];
+        sortedSeasons.shift();
+        sortedSeasons.push(holdSeasonZero);
+      }
       return sortedSeasons;
     },
   });
 };
 
-export const getTVShowSeasonDataAPI = async (tvShowId: number, seasonNumbers: number[]) => {
-  const seasonData = await Promise.all(
-    seasonNumbers.map(async (season) => {
-      // Need to pull off just the data piece.
-      return tvGetShowSeasonDetails(tvShowId, season).then((resp) => {
-        console.log(resp.apiCall);
-        // return resp.data
-      });
-    })
-  );
-  return seasonData;
+//*=================================
+//*- Get Episode IMDB URL from TMDB Api
+//*=================================
+export const getEpisodeIMDBURL = async (
+  tvShowId: number,
+  seasonNumber: number,
+  episodeNumber: number
+) => {
+  const results = await tvGetShowEpisodeExternalIds(tvShowId, seasonNumber, episodeNumber);
+  return results.data;
 };
+
 //~ ------------------------------------------------------
 //~ useShowCast
 //~ ------------------------------------------------------

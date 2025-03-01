@@ -1,14 +1,16 @@
-import { View, Text } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import React, { useMemo } from 'react';
 import { ShowDetailsData, useShowDetails, useShowSeasonData } from '~/data/query.shows';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import EpisodeList from './EpisodeList';
+import { CloseIcon } from '~/components/common/Icons';
 
 type Props = {
   showData: ShowDetailsData;
 };
 const SeasonsContainer = () => {
   const { showid } = useLocalSearchParams();
+  const router = useRouter();
   const { data: showData } = useShowDetails(parseInt(showid as string));
   // console.log('SeasonsContainer', showid, showData.tmdbId);
   const seasons = useMemo(() => {
@@ -25,10 +27,24 @@ const SeasonsContainer = () => {
     // );
   }
   return (
-    <View className="mb-20 ">
-      {!isLoading && (
-        <EpisodeList seasons={data} onEpisodePress={() => console.log('Episode Pressed')} />
-      )}
+    <View className="mb-20">
+      {/* Modal Header */}
+      <View className="h-12 flex-row items-center justify-center bg-gray-800">
+        <View className="ml-3  flex-row items-center ">
+          <Text
+            className="flex-1 px-12 text-center text-xl font-bold text-white"
+            numberOfLines={1}
+            ellipsizeMode="tail">
+            {showData.name}
+          </Text>
+        </View>
+        <View className="absolute right-2 rounded-lg border-hairline bg-slate-300 p-[2]">
+          <Pressable onPress={() => router.back()}>
+            <CloseIcon size={20} />
+          </Pressable>
+        </View>
+      </View>
+      {!isLoading && <EpisodeList seasons={data} />}
       {/* {data?.map((el) => {
         return (
           <View>

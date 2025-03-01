@@ -20,6 +20,7 @@ export default function ShowIdLayout() {
         options={{
           presentation: 'modal',
           title: 'Seasons',
+          headerShown: false,
         }}
       />
     </Stack>

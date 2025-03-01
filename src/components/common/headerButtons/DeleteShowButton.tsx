@@ -31,13 +31,13 @@ const ShowDeleteButton = ({ showId }: Props) => {
         setIsProcessing(true);
         savedShows$.removeShow(showId);
         // Navigate back to the desired screen
+        router.dismissAll();
       }
     } catch (error) {
       console.error('Delete operation failed:', error);
     } finally {
       setIsProcessing(false);
       // If we are deep in a stack go back to starting point
-      router.dismissAll();
       // InteractionManager.runAfterInteractions(() => eventBus.publish('TAG_SEARCH_RESULTS'));
     }
   };
