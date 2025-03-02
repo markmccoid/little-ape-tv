@@ -14,6 +14,8 @@ import { search$ } from './store-search';
 // import { savedShows$ } from './store-shows';
 import { InfiniteData } from '@tanstack/react-query';
 import { formatEpoch } from '~/utils/utils';
+import { savedShows$ } from './store-shows';
+import { use$ } from '@legendapp/state/react';
 
 //~ -----------------------------------------------
 export type SavedShow = {
@@ -215,4 +217,118 @@ export const getShowDetails = async (showId: number) => {
     data = result.data;
   }
   return data;
+};
+
+// ====================================================
+// ====================================================
+// savedShowAttributes$ functions
+// ====================================================
+// ====================================================
+export type EpisodeAttributes = {
+  watched?: boolean;
+  downloaded?: boolean;
+  dateWatched?: number;
+  rating?: number;
+};
+type SeasonEpisodeKey = string; // `${seasonNumber}-${episodeNumber}`;
+export type SeasonEpisodeAttributes = Record<SeasonEpisodeKey, EpisodeAttributes>;
+export type SavedShowsAttributes = Record<ShowId, SeasonEpisodeAttributes>;
+
+/*
+Attributes object will have showId as keys and EpisodeAttributes as values
+{
+  showId: {
+    '1-1': { // SeasonEpisodeKey
+    watched: boolean,  
+    downloaded: boolean,
+    dateWatched: number,
+    rating: number
+    },
+    '1-2': {
+    watched: boolean,
+    downloaded: boolean,
+    dateWatched: number,  
+    rating: number
+    }
+  },
+  ...
+}
+
+The SeasonEpisodeKey is a string that is a combination of the season number and episode number.
+*/
+export const buildSeasonEpisodeKey = (seasonNumber: number, episodeNumber: number) => {
+  return `${seasonNumber}-${episodeNumber}`;
+};
+
+//~ GET Watched Episode Count
+
+interface SeasonEpisodesState {
+  [seasonNumber: string]: { watched: number; downloaded: number };
+}
+
+export const useWatchedEpisodeCount = (showId: string) => {
+  const tempSeasonEpisodeState = use$(savedShows$.showAttributes[showId]);
+  if (!tempSeasonEpisodeState) return;
+  const seasonEpisodesState = Object.keys(tempSeasonEpisodeState).reduce(
+    (fin: SeasonEpisodesState, epStateKey: string) => {
+      const seasonNumber = epStateKey.slice(0, epStateKey.indexOf('-'));
+      const isWatched = tempSeasonEpisodeState[epStateKey].watched ? 1 : 0;
+      const isDownloaded = tempSeasonEpisodeState[epStateKey].downloaded ? 1 : 0;
+      console.log('Season Number', seasonNumber, tempSeasonEpisodeState[epStateKey].watched);
+      // Initialize fin[seasonNumber] if it doesn't exist
+      if (!fin[seasonNumber]) {
+        fin[seasonNumber] = { watched: 0, downloaded: 0 };
+      }
+      // Assign if episode watched or downloaded
+      fin[seasonNumber].watched = fin[seasonNumber].watched + isWatched;
+      fin[seasonNumber].downloaded = fin[seasonNumber].downloaded + isDownloaded;
+
+      return fin;
+    },
+    {}
+  );
+  console.log('Season Episodes State', seasonEpisodesState);
+  return seasonEpisodesState;
+};
+export const getEpisodeAttributes = (
+  showId: string,
+  seasonNumber: number,
+  episodeNumber: number
+) => {
+  const episodeKey = buildSeasonEpisodeKey(seasonNumber, episodeNumber);
+  return savedShows$.showAttributes[showId]?.[episodeKey]?.get();
+};
+
+//~ Toggle Watched Status
+export const toggleEpisodeWatched = (
+  showId: string,
+  seasonNumber: number,
+  episodeNumber: number
+) => {
+  const episodeKey = buildSeasonEpisodeKey(seasonNumber, episodeNumber);
+  const watched = savedShows$.showAttributes[showId][episodeKey].watched.peek();
+  if (watched === true) {
+    savedShows$.showAttributes[showId][episodeKey].watched.delete();
+  } else {
+    savedShows$.showAttributes[showId][episodeKey].watched.set(!!!watched);
+  }
+};
+
+export const updateAllEpisodesWatched = (
+  showId: string,
+  seasonNumber: number,
+  numOfEpisodes: number,
+  action: 'watched' | 'unwatched'
+) => {
+  if (action === 'watched') {
+    for (let i = 1; i <= numOfEpisodes; i++) {
+      const episodeKey = buildSeasonEpisodeKey(seasonNumber, i);
+      savedShows$.showAttributes[showId][episodeKey].watched.set(true);
+    }
+  } else {
+    for (let i = 1; i <= numOfEpisodes; i++) {
+      const episodeKey = buildSeasonEpisodeKey(seasonNumber, i);
+      savedShows$.showAttributes[showId][episodeKey].watched.delete();
+    }
+  }
 };

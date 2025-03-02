@@ -18,14 +18,14 @@ import DeleteShowButton from '~/components/common/headerButtons/DeleteShowButton
 import { AnimatePresence, MotiView } from 'moti';
 import DetailHeader from './DetailHeader';
 import ShowTagContainer from './tags/ShowTagContainer';
-import { useHeaderHeight } from '@react-navigation/elements';
 import HiddenContainerAnimated from '~/components/common/HiddenContainer/HiddenContainerAnimated';
 import WatchProviderContainer from './watchProviders/WatchProviderContainer';
 import DetailRecommendations from './DetailRecommendations';
 import { HomeIcon } from '~/components/common/Icons';
 import CastContainer from './cast/CastContainer';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import HiddenContainer from '~/components/common/HiddenContainer/HiddenContainer';
+import { useHeaderHeight } from '@react-navigation/elements';
+
 const { width, height } = Dimensions.get('window');
 
 type Props = {

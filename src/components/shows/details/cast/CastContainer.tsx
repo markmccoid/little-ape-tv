@@ -9,9 +9,11 @@ type Props = {
   cast: { cast: CastType[]; crew: CrewType[] };
 };
 const CastContainer = ({ showId, cast }: Props) => {
-  // const { data, isLoading } = useShowCast(showId);
   if (!cast) return;
-
+  // const { data, isLoading } = useShowCast(showId);
+  // if (!isLoading) {
+  //   console.log('CastContainer', cast.cast.length, data);
+  // }
   return (
     <View className="mx-[3] mb-4 flex-row flex-wrap justify-around">
       {cast.cast.map((member) => {

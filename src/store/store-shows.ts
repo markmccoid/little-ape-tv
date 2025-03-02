@@ -1,7 +1,7 @@
 import { authManager } from '~/authentication/AuthProvider';
 import { observable, Observable, syncState } from '@legendapp/state';
 import { createShowFunctions } from './functions-shows';
-import type { ShowFunctions, SavedShow, SavedShows } from './functions-shows';
+import type { ShowFunctions, SavedShow, SavedShows, SavedShowsAttributes } from './functions-shows';
 import { type TagFunctions, type Tag, createTagFunctions } from './functions-tags';
 import { synced } from '@legendapp/state/sync';
 import { ObservablePersistMMKV } from '@legendapp/state/persist-plugins/mmkv';
@@ -18,18 +18,19 @@ const defaultTagListValue: Tag[] = [];
 // const storedTags = authManager.userStorage?.getItem('tags');
 
 // Create the initial state, if nothing loaded from MMKV then the default will be used
-const initialState: { shows: SavedShows } = { shows: {} };
+const initialState: { shows: SavedShows; showAttributes: SavedShowsAttributes } = {
+  shows: {},
+  showAttributes: {},
+};
 const tagInitialState: { tagList: Tag[] } = { tagList: [] };
 
 //~ ==================
 //~ --- savedShow$ --------
 //~ Create the Observable, minus the functions
 //~ ==================
-// export const savedShows$ = observable<{ shows: SavedShows } & ShowFunctions>({
-//   ...initialState,
-//   ...({} as ShowFunctions),
-// });
-export const savedShows$ = observable<{ shows: SavedShows } & ShowFunctions>(
+export const savedShows$ = observable<
+  { shows: SavedShows; showAttributes: SavedShowsAttributes } & ShowFunctions
+>(
   synced({
     initial: initialState,
     persist: {
@@ -40,6 +41,11 @@ export const savedShows$ = observable<{ shows: SavedShows } & ShowFunctions>(
 );
 //~ Add the function by running a function that accepts observable to create functions with.
 savedShows$.set({ ...initialState, ...createShowFunctions(savedShows$) });
+
+//~ ==================
+//~ --- savedShowAttributes$ --------
+//~ Create the Observable, minus the functions
+//~ ==================
 
 //~ ==================
 //~ --- tags$ --------

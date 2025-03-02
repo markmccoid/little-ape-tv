@@ -44,7 +44,7 @@ const SeasonsContainer = () => {
           </Pressable>
         </View>
       </View>
-      {!isLoading && <EpisodeList seasons={data} />}
+      {!isLoading && <EpisodeList seasons={data} showData={showData} />}
       {/* {data?.map((el) => {
         return (
           <View>
