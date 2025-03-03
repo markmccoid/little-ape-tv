@@ -1,13 +1,13 @@
 import { View, Text, Linking, Pressable, StyleSheet } from 'react-native';
 import React from 'react';
 import { Image } from 'expo-image';
-import { EyeFilledIcon, ViewTVShowIcon } from '~/components/common/Icons';
+import { EyeFilledIcon, TelevisionIcon, ViewTVShowIcon } from '~/components/common/Icons';
 import { savedShows$ } from '~/store/store-shows';
 import {
   buildSeasonEpisodeKey,
-  getEpisodeAttributes,
+  toggleEpisodeDownloaded,
   toggleEpisodeWatched,
-} from '~/store/functions-shows';
+} from '~/store/functions-showAttributes';
 import { Episode } from '@markmccoid/tmdb_api';
 import { getEpisodeIMDBURL } from '~/data/query.shows';
 import { use$ } from '@legendapp/state/react';
@@ -22,7 +22,6 @@ type Props = {
 };
 
 const EpisodeRow = ({ showId, isStoredLocally, item }: Props) => {
-  // const atributes = getEpisodeAttributes(showId, item.seasonNumber, item.episodeNumber);
   const attributes = use$(
     savedShows$.showAttributes[showId][buildSeasonEpisodeKey(item.seasonNumber, item.episodeNumber)]
   );
@@ -62,18 +61,28 @@ const EpisodeRow = ({ showId, isStoredLocally, item }: Props) => {
               {item.episodeNumber}-{item.name}
             </Text>
             <Image source={{ uri: item.stillURL }} style={styles.image} /> */}
-        <View className="mx-2  flex-1">
-          <Text className="text-lg font-semibold text-text" numberOfLines={1}>
-            {item.episodeNumber}. {item.name}
-          </Text>
-          <Text
-            style={styles.overview}
-            className="text-text"
-            numberOfLines={3}
-            ellipsizeMode="tail">
-            {item.overview}
-          </Text>
-          <View className="mt-2 flex-row justify-between">
+        <View className="flex-1">
+          <Pressable
+            onPress={() => {
+              toggleEpisodeDownloaded(showId, item.seasonNumber, item.episodeNumber);
+            }}
+            disabled={!isStoredLocally}>
+            <View className={`${attributes?.downloaded ? 'bg-green-200' : 'bg-white'}`}>
+              <Text className="mx-2 text-lg font-semibold text-text" numberOfLines={1}>
+                {item.episodeNumber}. {item.name}
+              </Text>
+            </View>
+          </Pressable>
+          <View className="mx-2">
+            <Text
+              style={styles.overview}
+              className="text-text"
+              numberOfLines={3}
+              ellipsizeMode="tail">
+              {item.overview}
+            </Text>
+          </View>
+          <View className="mx-2 mt-2 flex-row justify-between">
             {isStoredLocally && (
               <Pressable
                 className="flex-row items-center justify-center"
@@ -89,6 +98,25 @@ const EpisodeRow = ({ showId, isStoredLocally, item }: Props) => {
                   </View>
                 ) : (
                   <ViewTVShowIcon size={22} />
+                )}
+              </Pressable>
+            )}
+
+            {isStoredLocally && (
+              <Pressable
+                className="flex-row items-center justify-center"
+                onPress={() => {
+                  toggleEpisodeDownloaded(showId, item.seasonNumber, item.episodeNumber);
+                }}>
+                {!!attributes?.downloaded ? (
+                  <View className="flex-row items-center justify-center">
+                    <TelevisionIcon size={25} color={'green'} />
+                    <View className="absolute top-[7]">
+                      <EyeFilledIcon size={15} color={'green'} />
+                    </View>
+                  </View>
+                ) : (
+                  <TelevisionIcon size={22} />
                 )}
               </Pressable>
             )}

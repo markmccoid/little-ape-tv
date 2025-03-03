@@ -2,7 +2,7 @@ import { View, Text, Pressable } from 'react-native';
 import React, { useMemo } from 'react';
 import { ShowDetailsData, useShowDetails, useShowSeasonData } from '~/data/query.shows';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import EpisodeList from './EpisodeList';
+import SeasonEpisodeList from './SeasonEpisodeList';
 import { CloseIcon } from '~/components/common/Icons';
 
 type Props = {
@@ -27,7 +27,7 @@ const SeasonsContainer = () => {
     // );
   }
   return (
-    <View className="mb-20">
+    <View className="mb-20 flex-1">
       {/* Modal Header */}
       <View className="h-12 flex-row items-center justify-center bg-gray-800">
         <View className="ml-3  flex-row items-center ">
@@ -44,7 +44,7 @@ const SeasonsContainer = () => {
           </Pressable>
         </View>
       </View>
-      {!isLoading && <EpisodeList seasons={data} showData={showData} />}
+      {!isLoading && <SeasonEpisodeList seasons={data} showData={showData} />}
       {/* {data?.map((el) => {
         return (
           <View>
