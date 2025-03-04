@@ -57,10 +57,13 @@ export type SeasonEpisodesState = {
     allWatched: boolean;
     allDownloaded: boolean;
   };
-};
+} & { lastWatchedSeason: number };
 export type SeasonStateKeys = keyof SeasonEpisodesState;
 
-export const useWatchedEpisodeCount = (showId: string, seasons: TVShowSeasonDetails[]) => {
+export const useWatchedEpisodeCount = (
+  showId: string,
+  seasons: TVShowSeasonDetails[]
+): SeasonEpisodesState => {
   const seasonEpisodeCounts: Record<number, number> = {};
   seasons.forEach((season) => {
     seasonEpisodeCounts[season.seasonNumber] = season.episodes.length;
@@ -96,7 +99,9 @@ export const useWatchedEpisodeCount = (showId: string, seasons: TVShowSeasonDeta
       fin[seasonNumber].downloaded = fin[seasonNumber].downloaded + isDownloaded;
       fin[seasonNumber].allDownloaded =
         fin[seasonNumber].downloaded === seasonEpisodeCounts?.[Number(seasonNumber)];
-
+      fin['lastWatchedSeason'] = fin[seasonNumber].allWatched
+        ? Number(seasonNumber)
+        : fin['lastWatchedSeason'] || 0;
       return fin;
     },
     {}

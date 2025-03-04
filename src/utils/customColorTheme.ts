@@ -15,7 +15,9 @@ type CustomTheme = Theme & {
     // muted: string;
     // mutedForeground: string;
     button: string;
+    buttonDarker: string;
     buttontext: string;
+    buttonDarkerText: string;
     // textInverted: string;
     // textInput: string;
     // cardInverted: string;
@@ -37,8 +39,10 @@ export const CustomLightTheme: CustomTheme = {
     background: '#e3efd9', // Light background (almost off-white)
     card: '#f9f9f5', //'#a8c4a8', //'#7bb55b', //'#6a9c4f', // Card color (same as primary)
     text: '#222222', // Dark text for readability
-    button: '#2a5298',
-    buttontext: '#ffffff',
+    button: '#7d9c66',
+    buttonDarker: '#59922D',
+    buttontext: '#040316',
+    buttonDarkerText: '#040316',
     border: '#606B5A', // Light border
     notification: '#d8504b', // Bright color for notifications
     // header: '#f5fcf2', // Light color for header
@@ -68,8 +72,10 @@ export const CustomDarkTheme: CustomTheme = {
     background: '#1e1e1e', // Dark background
     card: '#415934', //'#4b663c', // Darkened version of base color for cards
     text: '#ffffff', // White text for contrast
-    button: '#2a5298',
-    buttontext: '#ffffff',
+    button: '#7d9c66',
+    buttonDarker: '#59922D',
+    buttontext: '#040316',
+    buttonDarkerText: '#040316',
     border: '#99D66F', // Darker border that still provides definition
     notification: '#ff847a', // Brighter red for contrast
     // header: '#191919'

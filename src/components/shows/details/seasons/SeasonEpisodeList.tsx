@@ -6,7 +6,7 @@ import { Episode, TVShowSeasonDetails } from '@markmccoid/tmdb_api';
 import { getEpisodeIMDBURL, ShowDetailsData, UseShowDetailsReturn } from '~/data/query.shows';
 import { useLocalSearchParams } from 'expo-router';
 import EpisodeRow from './EpisodeRow';
-import { TelevisionIcon, TelevisionOffIcon } from '~/components/common/Icons';
+import { CheckIcon, TelevisionIcon, TelevisionOffIcon } from '~/components/common/Icons';
 import {
   removeSeasonFromWatched,
   SeasonEpisodesState,
@@ -35,7 +35,7 @@ const TVShowSectionList: React.FC<Props> = ({ seasons, showData }) => {
   const { showid } = useLocalSearchParams();
   const sectionListRef = useRef<SectionList>(null);
   const watchedCounts = useWatchedEpisodeCount(showid as string, seasons);
-
+  console.log('watchedCounts', watchedCounts.lastWatchedSeason + 1);
   // Map seasons to SectionList sections
   const sections = seasons.map((season) => ({
     title: season.seasonNumber === 0 ? season.name : `Season ${season.seasonNumber}`,
@@ -54,6 +54,15 @@ const TVShowSectionList: React.FC<Props> = ({ seasons, showData }) => {
     getItemHeight: ITEM_HEIGHT,
     getSectionHeaderHeight: SECTION_HEADER_HEIGHT,
   });
+
+  useEffect(() => {
+    if (sectionListRef.current) {
+      console.log('USEEFFECT', watchedCounts.lastWatchedSeason);
+      setTimeout(() => scrollToLocation(watchedCounts.lastWatchedSeason, 0), 100);
+    } else {
+      console.log('sectionListRef.current is null');
+    }
+  }, [watchedCounts.lastWatchedSeason, sectionListRef.current]);
 
   const scrollToLocation = useCallback(
     (sectionIndex: number, itemIndex: number) => {
@@ -98,11 +107,18 @@ const TVShowSectionList: React.FC<Props> = ({ seasons, showData }) => {
   const renderItem = useCallback(({ item, index }: { item: Episode; index: number }) => {
     // console.log('ITEM', index);
     return (
-      <EpisodeRow
-        item={item}
-        showId={showid as string}
-        isStoredLocally={showData.isStoredLocally}
-      />
+      <View
+        style={{
+          borderBottomWidth: StyleSheet.hairlineWidth,
+          borderColor: 'black',
+          height: ITEM_HEIGHT,
+        }}>
+        <EpisodeRow
+          item={item}
+          showId={showid as string}
+          isStoredLocally={showData.isStoredLocally}
+        />
+      </View>
     );
   }, []);
 
@@ -117,8 +133,16 @@ const TVShowSectionList: React.FC<Props> = ({ seasons, showData }) => {
           <Pressable
             key={section.title}
             onPress={() => scrollToLocation(index, 0)}
-            className={`rounded-lg border bg-green-700 px-2 py-1 ${watchedCounts?.[section.seasonNumber]?.allWatched ? 'bg-green-200' : ''}`}>
-            <Text>{section.title}</Text>
+            className={`flex-row rounded-lg border bg-button px-2 py-1 ${section.counts?.allWatched ? 'bg-buttondarker' : ''}`}>
+            <Text
+              className={`font-semibold ${section.counts?.allWatched ? 'text-buttondarkertext' : 'text-buttontext'} `}>
+              {section.title}
+            </Text>
+            {section.counts.allWatched && (
+              <View className="ml-[3]">
+                <CheckIcon size={15} color="white" />
+              </View>
+            )}
           </Pressable>
         ))}
       </ScrollView>

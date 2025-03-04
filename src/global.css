@@ -7,8 +7,10 @@
   --color-background: #e3efd9; /* background - Light background */
   --color-text: #222222; /* text - Dark text for readability */
   --color-border: #b3c7a8; /* border - Light border */
-  --color-button: #2a5298; /*  Retaining original value as no direct equivalent exists */
+  --color-button: #7d9c66; /*  Retaining original value as no direct equivalent exists */
+  --color-button-darker: #59922D; /* Darker shade of button color use in Watched Season */
   --color-button-text: #040316; /* Retaining original value as no direct equivalent exists */
+  --color-buttondarker-text: #ffffff;
   --color-overlay: rgba(0, 0, 0, .05); /* Retaining original value */
   --color-card: #f9f9f5;
 }
@@ -19,8 +21,10 @@
     --color-background: #2f3633; /* background - Dark background */
     --color-text: #ffffff; /* text - White text for contrast */
     --color-border: #3d5435; /* border - Darker border that still provides definition */
-    --color-button: #9fb6db; /* Retaining original value as no direct equivalent exists */
+    --color-button: #7d9c66; /* Retaining original value as no direct equivalent exists */
+    --color-button-darker: #59922D; /* Darker shade of button color use in Watched Season */
     --color-button-text: #040316; /* Retaining original value as no direct equivalent exists */
+    --color-buttondarker-text: #ffffff;
     --color-overlay: rgba(0, 0, 0, .05); /* Retaining original value */
     --color-card: #415934;
   }

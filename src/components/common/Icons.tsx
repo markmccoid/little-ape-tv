@@ -120,11 +120,11 @@ export const HardDriveIcon = ({ size = 25, color, style = {} }: Props) => {
 // };
 // New Check icon has no circle around it
 export const CheckIcon = ({ size, color = undefined, style = undefined }: Props) => {
-  return <Ionicons name="ios-checkmark" color={color} size={size} style={style} />;
+  return <Ionicons name="checkmark" color={color} size={size} style={style} />;
 };
 
 export const MenuIcon = ({ size, color = undefined, style = undefined }: Props) => {
-  return <Ionicons name="ios-menu" size={size} color={color} style={style} />;
+  return <Ionicons name="menu" size={size} color={color} style={style} />;
 };
 
 export const EditIcon = ({ size, color = undefined, style = undefined }: Props) => {

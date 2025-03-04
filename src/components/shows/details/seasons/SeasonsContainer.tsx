@@ -19,13 +19,7 @@ const SeasonsContainer = () => {
   // console.log('SEASONS', seasons);
   const { data, isLoading } = useShowSeasonData(showid as string, seasons);
   // console.log('SeasonEpisode Data', data[0]);
-  if (!isLoading) {
-    // console.log('Data', data[0].episodes);
-    // console.log(
-    //   'Data',
-    //   data?.map((el) => el.episodes).flatMap((el) => el)
-    // );
-  }
+
   return (
     <View className="mb-20 flex-1">
       {/* Modal Header */}
@@ -44,23 +38,8 @@ const SeasonsContainer = () => {
           </Pressable>
         </View>
       </View>
+      {/* SectionList Component */}
       {!isLoading && <SeasonEpisodeList seasons={data} showData={showData} />}
-      {/* {data?.map((el) => {
-        return (
-          <View>
-            <Text>{el.name}</Text>
-            {el.episodes.map((episode) => {
-              return (
-                <View className="flex-row justify-between">
-                  <Text>{episode.episodeNumber}</Text>
-                  <Text>{episode.name}</Text>
-                  <Text>{episode.runtime}</Text>
-                </View>
-              );
-            })}
-          </View>
-        );
-      })} */}
     </View>
   );
 };

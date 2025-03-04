@@ -25,11 +25,14 @@ const SeasonHeader = ({ showId, section, headerHeight }: Props) => {
 
   return (
     <View
-      className={` flex-col border-b-hairline bg-[#6a9c4fee] px-3 py-1 ${allWatched ? 'bg-green-200' : ''}`}
-      style={{ height: headerHeight }}>
+      className={` flex-col border-b-hairline bg-button px-3 py-2  ${allWatched ? 'bg-buttondarker' : ''}`}
+      style={{ height: 70 }}>
       {/* First Line */}
       <View className="flex-row justify-between">
-        <Text className="text-xl font-bold">{section.title}</Text>
+        <Text
+          className={`text-xl font-bold ${allWatched ? 'text-buttondarkertext' : 'text-buttontext'}`}>
+          {section.title}
+        </Text>
         <Text>
           {section.counts.watched}/{section.numEpisodes} watched
         </Text>
