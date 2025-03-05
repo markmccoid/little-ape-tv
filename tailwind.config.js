@@ -15,6 +15,7 @@ module.exports = {
       },
       colors: {
         primary: 'var(--color-primary)',
+        primarytext: 'var(color-primary-text)',
         secondary: {
           DEFAULT: 'var(--color-secondary)',
         },
@@ -32,6 +33,11 @@ module.exports = {
         buttontext: 'var(--color-button-text)',
         buttondarkertext: 'var(--color-buttondarker-text)',
         overlay: 'var(--color-overlay)',
+        taginclude: 'var(--color-tag-include)',
+        tagincludetext: 'var(--color-tag-in-text)',
+        tagexclude: 'var(--color-tag-exclude)',
+        tagexcludetext: 'var(--color-tag-ex-text)',
+        imdbYellow: 'var(--color-imdb-yellow)',
       },
     },
   },

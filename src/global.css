@@ -4,6 +4,7 @@
 
 :root {
   --color-primary: #193703; /* primary - Base card color (from light theme) */
+  --color-primary-text: #e3efd9;
   --color-background: #e3efd9; /* background - Light background */
   --color-text: #222222; /* text - Dark text for readability */
   --color-border: #b3c7a8; /* border - Light border */
@@ -13,11 +14,17 @@
   --color-buttondarker-text: #ffffff;
   --color-overlay: rgba(0, 0, 0, .05); /* Retaining original value */
   --color-card: #f9f9f5;
+  --color-tag-include: #3E8326
+  --color-tag-in-text: #e3efd9;
+  --color-tag-exclude: #a61000
+  --color-tag-ex-text: #e3efd9;
+  --color-imdb-yellow: #ECC233;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --color-primary: #a0c188; /* primary - A lighter shade of the base for better visibility on dark background */
+    --color-primary-text: #2f3633;
     --color-background: #2f3633; /* background - Dark background */
     --color-text: #ffffff; /* text - White text for contrast */
     --color-border: #3d5435; /* border - Darker border that still provides definition */
@@ -27,5 +34,10 @@
     --color-buttondarker-text: #ffffff;
     --color-overlay: rgba(0, 0, 0, .05); /* Retaining original value */
     --color-card: #415934;
+    --color-tag-include: #3E8326;
+    --color-tag-in-text: #e3efd9;
+    --color-tag-exclude: #a61000;
+    --color-tag-ex-text: #e3efd9;
+    --color-imdb-yellow: #ECC233;
   }
 }

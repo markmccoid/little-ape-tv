@@ -41,8 +41,17 @@ export const TagItem = ({
   const [localState, setLocalState] = useState(state);
   const [isProcessing, setIsProcessing] = useState(false);
   const bgColor =
-    localState === 'include' ? 'green' : localState === 'exclude' ? colors.deleteRed : 'white';
-  const fgColor = localState === 'exclude' ? 'white' : 'black';
+    localState === 'include'
+      ? colors.tagInclude
+      : localState === 'exclude'
+        ? colors.tagExclude
+        : 'white';
+  const fgColor =
+    localState === 'exclude'
+      ? colors.tagExcludeText
+      : localState === 'include'
+        ? colors.tagIncludeText
+        : 'black';
 
   const fontSize = size === 'xs' ? 12 : size === 's' ? 15 : 18;
   const iconSize = size === 'xs' ? 12 : size === 's' ? 15 : 20;
@@ -115,9 +124,15 @@ export const TagItem = ({
             style={{ paddingRight: 5 }}
             name={localState !== 'off' ? 'tag' : 'tago'}
             size={iconSize}
+            color={fgColor}
           />
         )}
-        <Text className="" style={{ fontSize: fontSize, color: fgColor }}>
+        <Text
+          style={{
+            fontSize: fontSize,
+            color: fgColor,
+            fontWeight: localState === 'off' ? '400' : '600',
+          }}>
           {tagName}
         </Text>
       </View>

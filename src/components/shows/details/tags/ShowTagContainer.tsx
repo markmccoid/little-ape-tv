@@ -98,7 +98,7 @@ const ShowTagContainer = ({ showId }: Props) => {
             <MotiView
               from={{ rotate: '-45deg' }}
               animate={{ rotate: showTags ? '-135deg' : '-45deg' }}>
-              <TagPlusIcon size={25} color={colors.buttontext} />
+              <TagPlusIcon size={25} color={colors.primarytext} />
             </MotiView>
             {matchedTags?.length === 0 && !showTags && (
               <MotiView

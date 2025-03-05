@@ -4,8 +4,9 @@ import {
   Dimensions,
   Image as RNImage,
   ScrollView,
-  StyleSheet,
+  Linking,
   Pressable,
+  Alert,
 } from 'react-native';
 import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { useShowDetails } from '~/data/query.shows';
@@ -25,6 +26,9 @@ import { HomeIcon } from '~/components/common/Icons';
 import CastContainer from './cast/CastContainer';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useHeaderHeight } from '@react-navigation/elements';
+import TransparentBackground from '~/components/common/TransparentBackground';
+import UserRatingContainer from './userRating/UserRatingContainer';
+import { UserRatingDetailScreen, MenuItem } from './userRating/UserRatingDetailScreen';
 
 const { width, height } = Dimensions.get('window');
 
@@ -133,14 +137,74 @@ const ShowDetailContainer = ({ showId }: Props) => {
           </View>
         </View>
 
-        <View className="mx-2 mt-2 flex-row justify-start">
-          <Pressable
-            onPress={() =>
-              router.push({ pathname: `/[showid]/seasonslist`, params: { showid: showId } })
-            }
-            className="border bg-green-700 px-2 py-1">
-            <Text>Seasons</Text>
-          </Pressable>
+        <View className="mx-2 mt-2 flex-1 flex-row items-center rounded-lg border-hairline p-2">
+          <TransparentBackground />
+          <View
+            className="flex-row"
+            style={[
+              {
+                justifyContent: 'flex-start',
+                paddingBottom: 0,
+                flex: 1,
+                alignItems: 'center',
+              },
+            ]}>
+            <UserRatingDetailScreen
+              menu={[
+                { displayText: '1' },
+                { displayText: '2' },
+                { displayText: '3' },
+                { displayText: '4' },
+                { displayText: '5' },
+                { displayText: '6' },
+                { displayText: '7' },
+                { displayText: '8' },
+                { displayText: '9' },
+                { displayText: '10' },
+              ]} // Explicitly pass the 10-item menu
+              onPress={(selectedItem: MenuItem) =>
+                savedShows$.updateShowUserRating(data.tmdbId, parseInt(selectedItem.displayText))
+              }
+              size={32} // Optional: Customize the size
+              closedOffset={4} // Optional: Customize the closed offset
+              itemSpacing={5}
+              currentRating={data.userRating || 0}
+            />
+          </View>
+          {/* <UserRatingContainer showId={data.tmdbId} /> */}
+          {/* <View className="flex-1 flex-row gap-1">
+            {new Array(11).fill(undefined).map((_, index) => (
+              <View className="z-20 h-[25] w-[25] flex-row items-center justify-center rounded-lg border-hairline bg-white">
+                <Text className="text-base font-semibold">{index}</Text>
+              </View>
+            ))}
+          </View> */}
+          {/* Buttons */}
+          <View className="flex-row justify-end gap-2">
+            <Pressable
+              onPress={() =>
+                router.push({ pathname: `/[showid]/seasonslist`, params: { showid: showId } })
+              }
+              className="rounded-lg border-hairline bg-buttondarker px-3 py-1">
+              <Text className="font-semibold text-buttondarkertext">Seasons</Text>
+            </Pressable>
+            <Pressable
+              onPress={() => {
+                try {
+                  const imdbId = data?.imdbId;
+                  if (!imdbId) throw new Error('Null imdb id');
+                  Linking.openURL(`imdb:///title/${imdbId}`).catch((err) => {
+                    Linking.openURL(`https://www.imdb.com/title/${imdbId}/`);
+                    // Linking.openURL('https://apps.apple.com/us/app/imdb-movies-tv-shows/id342792525');
+                  });
+                } catch (err) {
+                  Alert.alert('Error', 'Unable to find Link for IMDB');
+                }
+              }}
+              className="rounded-lg border-hairline bg-imdbYellow px-3 py-1">
+              <Text className="font-semibold">IMDB</Text>
+            </Pressable>
+          </View>
         </View>
 
         {/* Show Tags - If null passed for showId, this container will not show */}

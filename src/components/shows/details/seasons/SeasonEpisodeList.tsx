@@ -35,7 +35,7 @@ const TVShowSectionList: React.FC<Props> = ({ seasons, showData }) => {
   const { showid } = useLocalSearchParams();
   const sectionListRef = useRef<SectionList>(null);
   const watchedCounts = useWatchedEpisodeCount(showid as string, seasons);
-  console.log('watchedCounts', watchedCounts.lastWatchedSeason + 1);
+
   // Map seasons to SectionList sections
   const sections = seasons.map((season) => ({
     title: season.seasonNumber === 0 ? season.name : `Season ${season.seasonNumber}`,
@@ -56,13 +56,12 @@ const TVShowSectionList: React.FC<Props> = ({ seasons, showData }) => {
   });
 
   useEffect(() => {
-    if (sectionListRef.current) {
-      console.log('USEEFFECT', watchedCounts.lastWatchedSeason);
+    if (sectionListRef.current && watchedCounts?.lastWatchedSeason) {
       setTimeout(() => scrollToLocation(watchedCounts.lastWatchedSeason, 0), 100);
     } else {
-      console.log('sectionListRef.current is null');
+      // console.log('sectionListRef.current is null');
     }
-  }, [watchedCounts.lastWatchedSeason, sectionListRef.current]);
+  }, [watchedCounts?.lastWatchedSeason, sectionListRef.current]);
 
   const scrollToLocation = useCallback(
     (sectionIndex: number, itemIndex: number) => {

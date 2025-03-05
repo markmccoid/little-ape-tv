@@ -1,7 +1,8 @@
 import { authManager } from '~/authentication/AuthProvider';
 import { observable, Observable, syncState } from '@legendapp/state';
 import { createShowFunctions } from './functions-shows';
-import type { ShowFunctions, SavedShow, SavedShows, SavedShowsAttributes } from './functions-shows';
+import type { ShowFunctions, SavedShow, SavedShows } from './functions-shows';
+import type { SavedShowsAttributes } from './functions-showAttributes';
 import { type TagFunctions, type Tag, createTagFunctions } from './functions-tags';
 import { synced } from '@legendapp/state/sync';
 import { ObservablePersistMMKV } from '@legendapp/state/persist-plugins/mmkv';

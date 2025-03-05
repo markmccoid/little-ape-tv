@@ -14,6 +14,7 @@ type CustomTheme = Theme & {
     // secondaryForeground: string;
     // muted: string;
     // mutedForeground: string;
+    primarytext: string;
     button: string;
     buttonDarker: string;
     buttontext: string;
@@ -28,6 +29,10 @@ type CustomTheme = Theme & {
     deleteRed: string;
     includeGreen: string;
     imdbYellow: string;
+    tagInclude: string;
+    tagExclude: string;
+    tagIncludeText: string;
+    tagExcludeText: string;
   };
 };
 
@@ -36,6 +41,7 @@ export const CustomLightTheme: CustomTheme = {
   colors: {
     ...DefaultTheme.colors,
     primary: '#193703', // will be text color in React Native headers
+    primarytext: '#e3efd9',
     background: '#e3efd9', // Light background (almost off-white)
     card: '#f9f9f5', //'#a8c4a8', //'#7bb55b', //'#6a9c4f', // Card color (same as primary)
     text: '#222222', // Dark text for readability
@@ -49,7 +55,10 @@ export const CustomLightTheme: CustomTheme = {
     deleteRed: '#a61000',
     includeGreen: '#6cb043',
     imdbYellow: '#ECC233',
-
+    tagInclude: '#3E8326',
+    tagIncludeText: '#e3efd9',
+    tagExclude: '#a61000',
+    tagExcludeText: '#e3efd9',
     // // Additional recommended colors
     // secondary: '#2f80ed', // Secondary brand color (contrasting blue)
     // success: '#4caf50', // Success states
@@ -69,6 +78,7 @@ export const CustomDarkTheme: CustomTheme = {
   colors: {
     ...DarkTheme.colors,
     primary: '#a0c188', // A lighter shade of the base for better visibility on dark background
+    primarytext: '#2f3633',
     background: '#1e1e1e', // Dark background
     card: '#415934', //'#4b663c', // Darkened version of base color for cards
     text: '#ffffff', // White text for contrast
@@ -82,5 +92,9 @@ export const CustomDarkTheme: CustomTheme = {
     deleteRed: '#e85a49',
     includeGreen: '#8dc864',
     imdbYellow: '#f8cf4a',
+    tagInclude: '#3E8326',
+    tagIncludeText: '#e3efd9',
+    tagExclude: '#a61000',
+    tagExcludeText: '#e3efd9',
   },
 };

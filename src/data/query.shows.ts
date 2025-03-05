@@ -9,7 +9,7 @@ import {
   TVShowDetails,
   TVShowSeasonDetails,
 } from '@markmccoid/tmdb_api';
-import { SavedShow } from '~/store/functions-shows';
+import { SavedShow, SavedShows } from '~/store/functions-shows';
 import { useQuery, QueryClient } from '@tanstack/react-query';
 import { savedShows$ } from '~/store/store-shows';
 import axios, { all } from 'axios';
@@ -88,7 +88,7 @@ export type ShowDetailsData = UseShowDetailsReturn['data'];
 
 export const useShowDetails = (showId: number) => {
   // Load show if saved locally from legend state
-  const localShow = use$(savedShows$.shows[showId]);
+  const localShow = use$(savedShows$.shows[showId]) as SavedShow;
   // This query will immediately return the placeholder data if available (locally saved show)
   // Then pull details from tmdb_api and merge with localShow if available.
   const { data, ...rest } = useQuery<Partial<SavedShow> & Partial<TVShowDetails>, Error>({

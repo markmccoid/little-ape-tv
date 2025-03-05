@@ -104,7 +104,7 @@ export const useWatchedEpisodeCount = (
         : fin['lastWatchedSeason'] || 0;
       return fin;
     },
-    {}
+    {} as SeasonEpisodesState
   );
   return seasonEpisodesState;
 };
