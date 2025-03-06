@@ -54,12 +54,31 @@ const TVShowSectionList: React.FC<Props> = ({ seasons, showData }) => {
     getItemHeight: ITEM_HEIGHT,
     getSectionHeaderHeight: SECTION_HEADER_HEIGHT,
   });
-
+  // Find the lastSeasonWatched
+  // then check if the season following (if exists) has any watched episodes
+  // scroll to first unwatched episode index
+  // console.log('WWWW', watchedCounts);
+  // console.log(
+  //   watchedCounts.lastWatchedSeason,
+  //   watchedCounts[watchedCounts.lastWatchedSeason + 1]?.watched,
+  //   seasons.length,
+  //   watchedCounts.lastWatchedSeason + 1 <= seasons.length
+  //     ? watchedCounts[watchedCounts.lastWatchedSeason + 1]?.watched
+  //     : 0
+  // );
   useEffect(() => {
-    if (sectionListRef.current && watchedCounts?.lastWatchedSeason) {
-      setTimeout(() => scrollToLocation(watchedCounts.lastWatchedSeason, 0), 100);
-    } else {
-      // console.log('sectionListRef.current is null');
+    if (
+      sectionListRef.current &&
+      (watchedCounts?.lastWatchedSeason || watchedCounts?.lastWatchedSeason === 0) &&
+      // If last season watched is the last season then we can't scroll past it.
+      // This keeps that from happening
+      watchedCounts?.lastWatchedSeason < seasons.length
+    ) {
+      const episodeIndex =
+        watchedCounts.lastWatchedSeason + 1 <= seasons.length
+          ? watchedCounts[watchedCounts.lastWatchedSeason + 1]?.watched || 0
+          : 0;
+      setTimeout(() => scrollToLocation(watchedCounts.lastWatchedSeason, episodeIndex), 100);
     }
   }, [watchedCounts?.lastWatchedSeason, sectionListRef.current]);
 
