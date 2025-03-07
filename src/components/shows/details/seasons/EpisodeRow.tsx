@@ -13,6 +13,7 @@ import { getEpisodeIMDBURL } from '~/data/query.shows';
 import { use$ } from '@legendapp/state/react';
 import { SymbolView } from 'expo-symbols';
 import { useCustomTheme } from '~/utils/customColorTheme';
+import { MotiView } from 'moti';
 
 // Define fixed heights for performance
 const ITEM_HEIGHT = 120;
@@ -48,17 +49,26 @@ const EpisodeRow = ({ showId, isStoredLocally, item }: Props) => {
     //     });
     //   }}>
     <View
-      className="flex-row items-center  px-2 py-2"
+      className={`flex-row items-center border-t-hairline px-2 py-2 ${attributes?.watched ? 'bg-[#c5d9c3] dark:bg-[#606b5f]' : ''}`}
       style={{
         height: ITEM_HEIGHT,
-        backgroundColor: attributes?.watched ? '#c5d9c3' : '',
+        // backgroundColor: attributes?.watched ? '#c5d9c3' : '',
       }}>
       <Pressable
-        onPress={() => {
-          toggleEpisodeDownloaded(showId, item.seasonNumber, item.episodeNumber);
-        }}
-        disabled={!isStoredLocally}>
-        {isStoredLocally && attributes?.downloaded && (
+        onPress={async () => {
+          const { imdbId } = await getEpisodeIMDBURL(
+            parseInt(showId),
+            item.seasonNumber,
+            item.episodeNumber
+          );
+          if (imdbId === null) {
+            return null;
+          }
+          Linking.openURL(`imdb:///title/${imdbId}`).catch((err) => {
+            Linking.openURL(`https://www.imdb.com/title/${imdbId}/`);
+          });
+        }}>
+        {/* {isStoredLocally && attributes?.downloaded && (
           <View className="absolute left-[-8] top-[-8] z-10 items-center justify-center rounded-lg  bg-white p-1">
             <SymbolView name="square.and.arrow.down" size={20} tintColor="black" />
           </View>
@@ -67,33 +77,64 @@ const EpisodeRow = ({ showId, isStoredLocally, item }: Props) => {
           <View className="absolute left-[-8] top-[-8] z-10 items-center justify-center rounded-lg  bg-white p-1">
             <SymbolView name="arrow.down" size={20} tintColor="black" />
           </View>
-        )}
-        <Image
-          source={item.stillURL}
-          // style={styles.image}
+        )} */}
+        <View
+          // className="overflow-hidden"
           style={{
-            width: 100,
-            height: 100,
-            borderWidth: attributes?.downloaded ? 2 : StyleSheet.hairlineWidth,
-            borderColor: attributes?.downloaded ? 'red' : '#ccc',
+            backgroundColor: 'white',
             borderRadius: 12,
-          }}
-          placeholder={require('../../../../../assets/missingPoster.png')}
-        />
+            borderWidth: attributes?.downloaded ? 2 : 2, //StyleSheet.hairlineWidth,
+            borderColor: attributes?.downloaded ? colors.buttonDarker : colors.border,
+            shadowColor: '#000',
+            shadowOffset: {
+              width: 1,
+              height: 2,
+            },
+            shadowOpacity: 0.25,
+            shadowRadius: 3.84,
+          }}>
+          <Image
+            source={item.stillURL}
+            style={{
+              width: 100,
+              height: 100,
+              borderRadius: 10,
+              // borderWidth: attributes?.downloaded ? 2 : 2, //StyleSheet.hairlineWidth,
+              // borderColor: '#ffffff00',
+            }}
+            placeholder={require('../../../../../assets/missingPoster.png')}
+          />
+        </View>
       </Pressable>
-      {/* <Text>
-              {item.episodeNumber}-{item.name}
-            </Text>
-            <Image source={{ uri: item.stillURL }} style={styles.image} /> */}
+
       <View className="flex-1">
         <Pressable
           onPress={() => {
             toggleEpisodeDownloaded(showId, item.seasonNumber, item.episodeNumber);
           }}
           disabled={!isStoredLocally}>
-          <View>
-            <Text className="mx-2 text-lg font-semibold text-text" numberOfLines={1}>
-              {item.episodeNumber}. {item.name}
+          <View className="flex-row items-center">
+            <MotiView
+              animate={{
+                backgroundColor: attributes?.downloaded ? colors.buttonDarker : '#ffffff00',
+                borderColor: attributes?.downloaded ? colors.buttonDarkerText : '#ffffff00',
+              }}
+              exit={{
+                backgroundColor: attributes?.downloaded ? colors.buttonDarker : '#ffffff00',
+                borderColor: attributes?.downloaded ? colors.buttonDarkerText : '#ffffff00',
+              }}
+              className={`rounded-b-xl rounded-r-xl ${attributes?.downloaded ? ' border-hairline' : 'border-hairline border-transparent'}`}>
+              <Text
+                className="mx-2 py-[2] pl-[2] pr-[1] text-lg font-semibold text-text"
+                numberOfLines={1}>
+                {item.episodeNumber}.
+              </Text>
+            </MotiView>
+            <Text
+              className="flex-1 pl-[1] text-lg font-semibold text-text"
+              numberOfLines={1}
+              lineBreakMode="tail">
+              {item.name}
             </Text>
           </View>
         </Pressable>
@@ -106,9 +147,11 @@ const EpisodeRow = ({ showId, isStoredLocally, item }: Props) => {
             {item.overview}
           </Text>
         </View>
-        <View className="mx-2 mt-1 flex-row items-center justify-between">
-          <Text style={styles.footerText}>{item?.airDate?.formatted}</Text>
-          <Text style={styles.footerText}>{item?.runTime} min</Text>
+        <View
+          className="ml-1 mt-1 flex-row items-center justify-between rounded-lg border-hairline bg-[#ffffff99] py-[2] pl-2 pr-2
+         dark:bg-[#77777777]">
+          <Text style={{ color: colors.text, fontSize: 12 }}>{item?.airDate?.formatted}</Text>
+          <Text style={{ color: colors.text, fontSize: 12 }}>{item?.runTime} min</Text>
           {/* {isStoredLocally && ( */}
           <Pressable
             className={`flex-row items-center justify-center ${isStoredLocally ? 'opacity-100' : 'opacity-0'}`}

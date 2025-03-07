@@ -4,6 +4,7 @@ import { ShowDetailsData, useShowDetails, useShowSeasonData } from '~/data/query
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import SeasonEpisodeList from './SeasonEpisodeList';
 import { CloseIcon } from '~/components/common/Icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type Props = {
   showData: ShowDetailsData;
@@ -11,6 +12,7 @@ type Props = {
 const SeasonsContainer = () => {
   const { showid } = useLocalSearchParams();
   const router = useRouter();
+  const { bottom } = useSafeAreaInsets();
   const { data: showData } = useShowDetails(parseInt(showid as string));
   // console.log('SeasonsContainer', showid, showData.tmdbId);
   const seasons = useMemo(() => {
@@ -19,9 +21,8 @@ const SeasonsContainer = () => {
   // console.log('SEASONS', seasons);
   const { data, isLoading } = useShowSeasonData(showid as string, seasons);
   // console.log('SeasonEpisode Data', data[0]);
-
   return (
-    <View className="mb-20 flex-1">
+    <View className={`flex-1`}>
       {/* Modal Header */}
       <View className="h-12 flex-row items-center justify-center bg-gray-800">
         <View className="ml-3  flex-row items-center ">

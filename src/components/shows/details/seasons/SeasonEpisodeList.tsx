@@ -54,18 +54,9 @@ const TVShowSectionList: React.FC<Props> = ({ seasons, showData }) => {
     getItemHeight: ITEM_HEIGHT,
     getSectionHeaderHeight: SECTION_HEADER_HEIGHT,
   });
-  // Find the lastSeasonWatched
+  // Find the lastSeasonWatched (0 means no season watched)
   // then check if the season following (if exists) has any watched episodes
   // scroll to first unwatched episode index
-  // console.log('WWWW', watchedCounts);
-  // console.log(
-  //   watchedCounts.lastWatchedSeason,
-  //   watchedCounts[watchedCounts.lastWatchedSeason + 1]?.watched,
-  //   seasons.length,
-  //   watchedCounts.lastWatchedSeason + 1 <= seasons.length
-  //     ? watchedCounts[watchedCounts.lastWatchedSeason + 1]?.watched
-  //     : 0
-  // );
   useEffect(() => {
     if (
       sectionListRef.current &&
@@ -127,8 +118,8 @@ const TVShowSectionList: React.FC<Props> = ({ seasons, showData }) => {
     return (
       <View
         style={{
-          borderBottomWidth: StyleSheet.hairlineWidth,
-          borderColor: 'black',
+          // borderBottomWidth: 2, //StyleSheet.hairlineWidth,
+          // borderColor: 'black',
           height: ITEM_HEIGHT,
         }}>
         <EpisodeRow
@@ -211,4 +202,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TVShowSectionList;
+export default React.memo(TVShowSectionList);
