@@ -7,18 +7,12 @@ import { getEpisodeIMDBURL, ShowDetailsData, UseShowDetailsReturn } from '~/data
 import { useLocalSearchParams } from 'expo-router';
 import EpisodeRow from './EpisodeRow';
 import { CheckIcon, TelevisionIcon, TelevisionOffIcon } from '~/components/common/Icons';
-import {
-  removeSeasonFromWatched,
-  SeasonEpisodesState,
-  setSeasonToWatched,
-  updateAllEpisodesWatched,
-  useWatchedEpisodeCount,
-} from '~/store/functions-showAttributes';
+import { useWatchedEpisodeCount } from '~/store/functions-showAttributes';
 import SeasonHeader from './SeasonHeader';
 
 // Define fixed heights for performance
 const SECTION_HEADER_HEIGHT = 70;
-const ITEM_HEIGHT = 120;
+const ITEM_HEIGHT = 125;
 
 type Props = {
   seasons: TVShowSeasonDetails[];
@@ -34,6 +28,7 @@ export type SeasonsSection = {
 const TVShowSectionList: React.FC<Props> = ({ seasons, showData }) => {
   const { showid } = useLocalSearchParams();
   const sectionListRef = useRef<SectionList>(null);
+  const seasonScrollRef = useRef<ScrollView>(null);
   const watchedCounts = useWatchedEpisodeCount(showid as string, seasons);
 
   // Map seasons to SectionList sections
@@ -54,6 +49,16 @@ const TVShowSectionList: React.FC<Props> = ({ seasons, showData }) => {
     getItemHeight: ITEM_HEIGHT,
     getSectionHeaderHeight: SECTION_HEADER_HEIGHT,
   });
+  useEffect(() => {
+    if (seasonScrollRef.current) {
+      // Button Width = 105
+      // find last watched season and multiple by button width
+      const xOffset = (watchedCounts?.lastWatchedSeason || 0 - 1) * 105;
+      if (xOffset < 0) return;
+      console.log('watched', watchedCounts?.lastWatchedSeason, xOffset);
+      setTimeout(() => seasonScrollRef.current.scrollTo({ x: xOffset, animated: true }), 0);
+    }
+  }, [seasonScrollRef.current]);
   // Find the lastSeasonWatched (0 means no season watched)
   // then check if the season following (if exists) has any watched episodes
   // scroll to first unwatched episode index
@@ -134,15 +139,16 @@ const TVShowSectionList: React.FC<Props> = ({ seasons, showData }) => {
   return (
     <View className="flex-1">
       <ScrollView
+        ref={seasonScrollRef}
         horizontal
-        className="my-1 flex-row"
-        contentContainerClassName="gap-2 px-2"
+        className="my-2 flex-row"
+        contentContainerClassName="gap-[8] px-2"
         showsHorizontalScrollIndicator={false}>
         {sections.map((section, index) => (
           <Pressable
             key={section.title}
             onPress={() => scrollToLocation(index, 0)}
-            className={`flex-row rounded-lg border bg-button px-2 py-1 ${section.counts?.allWatched ? 'bg-buttondarker' : ''}`}>
+            className={`w-[97] flex-row justify-center rounded-lg border bg-button px-[8] py-1 ${section.counts?.allWatched ? 'bg-buttondarker' : ''}`}>
             <Text
               className={`font-semibold ${section.counts?.allWatched ? 'text-buttondarkertext' : 'text-buttontext'} `}>
               {section.title}

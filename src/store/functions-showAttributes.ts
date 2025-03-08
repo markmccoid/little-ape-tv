@@ -4,6 +4,7 @@
 import { TVShowSeasonDetails } from '@markmccoid/tmdb_api';
 import { savedShows$ } from './store-shows';
 import { use$ } from '@legendapp/state/react';
+import { confirmAlert } from '~/utils/alert';
 
 // ====================================================
 // ====================================================
@@ -13,6 +14,7 @@ import { use$ } from '@legendapp/state/react';
 export type EpisodeAttributes = {
   watched?: boolean;
   downloaded?: boolean;
+  favorited?: boolean;
   dateWatched?: number;
   rating?: number;
 };
@@ -54,6 +56,7 @@ export type SeasonEpisodesState = {
   [seasonNumber: string]: {
     watched: number;
     downloaded: number;
+    favorited: number;
     allWatched: boolean;
     allDownloaded: boolean;
   };
@@ -119,12 +122,36 @@ export const toggleEpisodeWatched = (
 ) => {
   const episodeKey = buildSeasonEpisodeKey(seasonNumber, episodeNumber);
   const watched = savedShows$.showAttributes[showId][episodeKey].watched.peek();
+
   if (watched === true) {
     savedShows$.showAttributes[showId][episodeKey].watched.delete();
   } else {
     savedShows$.showAttributes[showId][episodeKey].watched.set(!!!watched);
+    // if episode is 0 or 1 just return
+    if (episodeNumber <= 1) return;
+    // Else check to see if previous episode was watched, if so ask if they want previous checked
+    let prevWatched = true;
+    const prevEpisodeKey = buildSeasonEpisodeKey(seasonNumber, episodeNumber - 1);
+    prevWatched = savedShows$.showAttributes[showId][prevEpisodeKey].watched.peek();
+    if (prevWatched) return;
+    // Loop through previous episodes for season and update watch to true
+    confirmAlert(
+      'Mark Previous',
+      'Set Previous Episodes to Watched',
+      () => {
+        const prevEpisode = episodeNumber - 1;
+        for (let e = prevEpisode; e >= 0; e--) {
+          const episodeKey = buildSeasonEpisodeKey(seasonNumber, e);
+          savedShows$.showAttributes[showId][episodeKey].watched.set(true);
+        }
+      },
+      () => {} // Do nothing on Cancel
+    );
   }
 };
+//~ -----------------------------------------------
+//~ Toggle Downloaded Status
+//~ -----------------------------------------------
 export const toggleEpisodeDownloaded = (
   showId: string,
   seasonNumber: number,
@@ -136,6 +163,23 @@ export const toggleEpisodeDownloaded = (
     savedShows$.showAttributes[showId][episodeKey].downloaded.delete();
   } else {
     savedShows$.showAttributes[showId][episodeKey].downloaded.set(!!!downloaded);
+  }
+};
+
+//~ -----------------------------------------------
+//~ Toggle Favorited Status
+//~ -----------------------------------------------
+export const toggleEpisodeFavorited = (
+  showId: string,
+  seasonNumber: number,
+  episodeNumber: number
+) => {
+  const episodeKey = buildSeasonEpisodeKey(seasonNumber, episodeNumber);
+  const favorited = savedShows$.showAttributes[showId][episodeKey].favorited.peek();
+  if (favorited === true) {
+    savedShows$.showAttributes[showId][episodeKey].favorited.delete();
+  } else {
+    savedShows$.showAttributes[showId][episodeKey].favorited.set(!!!favorited);
   }
 };
 
@@ -167,6 +211,7 @@ export const removeSeasonFromDownloaded = (
   updateAllEpisodesWatched(showId, seasonNumber, numOfEpisodes, 'downloaded', 'remove');
 };
 
+// Helper functions all call this with hardcoded values for field and action
 export const updateAllEpisodesWatched = (
   showId: string,
   seasonNumber: number,

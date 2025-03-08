@@ -7,17 +7,18 @@ import { synced } from '@legendapp/state/sync';
 
 type Settings = {
   searchNumColumns: 2 | 3;
+  showImageInEpisode: boolean;
 };
 //~ - - - - - - - - - - - - - - - - - -
 //~ settings$ Observable
 //~ - - - - - - - - - - - - - - - - - -
-const initialState = { searchNumColumns: 2 };
+const initialState = { searchNumColumns: 2, showImageInEpisode: true };
 export const settings$ = observable<Settings>(
   synced({
     initial: initialState,
     persist: {
       plugin: new ObservablePersistMMKV({ id: authManager.currentUser?.id }),
-      name: 'savedshows',
+      name: 'settings',
     },
   })
 );

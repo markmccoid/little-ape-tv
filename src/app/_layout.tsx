@@ -2,7 +2,7 @@ import '~/global.css';
 
 import { Slot, Stack, useRouter, useSegments } from 'expo-router';
 import { useEffect } from 'react';
-import { View, useColorScheme } from 'react-native';
+import { Appearance, View, useColorScheme } from 'react-native';
 import { AuthProvider, useAuth } from '~/authentication/AuthProvider';
 import * as SplashScreen from 'expo-splash-screen';
 import { initTMDB } from '@markmccoid/tmdb_api';
@@ -91,6 +91,7 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
   //! Uncomment to use the react query dev tools
   // useReactQueryDevTools(queryClient);
+  // Appearance.setColorScheme('light');
 
   return (
     <GestureHandlerRootView>
