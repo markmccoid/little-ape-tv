@@ -112,6 +112,7 @@ const ShowTagContainer = ({ showId }: Props) => {
             )}
           </Animated.View>
         </Pressable>
+
         <Animated.FlatList
           horizontal={true}
           showsHorizontalScrollIndicator={false}
@@ -119,7 +120,8 @@ const ShowTagContainer = ({ showId }: Props) => {
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => {
             return (
-              <Pressable onPress={() => toggleTagState(item.id)}>
+              <Pressable onPress={toggleShowTags}>
+                {/* <Pressable onPress={() => toggleTagState(item.id)}> */}
                 <Animated.View
                   className={`mr-[5] flex-row items-center justify-center rounded-lg border-hairline px-[5] py-[2]
                   ${showTags ? 'opacity-55' : 'opacity-100'} `}

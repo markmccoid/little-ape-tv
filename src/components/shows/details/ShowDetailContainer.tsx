@@ -99,7 +99,7 @@ const ShowDetailContainer = ({ showId }: Props) => {
         from={{ translateY: 50 }}
         animate={{ translateY: 0 }}
         transition={{ delay: 300 }}
-        className="absolute bottom-[2] right-[20%] z-10">
+        className="absolute bottom-[5] right-[5%] z-10 rounded-full border bg-white p-2">
         <Pressable onPress={() => router.dismissAll()}>
           <HomeIcon size={25} />
         </Pressable>

@@ -1,5 +1,5 @@
 import { View, Text, Linking, Pressable, StyleSheet } from 'react-native';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Image } from 'expo-image';
 import {
   EyeFilledIcon,
@@ -22,6 +22,7 @@ import { SymbolView } from 'expo-symbols';
 import { useCustomTheme } from '~/utils/customColorTheme';
 import { MotiView } from 'moti';
 import { settings$ } from '~/store/store-settings';
+import { imdbLinkToEpisode } from '~/utils/imdbLinks';
 
 // Define fixed heights for performance
 const ITEM_HEIGHT = 125;
@@ -30,16 +31,6 @@ type Props = {
   showId: string;
   isStoredLocally: boolean;
   item: Episode;
-};
-//Open the IMDB app to the season/episode
-const linkToImdb = async (showId: string, seasonNumber: number, episodeNumber: number) => {
-  const { imdbId } = await getEpisodeIMDBURL(parseInt(showId), seasonNumber, episodeNumber);
-  if (imdbId === null) {
-    return null;
-  }
-  Linking.openURL(`imdb:///title/${imdbId}`).catch((err) => {
-    Linking.openURL(`https://www.imdb.com/title/${imdbId}/`);
-  });
 };
 
 //~~ Component EpisodeRow
@@ -50,7 +41,6 @@ const EpisodeRow = ({ showId, isStoredLocally, item }: Props) => {
   );
   const showImage = use$(settings$.showImageInEpisode);
 
-  // console.log('EpisodeRow', attributes);
   return (
     <View
       className={`flex-row items-center border-t px-2 py-2 ${attributes?.watched ? 'bg-[#c5d9c3] dark:bg-[#606b5f]' : ''}`}
@@ -60,8 +50,8 @@ const EpisodeRow = ({ showId, isStoredLocally, item }: Props) => {
       }}>
       {!showImage && (
         <Pressable
-          onPress={async () => linkToImdb(showId, item.seasonNumber, item.episodeNumber)}
-          className="absolute right-0 top-0 z-30">
+          onPress={async () => imdbLinkToEpisode(showId, item.seasonNumber, item.episodeNumber)}
+          className="absolute right-0 top-0 z-0">
           <View className="rounded-bl-lg border-b-hairline border-l-hairline bg-yellow-200 py-1 pl-[4] pr-[2]">
             {/* <IMDBIcon size={25}  /> */}
             <Text>IMDb</Text>
@@ -69,7 +59,8 @@ const EpisodeRow = ({ showId, isStoredLocally, item }: Props) => {
         </Pressable>
       )}
       {showImage && (
-        <Pressable onPress={async () => linkToImdb(showId, item.seasonNumber, item.episodeNumber)}>
+        <Pressable
+          onPress={async () => imdbLinkToEpisode(showId, item.seasonNumber, item.episodeNumber)}>
           <View
             style={{
               backgroundColor: 'white',
@@ -192,4 +183,5 @@ const styles = StyleSheet.create({
     color: '#666',
   },
 });
+
 export default React.memo(EpisodeRow);

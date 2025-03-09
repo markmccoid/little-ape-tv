@@ -54,15 +54,18 @@ export const buildSeasonEpisodeKey = (seasonNumber: number, episodeNumber: numbe
 //~ -----------------------------------------------
 export type SeasonEpisodesState = {
   [seasonNumber: string]: {
+    episodeCount: number;
     watched: number;
     downloaded: number;
     favorited: number;
     allWatched: boolean;
     allDownloaded: boolean;
   };
-} & { lastWatchedSeason: number };
+} & { lastWatchedSeason: number; numEpisodesWatched: number };
 export type SeasonStateKeys = keyof SeasonEpisodesState;
 
+// Calculate object with lastWatchedSeason and then a key for each season
+// and list of attributes for that season
 export const useWatchedEpisodeCount = (
   showId: string,
   seasons: TVShowSeasonDetails[]
@@ -90,21 +93,45 @@ export const useWatchedEpisodeCount = (
       // We are removing episodes that are marked as unwatched or undownloaded
       const isWatched = tempSeasonEpisodeState[epStateKey]?.watched ? 1 : 0;
       const isDownloaded = tempSeasonEpisodeState[epStateKey]?.downloaded ? 1 : 0;
+      const isFavorited = tempSeasonEpisodeState[epStateKey]?.favorited ? 1 : 0;
       // console.log('Season Number', seasonNumber, tempSeasonEpisodeState[epStateKey].watched);
       // Initialize fin[seasonNumber] if it doesn't exist
       if (!fin[seasonNumber]) {
-        fin[seasonNumber] = { watched: 0, downloaded: 0, allWatched: false, allDownloaded: false };
+        fin[seasonNumber] = {
+          watched: 0,
+          downloaded: 0,
+          favorited: 0,
+          allWatched: false,
+          allDownloaded: false,
+          episodeCount: 0,
+        };
       }
-      // Assign if episode watched or downloaded
+      // Assign how many episodes in each season are favorited, watched or downloaded
+      fin[seasonNumber].favorited = fin[seasonNumber].favorited + isFavorited;
+      // WATCHED
       fin[seasonNumber].watched = fin[seasonNumber].watched + isWatched;
       fin[seasonNumber].allWatched =
         fin[seasonNumber].watched === seasonEpisodeCounts?.[Number(seasonNumber)];
+      // DOWNLOADED
       fin[seasonNumber].downloaded = fin[seasonNumber].downloaded + isDownloaded;
       fin[seasonNumber].allDownloaded =
         fin[seasonNumber].downloaded === seasonEpisodeCounts?.[Number(seasonNumber)];
+      // Season Total Episode Count
+      fin[seasonNumber].episodeCount = seasonEpisodeCounts?.[Number(seasonNumber)];
+
+      // Aggregate number of episodes for each season marked as allWatched
+      // We are going to use this help place the section list in the right place
+      // when rendering for the first time.
+      let episodes = fin['numEpisodesWatched'] || 0;
+      episodes = fin[seasonNumber].allWatched
+        ? episodes + seasonEpisodeCounts?.[Number(seasonNumber)]
+        : episodes;
+      fin['numEpisodesWatched'] = episodes;
+      // Store the last season that is marked as allWatched
       fin['lastWatchedSeason'] = fin[seasonNumber].allWatched
         ? Number(seasonNumber)
         : fin['lastWatchedSeason'] || 0;
+
       return fin;
     },
     {} as SeasonEpisodesState

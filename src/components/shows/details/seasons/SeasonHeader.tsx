@@ -26,8 +26,8 @@ const SeasonHeader = ({ showId, section, headerHeight }: Props) => {
 
   return (
     <View
-      className={` flex-col border-b-hairline bg-button px-3 py-2  ${allWatched ? 'bg-buttondarker' : ''}`}
-      style={{ height: 70 }}>
+      className={`z-50 flex-col border-b-hairline bg-button px-3 py-2  ${allWatched ? 'bg-buttondarker' : ''}`}
+      style={{ height: headerHeight }}>
       {/* First Line */}
       <View className="flex-row justify-center">
         <Text
@@ -90,4 +90,4 @@ const SeasonHeader = ({ showId, section, headerHeight }: Props) => {
   );
 };
 
-export default SeasonHeader;
+export default React.memo(SeasonHeader);
