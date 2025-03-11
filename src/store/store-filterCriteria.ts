@@ -33,6 +33,7 @@ type BaseFilters = {
 };
 type NameFilter = {
   showName: string;
+  ignoreOtherFilters: boolean;
 };
 export type FilterStatus = {
   overallStatus: 'active' | 'inactive';
@@ -42,19 +43,65 @@ export type FilterStatus = {
   favorited: 'active' | 'inactive';
 };
 
-export type FilterCriteria = {
-  baseFilters: BaseFilters;
-  nameFilter: NameFilter;
-  actionClearTags: () => void;
-  actionClearGenres: () => void;
+//~ SORT Types
+export type SortField = {
+  id: string;
+  position: number;
+  active: boolean;
+  sortDirection: 'asc' | 'desc';
+  sortField: string;
+  title: string;
+  type: 'alpha' | 'date' | 'number';
 };
 
+//----------------------------
+//-- MAIN Filter Type
+//----------------------------
+export type FilterCriteria = {
+  baseFilters: BaseFilters;
+  nameFilter: NameFilter; //Title of show search
+  sortSettings: SortField[]; // The current sort
+  actionClearTags: () => void;
+  actionClearGenres: () => void;
+  updateSortSettings: (sortFields: SortField[]) => void;
+  reorderSortSettings: (sortedIds: string[]) => void;
+};
+const defaultSort: SortField[] = [
+  {
+    id: '1',
+    position: 1,
+    active: true,
+    sortDirection: 'desc',
+    sortField: 'dateAddedEpoch',
+    title: 'Date Added',
+    type: 'number',
+  },
+  {
+    id: '2',
+    position: 2,
+    active: true,
+    sortDirection: 'desc',
+    sortField: 'userRating',
+    title: 'User Rating',
+    type: 'number',
+  },
+  {
+    id: '3',
+    position: 3,
+    active: false,
+    sortDirection: 'asc',
+    sortField: 'name',
+    title: 'Show Name',
+    type: 'alpha',
+  },
+];
 //~ - - - - - - - - - - - - - - - - - -
 //~ filterCriteria$ Observable
 //~ - - - - - - - - - - - - - - - - - -
 export const filterCriteria$ = observable<FilterCriteria>({
   baseFilters: {},
-  nameFilter: { showName: '' },
+  nameFilter: { showName: '', ignoreOtherFilters: true },
+  sortSettings: defaultSort,
   actionClearTags: () => {
     filterCriteria$.baseFilters.assign({
       includeTags: [],
@@ -66,6 +113,24 @@ export const filterCriteria$ = observable<FilterCriteria>({
       includeGenres: [],
       excludeGenres: [],
     });
+  },
+  updateSortSettings: (sortFields) => {
+    filterCriteria$.sortSettings.set(sortFields);
+  },
+  reorderSortSettings: (sortedIds) => {
+    const sorts = filterCriteria$.sortSettings.peek();
+    const updatedSorts = sortedIds
+      .map((id, index) => {
+        const sort = sorts.find((sort) => sort.id === id);
+        if (sort) {
+          return { ...sort, position: index + 1 }; // Update position (starting from 1)
+        } else {
+          console.warn(`Sort with ID ${id} not found in the original sortSettings array.`);
+          return null; // Or handle the missing tag as appropriate for your application
+        }
+      })
+      .filter((sort) => sort !== null); // Remove any nulls caused by missing IDs
+    filterCriteria$.sortSettings.set(updatedSorts);
   },
 });
 
@@ -92,7 +157,10 @@ export const useFilterTags = () => {
     }
   }) as (Tag & { state: 'off' | 'include' | 'exclude' })[];
 };
-
+//~ ------------------------------------------------
+//~ Adds the state property to the genresList items so we know what is off/include/exclude
+//~ so we can set the ui correctly.
+//~ ------------------------------------------------
 export const useFilterGenres = () => {
   const includeGenres = use$(filterCriteria$.baseFilters.includeGenres) || [];
   const excludeGenres = use$(filterCriteria$.baseFilters.excludeGenres) || [];
@@ -110,7 +178,10 @@ export const useFilterGenres = () => {
 };
 
 //~ ------------------------------------------------
-//~ Updates both the includeTags and excludeTags arrays in filterCriteria.baseFitlers
+//~ Updates both the includeTags and excludeTags arrays in filterCriteria$.baseFitlers
+//~ parameters sent in will determine which helper function to call and what action to
+//~ take on (include, exclude, off) and which item (genres or tags)
+//~ This is the MAIN Function that sets the tag/genre filter data
 //~ ------------------------------------------------
 export const fcUpdateTagsGenres = (
   items: string,
@@ -185,9 +256,9 @@ const handleoffState = (includeTags: string[] = [], excludeTags: string[] = [], 
 };
 // - Tag update helpers END ----------
 
-//~ -----------------------------------------------------------------------------------------------
-//~ HELPER FUNCTIONS
-//~ -----------------------------------------------------------------------------------------------
+//# -----------------------------------------------------------------------------------------------
+//# HELPER FUNCTIONS
+//# -----------------------------------------------------------------------------------------------
 // --------------
 // -- Helper functions for tri-state filters like Watched and Favorited
 // Takes in an inlcusion string or a inclusion index and returns inclusion string
@@ -206,3 +277,7 @@ export const getInclusionIndex = (inclusionState: InclusionState | undefined) =>
   if (inclusionIndex === -1) return 0;
   return inclusionIndex;
 };
+
+//# ====================================================
+//# SORT FUNCTIONS
+//# ====================================================

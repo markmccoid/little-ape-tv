@@ -153,20 +153,28 @@ const TVShowSectionList: React.FC<Props> = ({ seasons, showData }) => {
         renderItem={renderItem}
         renderSectionHeader={renderSectionHeader}
         keyExtractor={keyExtractor}
-        // contentContainerStyle={{ paddingBottom: 55 }}
-        style={{ width: '100%' }}
+        contentContainerStyle={{ paddingBottom: 55 }}
+        style={{ width: '100%', paddingBottom: 55 }}
         getItemLayout={buildGetItemLayout}
-        // initialNumToRender={25}
+        // This will scroll us to the latest episode in the season being watched.
         onLayout={() => {
+          // Bail if no seasons watched
+          let lastSeasonWatched = 0;
+          if (watchedCounts?.lastWatchedSeason) {
+            lastSeasonWatched = watchedCounts?.lastWatchedSeason;
+          }
+
           const episodeIndex =
-            watchedCounts.lastWatchedSeason + 1 <= seasons.length
-              ? watchedCounts[watchedCounts.lastWatchedSeason + 1]?.watched || 0
+            lastSeasonWatched + 1 <= seasons.length
+              ? watchedCounts?.[lastSeasonWatched + 1]?.watched || 0
               : 0;
-          watchedCounts.lastWatchedSeason, episodeIndex;
+
+          const seasonIndexToScroll =
+            lastSeasonWatched === seasons.length ? lastSeasonWatched - 1 : lastSeasonWatched;
           // try and scroll to latest season/episode
           // const [latestSeason, latestEpisode] = getLastestEpisodeWatched(tvShowId);
           sectionListRef.current?.scrollToLocation({
-            sectionIndex: watchedCounts.lastWatchedSeason,
+            sectionIndex: seasonIndexToScroll,
             itemIndex: 0,
             viewPosition: 0,
             animated: true,
@@ -174,7 +182,7 @@ const TVShowSectionList: React.FC<Props> = ({ seasons, showData }) => {
           setTimeout(
             () =>
               sectionListRef.current?.scrollToLocation({
-                sectionIndex: watchedCounts.lastWatchedSeason,
+                sectionIndex: seasonIndexToScroll,
                 itemIndex: episodeIndex,
                 viewPosition: 0,
                 animated: true,
@@ -182,7 +190,7 @@ const TVShowSectionList: React.FC<Props> = ({ seasons, showData }) => {
             100
           );
         }}
-        initialScrollIndex={watchedCounts.numEpisodesWatched}
+        initialScrollIndex={watchedCounts?.numEpisodesWatched || 0}
       />
     </View>
   );

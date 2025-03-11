@@ -21,6 +21,7 @@ import ScrollerMain from './ScrollerMain';
 import ScrollerSecond from './ScrollerSecond';
 import { MotiView } from 'moti';
 import SetFavoriteButton from '../details/tags/SetFavoriteButton';
+import DeleteShowButton from './DeleteShowButton';
 
 const { width, height } = Dimensions.get('window');
 const MARGIN = 10;
@@ -78,10 +79,10 @@ const ShowItem = ({ show }: Props) => {
 
   const buttonStyle = useAnimatedStyle(() => {
     return {
-      position: 'absolute',
-      left: -10,
-      top: -10,
-      opacity: interpolate(scrollX.value, [0, 0.7, 0.9, 1], [0, 0.1, 0.4, 1], Extrapolation.CLAMP),
+      // position: 'absolute',
+      // left: -10,
+      // top: -10,
+      opacity: interpolate(scrollX.value, [0, 0.7, 0.9, 1], [0, 0.2, 0.4, 1], Extrapolation.CLAMP),
     };
   });
 
@@ -123,9 +124,14 @@ const ShowItem = ({ show }: Props) => {
       />
 
       {currIndex === 1 && (
-        <Animated.View style={buttonStyle}>
-          <SetFavoriteButton showId={show.tmdbId} isFavorited={!!show.favorite} />
-        </Animated.View>
+        <>
+          <Animated.View style={[buttonStyle, { position: 'absolute', left: 0, top: -10 }]}>
+            <SetFavoriteButton showId={show.tmdbId} isFavorited={!!show.favorite} />
+          </Animated.View>
+          <Animated.View style={[buttonStyle, { position: 'absolute', right: 0, top: -10 }]}>
+            <DeleteShowButton showId={show.tmdbId} />
+          </Animated.View>
+        </>
       )}
 
       {/* Future Home of dynamic Info screen.  Maybe button (circle) in corner of image when long press

@@ -29,9 +29,11 @@ const tagInitialState: { tagList: Tag[] } = { tagList: [] };
 //~ --- savedShow$ --------
 //~ Create the Observable, minus the functions
 //~ ==================
-export const savedShows$ = observable<
-  { shows: SavedShows; showAttributes: SavedShowsAttributes } & ShowFunctions
->(
+export type SavedShowObservable = {
+  shows: SavedShows;
+  showAttributes: SavedShowsAttributes;
+} & ShowFunctions;
+export const savedShows$ = observable<SavedShowObservable>(
   synced({
     initial: initialState,
     persist: {

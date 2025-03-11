@@ -68,6 +68,7 @@ const ScrollerSecond = ({ show, imageWidth, imageHeight, index, scrollX }: Props
             numberOfLines={2}>
             {show.name}
           </Text>
+          <Text className="text-center text-lg font-semibold">{show.dateAddedEpoch}</Text>
         </View>
       </Animated.View>
     </View>

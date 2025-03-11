@@ -30,7 +30,7 @@ const SetFavoriteButton = ({ showId, isDisplayed = true, isFavorited }: Props) =
         key="A"
         from={{ opacity: 0, scale: 0 }}
         animate={{ opacity: isDisplayed ? 100 : 0, scale: isDisplayed ? 1 : 0 }}
-        transition={{ type: 'timing', duration: 500 }}
+        transition={{ type: 'timing', duration: 300 }}
         exit={{ opacity: 0 }}>
         <SymbolView
           name="heart.circle.fill"

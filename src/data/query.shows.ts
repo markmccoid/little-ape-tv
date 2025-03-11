@@ -5,22 +5,20 @@ import {
   tvGetShowEpisodeExternalIds,
   tvGetShowSeasonDetails,
   tvGetWatchProviders,
-  TVSearchResultItem,
   TVShowDetails,
   TVShowSeasonDetails,
 } from '@markmccoid/tmdb_api';
-import { SavedShow, SavedShows } from '~/store/functions-shows';
-import { useQuery, QueryClient } from '@tanstack/react-query';
+import { SavedShow } from '~/store/functions-shows';
+import { useQuery } from '@tanstack/react-query';
 import { savedShows$ } from '~/store/store-shows';
-import axios, { all } from 'axios';
-import { filterCriteria$ } from '~/store/store-filterCriteria';
-import { sortBy } from 'lodash';
+import axios from 'axios';
+import { filterCriteria$, SortField } from '~/store/store-filterCriteria';
+import { orderBy, sortBy } from 'lodash';
 
 //~ ------------------------------------------------------
 //~ useShows - FILTERED SAVED Shows
 //~ ------------------------------------------------------
 export const useShows = () => {
-  // Need to bring in a filter
   const savedShowsObj = use$(savedShows$.shows);
   const {
     includeGenres = [],
@@ -29,56 +27,137 @@ export const useShows = () => {
     excludeTags = [],
   } = use$(filterCriteria$.baseFilters);
   const filterIsFavorited = use$(filterCriteria$.baseFilters.filterIsFavorited);
+  const { showName, ignoreOtherFilters } = use$(filterCriteria$.nameFilter);
+  const sortSettings = use$(filterCriteria$.sortSettings);
+  const savedShows = Object.values(savedShowsObj); // More performant than Object.keys().map()
 
-  const savedShows = Object.keys(savedShowsObj).map((key) => savedShowsObj[key]);
-  // If no filter critera are chosen that would affect shows shown, return all records
-  if (
-    !includeTags?.length &&
-    !excludeTags?.length &&
-    !includeGenres?.length &&
-    !excludeGenres?.length &&
-    filterIsFavorited === 'off'
-  ) {
-    return savedShows;
-  }
-  const filteredShows: SavedShow[] = savedShows.filter((show) => {
-    // Handle undefined userTags
-    const userTags = show.userTags || []; // Treat undefined as an empty array
-    const showGenres = show.genres || [];
+  // Early return for no filters
+  const hasNoFilters =
+    !includeTags.length &&
+    !excludeTags.length &&
+    !includeGenres.length &&
+    !excludeGenres.length &&
+    filterIsFavorited === 'off' &&
+    !showName;
+  if (hasNoFilters) return savedShows;
 
-    //~ Check Tags
-    // NOTE: if includeTags is an empty array, .every will always return true.
-    const includesAllIncludeTags = includeTags.every((tag) => userTags.includes(tag));
-    // Check if show includes any excludeTags
-    const includesAnyExcludeTags = excludeTags.some((tag) => userTags.includes(tag));
+  // Pre-process showName for better performance
+  const normalizedShowName = showName?.toLowerCase() || '';
 
-    //~~ Check Genres
-    const includesAllGenres = includeGenres.every((genre) => showGenres.includes(genre));
-    const includesAnyExcludeGenres = excludeGenres.some((genre) => showGenres.includes(genre));
+  // Filter predicates
+  // These functions will be called within the filter on savedShows
+  const matchesName = (show: SavedShow) =>
+    !normalizedShowName || show.name.toLowerCase().includes(normalizedShowName);
 
-    //~~ Check favorite
-    // off = true (include); include = true (include) ; exclude = false (exclude)
-    const isFavorite = !!show.favorite;
-    const includeShowAsFav =
-      filterIsFavorited === 'include'
-        ? isFavorite
-        : filterIsFavorited === 'exclude'
-          ? !isFavorite
-          : true;
-    // Return true if it includes all include tags and does NOT include any exclude tags
+  const matchesTags = (show: SavedShow) => {
+    const userTags = show.userTags || [];
     return (
-      show.name,
-      includesAllIncludeTags &&
-        !includesAnyExcludeTags &&
-        includesAllGenres &&
-        !includesAnyExcludeGenres &&
-        includeShowAsFav
+      includeTags.every((tag) => userTags.includes(tag)) &&
+      !excludeTags.some((tag) => userTags.includes(tag))
     );
-  });
-  // console.log(savedShowsObj);
+  };
 
-  return filteredShows;
+  const matchesGenres = (show: SavedShow) => {
+    const showGenres = show.genres || [];
+    return (
+      includeGenres.every((genre) => showGenres.includes(genre)) &&
+      !excludeGenres.some((genre) => showGenres.includes(genre))
+    );
+  };
+
+  const matchesFavorite = (show: SavedShow) => {
+    const isFavorite = !!show.favorite;
+    return filterIsFavorited === 'include'
+      ? isFavorite
+      : filterIsFavorited === 'exclude'
+        ? !isFavorite
+        : true;
+  };
+
+  const filteredShows = savedShows.filter((show) => {
+    // Quick name-only filter when ignoring other filters
+    if (ignoreOtherFilters && normalizedShowName) {
+      return matchesName(show);
+    }
+    // Full filter
+    return matchesName(show) && matchesTags(show) && matchesGenres(show) && matchesFavorite(show);
+  });
+  const { sortFields, sortDirections } = getSort(sortSettings);
+
+  return orderBy(filteredShows, sortFields, sortDirections);
 };
+// export const useShows = () => {
+//   // Need to bring in a filter
+//   const savedShowsObj = use$(savedShows$.shows);
+//   const {
+//     includeGenres = [],
+//     includeTags = [],
+//     excludeGenres = [],
+//     excludeTags = [],
+//   } = use$(filterCriteria$.baseFilters);
+//   const filterIsFavorited = use$(filterCriteria$.baseFilters.filterIsFavorited);
+//   // Show Title filter
+//   const { showName, ignoreOtherFilters } = use$(filterCriteria$.nameFilter);
+
+//   const savedShows = Object.keys(savedShowsObj).map((key) => savedShowsObj[key]);
+//   // If no filter critera are chosen that would affect shows shown, return all records
+//   if (
+//     !showName &&
+//     !includeTags?.length &&
+//     !excludeTags?.length &&
+//     !includeGenres?.length &&
+//     !excludeGenres?.length &&
+//     filterIsFavorited === 'off'
+//   ) {
+//     return savedShows;
+//   }
+//   const filteredShows: SavedShow[] = savedShows.filter((show) => {
+//     // Handle undefined userTags
+//     const userTags = show.userTags || []; // Treat undefined as an empty array
+//     const showGenres = show.genres || [];
+
+//     // Check name match first (case insensitive)
+//     const nameMatches = showName ? show.name.toLowerCase().includes(showName.toLowerCase()) : true;
+
+//     // If ignoreOtherFilters is true and we have a showName, return based on name match only
+//     if (ignoreOtherFilters && showName) {
+//       return nameMatches;
+//     }
+
+//     //~ Check Tags
+//     // NOTE: if includeTags is an empty array, .every will always return true.
+//     const includesAllIncludeTags = includeTags.every((tag) => userTags.includes(tag));
+//     // Check if show includes any excludeTags
+//     const includesAnyExcludeTags = excludeTags.some((tag) => userTags.includes(tag));
+
+//     //~~ Check Genres
+//     const includesAllGenres = includeGenres.every((genre) => showGenres.includes(genre));
+//     const includesAnyExcludeGenres = excludeGenres.some((genre) => showGenres.includes(genre));
+
+//     //~~ Check favorite
+//     // off = true (include); include = true (include) ; exclude = false (exclude)
+//     const isFavorite = !!show.favorite;
+//     const includeShowAsFav =
+//       filterIsFavorited === 'include'
+//         ? isFavorite
+//         : filterIsFavorited === 'exclude'
+//           ? !isFavorite
+//           : true;
+//     // Return true if it includes all include tags and does NOT include any exclude tags
+//     return (
+//       nameMatches &&
+//       includesAllIncludeTags &&
+//       !includesAnyExcludeTags &&
+//       includesAllGenres &&
+//       !includesAnyExcludeGenres &&
+//       includeShowAsFav
+//     );
+//   });
+//   // console.log(savedShowsObj);
+//   // Sort
+
+//   return filteredShows;
+// };
 
 //~ ------------------------------------------------------
 //~ useShowDetail - GET DETAILS For a Shows
@@ -341,4 +420,22 @@ export const useOMDBData = (imdbId: string | undefined) => {
     queryFn: async () => await getOMDBData(imdbId),
     enabled: !!imdbId,
   });
+};
+
+//- --------------------------------------
+// Get active sort in correct order
+//- --------------------------------------
+const getSort = (sortSettings: SortField[]) => {
+  const filteredAndSortedFields = sortSettings
+    .filter((field) => field.active) // Filter for active fields
+    .sort((a, b) => a.index - b.index); // Sort by index in ascending order
+
+  const sortFields = filteredAndSortedFields.map((field) => field.sortField);
+  const sortDirections = filteredAndSortedFields.map((field) => field.sortDirection);
+
+  return {
+    sortedFields: filteredAndSortedFields,
+    sortFields,
+    sortDirections,
+  };
 };

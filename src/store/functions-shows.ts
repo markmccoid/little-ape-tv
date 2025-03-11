@@ -14,8 +14,7 @@ import { search$ } from './store-search';
 // import { savedShows$ } from './store-shows';
 import { InfiniteData } from '@tanstack/react-query';
 import { formatEpoch } from '~/utils/utils';
-import { savedShows$ } from './store-shows';
-import { use$ } from '@legendapp/state/react';
+import { SavedShowObservable } from './store-shows';
 
 //~ -----------------------------------------------
 export type SavedShow = {
@@ -26,6 +25,7 @@ export type SavedShow = {
   posterURL?: string;
   backdropURL?: string;
   avgEpisodeRunTime?: number;
+  firstAirDateEpoch: number;
   imdbEpisodesURL?: string;
   genres?: string[];
   // User specific
@@ -33,6 +33,7 @@ export type SavedShow = {
   favorite?: number; // Epoch date number
   userTags?: string[];
   dateAddedEpoch: number;
+  dateLastUpdatedEpoch: number;
   // Stores the streaming data for a show (allows for search)
   streaming?: {
     dateAddedEpoch: number;
@@ -61,11 +62,7 @@ export type ShowFunctions = {
 };
 
 export const createShowFunctions = (
-  savedShows$: Observable<
-    {
-      shows: SavedShows;
-    } & ShowFunctions
-  >
+  savedShows$: Observable<SavedShowObservable>
 ): ShowFunctions => {
   return {
     addShow: async (showId) => {
@@ -81,17 +78,19 @@ export const createShowFunctions = (
         backdropURL: data.backdropURL,
         avgEpisodeRunTime: data.avgEpisodeRunTime,
         imdbEpisodesURL: data.imdbEpisodesURL,
+        firstAirDateEpoch: data.firstAirDate.epoch,
         genres: data.genres,
         // User specific
         userRating: 0,
         dateAddedEpoch: formatEpoch(Date.now()),
+        dateLastUpdatedEpoch: formatEpoch(Date.now()),
         // Stores the streaming data for a show (allows for search)
         // streaming?: {
         //   dateAddedEpoch: formatEpoch(Date.now()),
         //   providers: []
         // };
       });
-      console.log('Show Added', showId, data.name);
+      // console.log('Show Added', showId, data.name);
 
       //Retag items in search
       reTagSearch(savedShows$);
@@ -102,6 +101,8 @@ export const createShowFunctions = (
     },
     removeShow: (showId) => {
       savedShows$.shows[showId].delete();
+      savedShows$.showAttributes[showId].delete();
+      console.log('Remove Attr', savedShows$.showAttributes[showId].peek());
       //Retag items in search
       reTagSearch(savedShows$);
       // Need to resync list of genres in genres$.  Can't just filter out, must recalc

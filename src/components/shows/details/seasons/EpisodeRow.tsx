@@ -43,21 +43,12 @@ const EpisodeRow = ({ showId, isStoredLocally, item }: Props) => {
 
   return (
     <View
-      className={`flex-row items-center border-t px-2 py-2 ${attributes?.watched ? 'bg-[#c5d9c3] dark:bg-[#606b5f]' : ''}`}
+      className={`flex-row items-start border-t px-2 py-1 ${attributes?.watched ? 'bg-[#c5d9c3] dark:bg-[#606b5f]' : ''}`}
       style={{
         height: ITEM_HEIGHT,
         // backgroundColor: attributes?.watched ? '#c5d9c3' : '',
       }}>
-      {!showImage && (
-        <Pressable
-          onPress={async () => imdbLinkToEpisode(showId, item.seasonNumber, item.episodeNumber)}
-          className="absolute right-0 top-0 z-0">
-          <View className="rounded-bl-lg border-b-hairline border-l-hairline bg-yellow-200 py-1 pl-[4] pr-[2]">
-            {/* <IMDBIcon size={25}  /> */}
-            <Text>IMDb</Text>
-          </View>
-        </Pressable>
-      )}
+      {/* IMAGE Dependant upon settings$ if shown or not */}
       {showImage && (
         <Pressable
           onPress={async () => imdbLinkToEpisode(showId, item.seasonNumber, item.episodeNumber)}>
@@ -89,7 +80,7 @@ const EpisodeRow = ({ showId, isStoredLocally, item }: Props) => {
           </View>
         </Pressable>
       )}
-      <View className="flex-1">
+      <View className="h-full flex-1 flex-col justify-between ">
         <View className="flex-row items-center">
           <MotiView
             animate={{
@@ -120,6 +111,17 @@ const EpisodeRow = ({ showId, isStoredLocally, item }: Props) => {
             {item.name}
           </Text>
         </View>
+        {/* NO IMAGE Dependant upon settings$ if shown or not */}
+        {!showImage && (
+          <Pressable
+            onPress={async () => imdbLinkToEpisode(showId, item.seasonNumber, item.episodeNumber)}
+            className="absolute right-0 top-0">
+            <View className="rounded-lg border-hairline bg-yellow-200 py-1 pl-[4] pr-[2]">
+              {/* <IMDBIcon size={25}  /> */}
+              <Text>IMDb</Text>
+            </View>
+          </Pressable>
+        )}
         <View className="mx-2">
           <Text
             style={styles.overview}

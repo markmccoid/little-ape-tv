@@ -4,11 +4,9 @@ import { tags$ } from '~/store/store-shows';
 import { use$ } from '@legendapp/state/react';
 import Sortable, { SortableGridRenderItem } from 'react-native-sortables';
 import { Tag } from '~/store/functions-tags';
-import { DeleteIcon, EditIcon } from '~/components/common/Icons';
 import { useCustomTheme } from '~/utils/customColorTheme';
 import showConfirmationPrompt from '~/components/common/showConfirmationPrompt';
 import TagItem from './TagItem';
-import { BounceInRight } from 'react-native-reanimated';
 
 const TagContainer = () => {
   const [newTag, setNewTag] = useState('');

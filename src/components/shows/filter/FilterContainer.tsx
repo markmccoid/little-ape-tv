@@ -3,6 +3,7 @@ import React from 'react';
 import TagFilter from './TagFilter';
 import GenreFilter from './GenreFilter';
 import SegmentedControls from './SegmentedControls';
+import SortManager from './SortManager';
 
 const FilterContainer = () => {
   return (
@@ -10,6 +11,7 @@ const FilterContainer = () => {
       <SegmentedControls />
       <TagFilter />
       <GenreFilter />
+      <SortManager />
     </ScrollView>
   );
 };
