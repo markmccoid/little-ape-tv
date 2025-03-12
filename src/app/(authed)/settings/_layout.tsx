@@ -21,6 +21,14 @@ export default function SettingsLayout() {
         }}
       />
       <Stack.Screen name="tagsetup" options={{ headerShown: true, title: 'Tag Setup' }} />
+      <Stack.Screen
+        name="savedfiltersmaint"
+        options={{ headerShown: true, title: 'Saved Filters' }}
+      />
+      <Stack.Screen
+        name="addeditfiltermodal"
+        options={{ headerShown: true, title: 'Change Me', presentation: 'modal' }}
+      />
     </Stack>
   );
 }

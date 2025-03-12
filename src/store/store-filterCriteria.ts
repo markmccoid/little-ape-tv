@@ -4,7 +4,10 @@ import { tags$ } from './store-shows';
 import { Tag } from './functions-tags';
 import { genres$ } from './store-genres';
 import { use$ } from '@legendapp/state/react';
-
+import { synced } from '@legendapp/state/sync';
+import { ObservablePersistMMKV } from '@legendapp/state/persist-plugins/mmkv';
+import { authManager } from '~/authentication/AuthProvider';
+import { Ionicons } from '@expo/vector-icons';
 //**
 // store-settings contains
 //  */
@@ -54,6 +57,16 @@ export type SortField = {
   type: 'alpha' | 'date' | 'number';
 };
 
+//~ Saved Filter types
+export type SavedFilter = {
+  id: string;
+  name: string;
+  // determine if the filter is shown on side bar
+  favorite?: boolean;
+  position: number;
+  filter: BaseFilters;
+  sort: SortField[];
+};
 //----------------------------
 //-- MAIN Filter Type
 //----------------------------
@@ -61,6 +74,10 @@ export type FilterCriteria = {
   baseFilters: BaseFilters;
   nameFilter: NameFilter; //Title of show search
   sortSettings: SortField[]; // The current sort
+  savedFilters: SavedFilter[]; // Saved filters
+} & FilterCriteriaFunctions;
+
+type FilterCriteriaFunctions = {
   actionClearTags: () => void;
   actionClearGenres: () => void;
   updateSortSettings: (sortFields: SortField[]) => void;
@@ -95,13 +112,10 @@ const defaultSort: SortField[] = [
     type: 'alpha',
   },
 ];
-//~ - - - - - - - - - - - - - - - - - -
-//~ filterCriteria$ Observable
-//~ - - - - - - - - - - - - - - - - - -
-export const filterCriteria$ = observable<FilterCriteria>({
-  baseFilters: {},
-  nameFilter: { showName: '', ignoreOtherFilters: true },
-  sortSettings: defaultSort,
+//# -----------------------------
+//# Filter Criteria Function
+//# -----------------------------
+const filterCriteriaFunctions: FilterCriteriaFunctions = {
   actionClearTags: () => {
     filterCriteria$.baseFilters.assign({
       includeTags: [],
@@ -132,7 +146,69 @@ export const filterCriteria$ = observable<FilterCriteria>({
       .filter((sort) => sort !== null); // Remove any nulls caused by missing IDs
     filterCriteria$.sortSettings.set(updatedSorts);
   },
-});
+};
+
+//# Initial State
+const initialState: Pick<
+  FilterCriteria,
+  'baseFilters' | 'nameFilter' | 'sortSettings' | 'savedFilters'
+> = {
+  baseFilters: {},
+  nameFilter: { showName: '', ignoreOtherFilters: true },
+  sortSettings: defaultSort,
+  savedFilters: [],
+};
+
+//~ - - - - - - - - - - - - - - - - - -
+//~ filterCriteria$ Observable
+//~ - - - - - - - - - - - - - - - - - -
+export const filterCriteria$ = observable<FilterCriteria>(
+  synced({
+    initial: initialState,
+    persist: {
+      plugin: new ObservablePersistMMKV({ id: authManager.currentUser?.id }),
+      name: 'filtercriteria',
+    },
+  })
+);
+
+filterCriteria$.set({ ...initialState, ...filterCriteriaFunctions });
+
+// export const filterCriteria$ = observable<FilterCriteria>({
+//   baseFilters: {},
+//   nameFilter: { showName: '', ignoreOtherFilters: true },
+//   sortSettings: defaultSort,
+//   actionClearTags: () => {
+//     filterCriteria$.baseFilters.assign({
+//       includeTags: [],
+//       excludeTags: [],
+//     });
+//   },
+//   actionClearGenres: () => {
+//     filterCriteria$.baseFilters.assign({
+//       includeGenres: [],
+//       excludeGenres: [],
+//     });
+//   },
+//   updateSortSettings: (sortFields) => {
+//     filterCriteria$.sortSettings.set(sortFields);
+//   },
+//   reorderSortSettings: (sortedIds) => {
+//     const sorts = filterCriteria$.sortSettings.peek();
+//     const updatedSorts = sortedIds
+//       .map((id, index) => {
+//         const sort = sorts.find((sort) => sort.id === id);
+//         if (sort) {
+//           return { ...sort, position: index + 1 }; // Update position (starting from 1)
+//         } else {
+//           console.warn(`Sort with ID ${id} not found in the original sortSettings array.`);
+//           return null; // Or handle the missing tag as appropriate for your application
+//         }
+//       })
+//       .filter((sort) => sort !== null); // Remove any nulls caused by missing IDs
+//     filterCriteria$.sortSettings.set(updatedSorts);
+//   },
+// });
 
 // ---------------------------------------
 //-- filterCriteria$ Observable Functions

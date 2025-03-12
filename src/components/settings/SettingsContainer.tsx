@@ -28,6 +28,13 @@ const SettingsContainer = () => {
         <SymbolView name="chevron.right" tintColor={colors.text} size={20} />
       </Pressable>
       <Pressable
+        onPress={() => router.push('/(authed)/settings/savedfiltersmaint')}
+        className="mx-2 mt-2 flex-row items-center justify-between rounded-lg border-hairline p-1 px-2 active:bg-card"
+        style={{ backgroundColor: `${colors.card}99` }}>
+        <Text className="p-1 text-lg">Saved Filters</Text>
+        <SymbolView name="chevron.right" tintColor={colors.text} size={20} />
+      </Pressable>
+      <Pressable
         onPress={() => router.push('/(authed)/settings/tagsetup')}
         className="mx-2 mt-2 flex-row items-center justify-between rounded-lg border-hairline p-1 pl-2 active:bg-card"
         style={{ backgroundColor: `${colors.card}99` }}>

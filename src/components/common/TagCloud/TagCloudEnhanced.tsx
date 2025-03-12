@@ -118,7 +118,7 @@ export const TagItem = ({
     >
       <View className="flex-row items-center">
         {localState === 'exclude' ? (
-          <UnTagIcon size={iconSize} color="white" style={{ paddingRight: 8 }} />
+          <UnTagIcon size={iconSize} color="white" style={{ paddingRight: 5 }} />
         ) : (
           <AntDesign
             style={{ paddingRight: 5 }}
@@ -131,7 +131,7 @@ export const TagItem = ({
           style={{
             fontSize: fontSize,
             color: fgColor,
-            fontWeight: localState === 'off' ? '400' : '600',
+            fontWeight: localState === 'off' ? '400' : '400',
           }}>
           {tagName}
         </Text>
