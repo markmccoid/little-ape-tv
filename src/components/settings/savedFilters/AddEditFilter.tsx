@@ -2,9 +2,10 @@ import { View, Text, TextInput } from 'react-native';
 import React, { useState } from 'react';
 import { use$ } from '@legendapp/state/react';
 import { tags$ } from '~/store/store-shows';
-import SavedFilterTags from './SavedFilterTags';
+import AddEditFilterTags from './AddEditFilterTags';
 import { useTagManagement } from './useTagManagement';
 import { filterCriteria$ } from '~/store/store-filterCriteria';
+import AddEditFilterGenres from './AddEditFilterGenres';
 
 type Props = {
   filterId?: string;
@@ -19,8 +20,18 @@ const AddEditFilter = ({ filterId }: Props) => {
     includedTags: includeTags,
     excludedTags: excludeTags,
   });
+  //~ get any genres if editing
+  const includeGenres = savedFilters?.filter?.includeGenres;
+  const excludeGenres = savedFilters?.filter?.excludeGenres;
+  //~ YES, poorly named, but useTagManagement works for both tags and genres
+  const { state: genreStateArrays, ...genreFunctions } = useTagManagement({
+    includedTags: includeGenres,
+    excludedTags: excludeGenres,
+  });
+
   const [filterName, setFilterName] = useState(savedFilters?.name || '');
 
+  console.log('includes', genreStateArrays.includedTags);
   return (
     <View>
       <View className="mx-3 my-2 flex-row items-center">
@@ -32,7 +43,8 @@ const AddEditFilter = ({ filterId }: Props) => {
           placeholder="Filter Name"
         />
       </View>
-      <SavedFilterTags tagStateArrays={stateArrays} tagFunctions={tagFunctions} />
+      <AddEditFilterTags tagStateArrays={stateArrays} tagFunctions={tagFunctions} />
+      <AddEditFilterGenres genreStateArrays={genreStateArrays} genreFunctions={genreFunctions} />
     </View>
   );
 };

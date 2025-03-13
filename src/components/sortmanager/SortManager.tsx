@@ -4,29 +4,24 @@ import { use$ } from '@legendapp/state/react';
 import { filterCriteria$, SortField } from '~/store/store-filterCriteria';
 import type { SortableGridRenderItem } from 'react-native-sortables';
 import Sortable from 'react-native-sortables';
+import SortItem from './SortItem';
 
 const SortManager = () => {
   const sortSettings = use$(filterCriteria$.sortSettings);
   // console.log(sortSettings);
   const renderItem = useCallback<SortableGridRenderItem<SortField>>(
-    ({ item }) => (
-      <View className="flex-row border bg-white p-1">
-        <Text>{item.title}</Text>
-        <Text>{item.active}</Text>
-        <Text>{item.sortDirection}</Text>
-        <Text>{item.sortField}</Text>
-      </View>
-    ),
+    ({ item }) => <SortItem item={item} />,
     []
   );
 
   return (
     <View>
+      <Text className="mx-3 text-lg font-semibold text-text">Define Sort</Text>
       <Sortable.Grid
         columns={1}
         data={sortSettings} // Pass your data here
         renderItem={renderItem}
-        rowGap={10}
+        rowGap={1}
         columnGap={10}
         onDragEnd={(parms) => filterCriteria$.reorderSortSettings(parms.indexToKey)}
         enableActiveItemSnap={false}

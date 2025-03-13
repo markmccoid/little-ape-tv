@@ -80,7 +80,7 @@ export type FilterCriteria = {
 type FilterCriteriaFunctions = {
   actionClearTags: () => void;
   actionClearGenres: () => void;
-  updateSortSettings: (sortFields: SortField[]) => void;
+  updateSortSettings: (newSortFieldValues: SortField) => void;
   reorderSortSettings: (sortedIds: string[]) => void;
 };
 const defaultSort: SortField[] = [
@@ -128,22 +128,59 @@ const filterCriteriaFunctions: FilterCriteriaFunctions = {
       excludeGenres: [],
     });
   },
-  updateSortSettings: (sortFields) => {
-    filterCriteria$.sortSettings.set(sortFields);
+  updateSortSettings: (newSortFieldValues) => {
+    const sortSettings = filterCriteria$.sortSettings.peek();
+
+    const newSortSettings = sortSettings.map((sort) => {
+      if (sort.id === newSortFieldValues.id) {
+        return newSortFieldValues;
+      } else {
+        return sort;
+      }
+    });
+    filterCriteria$.sortSettings.set(newSortSettings);
+    filterCriteria$.reorderSortSettings(newSortSettings.map((el) => el.id));
   },
   reorderSortSettings: (sortedIds) => {
     const sorts = filterCriteria$.sortSettings.peek();
-    const updatedSorts = sortedIds
-      .map((id, index) => {
-        const sort = sorts.find((sort) => sort.id === id);
-        if (sort) {
-          return { ...sort, position: index + 1 }; // Update position (starting from 1)
+    // const updatedSorts = sortedIds
+    //   .map((id, index) => {
+    //     const sort = sorts.find((sort) => sort.id === id);
+    //     if (sort) {
+    //       return { ...sort, position: index + 1 }; // Update position (starting from 1)
+    //     } else {
+    //       console.warn(`Sort with ID ${id} not found in the original sortSettings array.`);
+    //       return null; // Or handle the missing tag as appropriate for your application
+    //     }
+    //   })
+    //   .filter((sort) => sort !== null); // Remove any nulls caused by missing IDs
+    // Separate active and inactive sorts based on sortedIds order
+    const activeSorts: SortField[] = [];
+    const inactiveSorts: SortField[] = [];
+
+    sortedIds.forEach((id) => {
+      const sort = sorts.find((sort) => sort.id === id);
+      if (sort) {
+        if (sort.active) {
+          activeSorts.push(sort);
         } else {
-          console.warn(`Sort with ID ${id} not found in the original sortSettings array.`);
-          return null; // Or handle the missing tag as appropriate for your application
+          inactiveSorts.push(sort);
         }
-      })
-      .filter((sort) => sort !== null); // Remove any nulls caused by missing IDs
+      } else {
+        console.warn(`Sort with ID ${id} not found in the original sortSettings array.`);
+      }
+    });
+
+    // Re-order active sorts based on sortedIds order, if they are present
+    const reorderedActiveSorts = sortedIds
+      .map((id) => activeSorts.find((sort) => sort.id === id))
+      .filter((sort) => sort !== undefined); //remove undefined values
+
+    // Combine active and inactive sorts, re-calculating position
+    const updatedSorts = [...reorderedActiveSorts, ...inactiveSorts].map((sort, index) => ({
+      ...sort,
+      position: index + 1,
+    }));
     filterCriteria$.sortSettings.set(updatedSorts);
   },
 };
@@ -254,7 +291,7 @@ export const useFilterGenres = () => {
 };
 
 //~ ------------------------------------------------
-//~ Updates both the includeTags and excludeTags arrays in filterCriteria$.baseFitlers
+//~ Updates both the includeTags and excludeTags arrays in filterCriteria$.baseFilters
 //~ parameters sent in will determine which helper function to call and what action to
 //~ take on (include, exclude, off) and which item (genres or tags)
 //~ This is the MAIN Function that sets the tag/genre filter data

@@ -18,7 +18,6 @@ const tagReducer = (state: TagStateArrays, action: Action): TagStateArrays => {
   switch (action.type) {
     case 'addInc': {
       const tagToAdd = action.payload;
-
       // If already in includedTags, do nothing
       if (state.includedTags.includes(tagToAdd)) {
         return state;
@@ -71,7 +70,11 @@ const tagReducer = (state: TagStateArrays, action: Action): TagStateArrays => {
   }
 };
 
-// Custom hook to use the reducer
+//# ----------------------------------------
+//# Custom Hook to manage both the Tag and Genre include/exclude/off settings
+//# when filtering.  It is poorly named, but since it doesn't manage any
+//# stored data and is just managing the include and exclude list it works fine
+//# ----------------------------------------
 export const useTagManagement = ({ includedTags, excludedTags }: Partial<TagStateArrays>) => {
   const initialState: TagStateArrays = {
     includedTags: includedTags || [],
