@@ -4,15 +4,36 @@ import { use$ } from '@legendapp/state/react';
 import { filterCriteria$, SortField } from '~/store/store-filterCriteria';
 import type { SortableGridRenderItem } from 'react-native-sortables';
 import Sortable from 'react-native-sortables';
-import SortItem from './SortItem';
+import SortItem, { SortItemProps } from './SortItem';
+import { reverse, sortBy } from 'lodash';
 
-const SortManager = () => {
-  const sortSettings = use$(filterCriteria$.sortSettings);
+type Props = {
+  currentSortSettings: SortField[];
+  reorderSorts: (index: string[]) => void;
+  updateActiveFlag: SortItemProps['updateActiveFlag'];
+  updateSortDirection: SortItemProps['updateSortDirection'];
+};
+const SortManager = ({
+  currentSortSettings,
+  reorderSorts,
+  updateActiveFlag,
+  updateSortDirection,
+}: Props) => {
+  const sortSettings = sortBy(currentSortSettings, ['position']);
   // console.log(sortSettings);
-  const renderItem = useCallback<SortableGridRenderItem<SortField>>(
-    ({ item }) => <SortItem item={item} />,
-    []
-  );
+  const renderItem = useCallback<SortableGridRenderItem<SortField>>(({ item, index }) => {
+    console.log('SortItem', item.sortField, index);
+    return (
+      // <Sortable.Handle disabled={!item.active}>
+      <SortItem
+        key={item.id}
+        item={item}
+        updateActiveFlag={updateActiveFlag}
+        updateSortDirection={updateSortDirection}
+      />
+      // </Sortable.Handle>
+    );
+  }, []);
 
   return (
     <View>
@@ -21,14 +42,20 @@ const SortManager = () => {
         columns={1}
         data={sortSettings} // Pass your data here
         renderItem={renderItem}
+        keyExtractor={(item) => item.id}
         rowGap={1}
         columnGap={10}
-        onDragEnd={(parms) => filterCriteria$.reorderSortSettings(parms.indexToKey)}
+        onOrderChange={() => console.log('Order Changed')}
+        onDragEnd={(parms) => {
+          reorderSorts(parms.indexToKey);
+        }}
         enableActiveItemSnap={false}
         activeItemScale={0.95}
         // showDropIndicator
         // itemEntering={BounceInRight}
         hapticsEnabled={true}
+        strategy={'insert'}
+        //        customHandle
       />
     </View>
   );

@@ -8,6 +8,7 @@ import { synced } from '@legendapp/state/sync';
 import { ObservablePersistMMKV } from '@legendapp/state/persist-plugins/mmkv';
 import { authManager } from '~/authentication/AuthProvider';
 import { Ionicons } from '@expo/vector-icons';
+import { update } from 'lodash';
 //**
 // store-settings contains
 //  */
@@ -130,7 +131,6 @@ const filterCriteriaFunctions: FilterCriteriaFunctions = {
   },
   updateSortSettings: (newSortFieldValues) => {
     const sortSettings = filterCriteria$.sortSettings.peek();
-
     const newSortSettings = sortSettings.map((sort) => {
       if (sort.id === newSortFieldValues.id) {
         return newSortFieldValues;
@@ -143,18 +143,6 @@ const filterCriteriaFunctions: FilterCriteriaFunctions = {
   },
   reorderSortSettings: (sortedIds) => {
     const sorts = filterCriteria$.sortSettings.peek();
-    // const updatedSorts = sortedIds
-    //   .map((id, index) => {
-    //     const sort = sorts.find((sort) => sort.id === id);
-    //     if (sort) {
-    //       return { ...sort, position: index + 1 }; // Update position (starting from 1)
-    //     } else {
-    //       console.warn(`Sort with ID ${id} not found in the original sortSettings array.`);
-    //       return null; // Or handle the missing tag as appropriate for your application
-    //     }
-    //   })
-    //   .filter((sort) => sort !== null); // Remove any nulls caused by missing IDs
-    // Separate active and inactive sorts based on sortedIds order
     const activeSorts: SortField[] = [];
     const inactiveSorts: SortField[] = [];
 
@@ -174,14 +162,18 @@ const filterCriteriaFunctions: FilterCriteriaFunctions = {
     // Re-order active sorts based on sortedIds order, if they are present
     const reorderedActiveSorts = sortedIds
       .map((id) => activeSorts.find((sort) => sort.id === id))
-      .filter((sort) => sort !== undefined); //remove undefined values
+      .filter((sort) => sort !== undefined);
 
     // Combine active and inactive sorts, re-calculating position
     const updatedSorts = [...reorderedActiveSorts, ...inactiveSorts].map((sort, index) => ({
       ...sort,
       position: index + 1,
     }));
-    filterCriteria$.sortSettings.set(updatedSorts);
+    console.log(
+      'Updated Sorts',
+      updatedSorts.map((el) => `${el.sortField}-${el.position}`)
+    );
+    filterCriteria$.sortSettings.set([...updatedSorts]);
   },
 };
 

@@ -4,18 +4,20 @@ import { filterCriteria$, SortField } from '~/store/store-filterCriteria';
 import { isEnabled } from 'react-native/Libraries/Performance/Systrace';
 import { SymbolView } from 'expo-symbols';
 import { MotiText, MotiView } from 'moti';
-type Props = {
+
+export type SortItemProps = {
   item: SortField;
+  updateActiveFlag: (sortField: SortField, newValue: boolean) => void;
+  updateSortDirection: (sortField: SortField, prevValue: 'asc' | 'desc') => void;
 };
 
-const SortItem = ({ item }: Props) => {
-  const updateSortActive = (value: boolean) => {
-    filterCriteria$.updateSortSettings({ ...item, active: value });
-  };
-  const toggleSortDirection = () => {
-    const newSortDirection = item.sortDirection === 'asc' ? 'desc' : 'asc';
-    filterCriteria$.updateSortSettings({ ...item, sortDirection: newSortDirection });
-  };
+const SortItem = ({ item, updateActiveFlag, updateSortDirection }: SortItemProps) => {
+  // console.log('In SortItem', `${item.sortField}-${item.reorderDate}`);
+
+  // const toggleSortDirection = () => {
+  //   const newSortDirection = item.sortDirection === 'asc' ? 'desc' : 'asc';
+  //   filterCriteria$.updateSortSettings({ ...item, sortDirection: newSortDirection });
+  // };
 
   return (
     <View className="mx-2 flex-row items-center justify-between ">
@@ -25,7 +27,10 @@ const SortItem = ({ item }: Props) => {
         <View className="w-[150] px-2">
           <Text className="font-bold text-text">{item.title}</Text>
         </View>
-        <Pressable onPress={toggleSortDirection} className="flex-row items-center">
+        <Pressable
+          onPress={() => updateSortDirection(item, item.sortDirection)}
+          disabled={!item.active}
+          className="flex-row items-center">
           <MotiView
             animate={{ rotate: item.sortDirection === 'asc' ? '-75deg' : '75deg' }}
             className="w-[25] flex-shrink flex-row justify-start ">
@@ -52,7 +57,7 @@ const SortItem = ({ item }: Props) => {
           // trackColor={{ false: '#D3D4D8', true: '#5CD85E' }}
           // thumbColor={'#fff'}
           // ios_backgroundColor={'#D3D4D8'}
-          onValueChange={updateSortActive}
+          onValueChange={(value) => updateActiveFlag(item, value)}
           value={item.active}
         />
       </View>
