@@ -8,7 +8,7 @@ import { synced } from '@legendapp/state/sync';
 import { ObservablePersistMMKV } from '@legendapp/state/persist-plugins/mmkv';
 import { authManager } from '~/authentication/AuthProvider';
 import { Ionicons } from '@expo/vector-icons';
-import { update } from 'lodash';
+import { filter, update } from 'lodash';
 //**
 // store-settings contains
 //  */
@@ -68,23 +68,8 @@ export type SavedFilter = {
   filter: BaseFilters;
   sort: SortField[];
 };
-//----------------------------
-//-- MAIN Filter Type
-//----------------------------
-export type FilterCriteria = {
-  baseFilters: BaseFilters;
-  nameFilter: NameFilter; //Title of show search
-  sortSettings: SortField[]; // The current sort
-  savedFilters: SavedFilter[]; // Saved filters
-} & FilterCriteriaFunctions;
 
-type FilterCriteriaFunctions = {
-  actionClearTags: () => void;
-  actionClearGenres: () => void;
-  updateSortSettings: (newSortFieldValues: SortField) => void;
-  reorderSortSettings: (sortedIds: string[]) => void;
-};
-const defaultSort: SortField[] = [
+export const defaultSort: SortField[] = [
   {
     id: '1',
     position: 1,
@@ -113,6 +98,28 @@ const defaultSort: SortField[] = [
     type: 'alpha',
   },
 ];
+//----------------------------
+//-- MAIN Filter Type
+//----------------------------
+export type FilterCriteria = {
+  baseFilters: BaseFilters;
+  nameFilter: NameFilter; //Title of show search
+  sortSettings: SortField[]; // The current sort
+  savedFilters: SavedFilter[]; // Saved filters
+} & FilterCriteriaFunctions;
+
+type FilterCriteriaFunctions = {
+  actionClearTags: () => void;
+  actionClearGenres: () => void;
+  updateSortSettings: (newSortFieldValues: SortField) => void;
+  reorderSortSettings: (sortedIds: string[]) => void;
+  saveFilter: (newSavedFilter: SavedFilter) => void;
+  deleteSavedFilter: (savedFilterId: string) => void;
+  toggleFavoriteSavedFilter: (filterId: string) => void;
+  updateSavedFilterPositions: (sortedIds: string[]) => void;
+  applySavedFilter: (filterId: string) => void;
+};
+
 //# -----------------------------
 //# Filter Criteria Function
 //# -----------------------------
@@ -143,37 +150,69 @@ const filterCriteriaFunctions: FilterCriteriaFunctions = {
   },
   reorderSortSettings: (sortedIds) => {
     const sorts = filterCriteria$.sortSettings.peek();
-    const activeSorts: SortField[] = [];
-    const inactiveSorts: SortField[] = [];
-
-    sortedIds.forEach((id) => {
-      const sort = sorts.find((sort) => sort.id === id);
-      if (sort) {
-        if (sort.active) {
-          activeSorts.push(sort);
-        } else {
-          inactiveSorts.push(sort);
-        }
+    const updatedSorts = reorderSorts(sortedIds, sorts);
+    filterCriteria$.sortSettings.set([...updatedSorts]);
+  },
+  saveFilter: (newSavedFilter: SavedFilter) => {
+    const savedFilters = filterCriteria$.savedFilters.peek();
+    let filterFound = false;
+    const finalFilters = savedFilters.map((filter) => {
+      if (filter.id === newSavedFilter.id) {
+        filterFound = true;
+        return newSavedFilter; // Replace the old filter
       } else {
-        console.warn(`Sort with ID ${id} not found in the original sortSettings array.`);
+        return filter; // Keep the existing filter
       }
     });
+    if (!filterFound) {
+      finalFilters.push({ ...newSavedFilter, position: finalFilters.length });
+    }
+    filterCriteria$.savedFilters.set(finalFilters);
+  },
+  deleteSavedFilter: (savedFilterId: string) => {
+    const savedFilters = filterCriteria$.savedFilters.peek();
+    filterCriteria$.savedFilters.set(savedFilters.filter((el) => el.id !== savedFilterId));
+  },
+  // Update properties on the savedFilters.
+  toggleFavoriteSavedFilter: (filterId: string) => {
+    const savedFilters = filterCriteria$.savedFilters.peek();
+    const finalFilters = savedFilters.map((filter) => {
+      if (filter.id === filterId) {
+        return { ...filter, favorite: !filter.favorite };
+      } else {
+        return filter;
+      }
+    });
+    filterCriteria$.savedFilters.set(finalFilters);
+  },
+  updateSavedFilterPositions: (sortedIds: string[]) => {
+    const savedFilters = filterCriteria$.savedFilters.peek();
+    const reorderedFilters: SavedFilter[] = sortedIds
+      .map((id, index) => {
+        const filter = savedFilters.find((filter) => filter.id === id);
+        if (filter) {
+          return { ...filter, position: index }; // Immutable update
+        } else {
+          console.warn(`ID ${id} not found in savedFilters.`);
+          return undefined; // Should never get here
+        }
+      })
+      .filter((filter) => filter !== undefined) as SavedFilter[]; // Remove undefined filters
+    filterCriteria$.savedFilters.set(reorderedFilters);
+    // Append any filters not in sortedIds to the end
+    // Should never need
+    // const remainingFilters = savedFilters.filter(filter => !sortedIds.includes(filter.id))
+    // remainingFilters.forEach((filter, index) => {
+    //   reorderedFilters.push({...filter, position: sortedIds.length + index})
+    // });
+  },
+  applySavedFilter: (filterId: string) => {
+    const savedFilters = filterCriteria$.savedFilters.peek();
+    const filterToApply = savedFilters.find((filter) => filter.id === filterId);
+    if (!filterToApply) return;
 
-    // Re-order active sorts based on sortedIds order, if they are present
-    const reorderedActiveSorts = sortedIds
-      .map((id) => activeSorts.find((sort) => sort.id === id))
-      .filter((sort) => sort !== undefined);
-
-    // Combine active and inactive sorts, re-calculating position
-    const updatedSorts = [...reorderedActiveSorts, ...inactiveSorts].map((sort, index) => ({
-      ...sort,
-      position: index + 1,
-    }));
-    console.log(
-      'Updated Sorts',
-      updatedSorts.map((el) => `${el.sortField}-${el.position}`)
-    );
-    filterCriteria$.sortSettings.set([...updatedSorts]);
+    filterCriteria$.baseFilters.set(filterToApply.filter);
+    filterCriteria$.sortSettings.set(filterToApply.sort);
   },
 };
 
@@ -386,3 +425,31 @@ export const getInclusionIndex = (inclusionState: InclusionState | undefined) =>
 //# ====================================================
 //# SORT FUNCTIONS
 //# ====================================================
+export const reorderSorts = (sortedIds: string[], sorts: SortField[]) => {
+  const activeSorts: SortField[] = [];
+  const inactiveSorts: SortField[] = [];
+
+  sortedIds.forEach((id) => {
+    const sort = sorts.find((sort) => sort.id === id);
+    if (sort) {
+      if (sort.active) {
+        activeSorts.push(sort);
+      } else {
+        inactiveSorts.push(sort);
+      }
+    } else {
+      console.warn(`Sort with ID ${id} not found in the original sortSettings array.`);
+    }
+  });
+
+  // Re-order active sorts based on sortedIds order, if they are present
+  const reorderedActiveSorts = sortedIds
+    .map((id) => activeSorts.find((sort) => sort.id === id))
+    .filter((sort) => sort !== undefined);
+
+  // Combine active and inactive sorts, re-calculating position
+  return [...reorderedActiveSorts, ...inactiveSorts].map((sort, index) => ({
+    ...sort,
+    position: index + 1,
+  }));
+};

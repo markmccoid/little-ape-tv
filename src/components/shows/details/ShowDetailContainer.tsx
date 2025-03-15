@@ -123,7 +123,6 @@ const ShowDetailContainer = ({ showId }: Props) => {
           <View className="ml-1 flex-1 flex-col overflow-hidden">
             <ScrollView className="mb-1 h-1/3 flex-shrink rounded-lg border-hairline bg-[#ffffff77] p-1">
               <Text className="dark:text-text">{data?.overview}</Text>
-              <Text className="dark:text-text">{data?.overview}</Text>
             </ScrollView>
             <View className="h-1/2 rounded-lg border-hairline bg-[#ffffff77] p-1">
               <Text>Avg. Run Time: {data?.avgEpisodeRunTime}</Text>
@@ -214,7 +213,7 @@ const ShowDetailContainer = ({ showId }: Props) => {
 
         {/* Show Information */}
         <HiddenContainerAnimated title="Where To Watch" extraHeight={10}>
-          <WatchProviderContainer showId={data?.tmdbId} />
+          <WatchProviderContainer showId={showId} />
         </HiddenContainerAnimated>
         <View className="h-2" />
         {/* Recommendations */}

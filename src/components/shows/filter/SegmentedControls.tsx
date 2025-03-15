@@ -18,10 +18,8 @@ const SegmentedControls = () => {
         values={['Ignore', 'Favorites', 'Exclude Favs']}
         selectedIndex={getInclusionIndex(filterIsFavorited)}
         onChange={(event) => {
-          console.log('W Changed', event.nativeEvent.selectedSegmentIndex);
           const state = event.nativeEvent.selectedSegmentIndex;
           filterCriteria$.baseFilters.filterIsFavorited.set(getInclusionValue(state as 0 | 1 | 2));
-          console.log('FAV?', filterCriteria$.baseFilters.filterIsFavorited.get());
         }}
       />
     </View>

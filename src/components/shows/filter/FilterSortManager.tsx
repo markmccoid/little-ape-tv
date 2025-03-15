@@ -7,10 +7,6 @@ import type { SortItemProps } from '~/components/sortmanager/SortItem';
 
 const FilterSortManager = () => {
   const sortSettings = use$(filterCriteria$.sortSettings);
-  console.log(
-    'FilterSortManager',
-    sortSettings.map((el) => `${el.sortField}-${el.position}`)
-  );
   const reorderFunction = filterCriteria$.reorderSortSettings;
   const updateActiveFlag: SortItemProps['updateActiveFlag'] = (item, newValue) => {
     filterCriteria$.updateSortSettings({ ...item, active: newValue });

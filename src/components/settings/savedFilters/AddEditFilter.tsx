@@ -1,37 +1,72 @@
-import { View, Text, TextInput } from 'react-native';
+import { View, Text, TextInput, Pressable, Alert } from 'react-native';
 import React, { useState } from 'react';
 import { use$ } from '@legendapp/state/react';
-import { tags$ } from '~/store/store-shows';
 import AddEditFilterTags from './AddEditFilterTags';
 import { useTagManagement } from './useTagManagement';
-import { filterCriteria$ } from '~/store/store-filterCriteria';
+import { filterCriteria$, InclusionState, SavedFilter } from '~/store/store-filterCriteria';
 import AddEditFilterGenres from './AddEditFilterGenres';
+import AddEditSort from './AddEditSort';
+import { useSavedFilterSort } from './useSavedFilterSort';
+import uuid from 'react-native-uuid';
+import { useRouter } from 'expo-router';
+import AddEditFavorites from './AddEditFavorites';
 
 type Props = {
   filterId?: string;
 };
 const AddEditFilter = ({ filterId }: Props) => {
-  const savedFilters = use$(() =>
+  const router = useRouter();
+  const savedFilter = use$(() =>
     filterCriteria$.savedFilters.peek().find((el) => el.id === filterId)
   );
-  const includeTags = savedFilters?.filter?.includeTags;
-  const excludeTags = savedFilters?.filter?.excludeTags;
+  //# --- Saved Filter Name
+  const [filterName, setFilterName] = useState(savedFilter?.name || '');
+  //# --- Base Filter Info
   const { state: stateArrays, ...tagFunctions } = useTagManagement({
-    includedTags: includeTags,
-    excludedTags: excludeTags,
+    includedTags: savedFilter?.filter?.includeTags,
+    excludedTags: savedFilter?.filter?.excludeTags,
   });
   //~ get any genres if editing
-  const includeGenres = savedFilters?.filter?.includeGenres;
-  const excludeGenres = savedFilters?.filter?.excludeGenres;
   //~ YES, poorly named, but useTagManagement works for both tags and genres
   const { state: genreStateArrays, ...genreFunctions } = useTagManagement({
-    includedTags: includeGenres,
-    excludedTags: excludeGenres,
+    includedTags: savedFilter?.filter?.includeGenres,
+    excludedTags: savedFilter?.filter?.excludeGenres,
   });
+  //~ Favorited
+  const [isFav, setIsFav] = useState<InclusionState>(
+    savedFilter?.filter?.filterIsFavorited || 'off'
+  );
+  const setFavorite = (inclusionState: InclusionState) => {
+    setIsFav(inclusionState);
+  };
+  //# --- Sort Info
+  const sortFields = savedFilter?.sort;
+  const { workingSortFields, savedSortReorder, updateSortDirection, updateActiveFlag } =
+    useSavedFilterSort(sortFields);
 
-  const [filterName, setFilterName] = useState(savedFilters?.name || '');
-
-  console.log('includes', genreStateArrays.includedTags);
+  //# Save Filter Call
+  const handleSaveFilter = () => {
+    if (!filterName.trim()) {
+      Alert.alert('Error', 'You Must Enter a Filter Name');
+      return;
+    }
+    const newFilter: SavedFilter = {
+      id: savedFilter?.id || uuid.v4(),
+      name: filterName,
+      position: savedFilter?.position || 0,
+      filter: {
+        excludeTags: stateArrays.excludedTags,
+        includeTags: stateArrays.includedTags,
+        excludeGenres: genreStateArrays.excludedTags,
+        includeGenres: genreStateArrays.includedTags,
+        filterIsFavorited: isFav,
+      },
+      sort: workingSortFields,
+      favorite: savedFilter?.favorite || false,
+    };
+    filterCriteria$.saveFilter(newFilter);
+    router.dismiss();
+  };
   return (
     <View>
       <View className="mx-3 my-2 flex-row items-center">
@@ -43,8 +78,18 @@ const AddEditFilter = ({ filterId }: Props) => {
           placeholder="Filter Name"
         />
       </View>
+      <AddEditFavorites isFavorited={isFav} setFavorite={setFavorite} />
       <AddEditFilterTags tagStateArrays={stateArrays} tagFunctions={tagFunctions} />
       <AddEditFilterGenres genreStateArrays={genreStateArrays} genreFunctions={genreFunctions} />
+      <AddEditSort
+        sortFields={workingSortFields}
+        updateActiveFlag={updateActiveFlag}
+        updateSortDirection={updateSortDirection}
+        savedSortReorder={savedSortReorder}
+      />
+      <Pressable onPress={handleSaveFilter} className="border bg-button p-2">
+        <Text className="text-buttontext">Save Filter</Text>
+      </Pressable>
     </View>
   );
 };

@@ -21,7 +21,7 @@ type FabButtonProps = {
 
 export function UserRatingDetailScreen({
   menu,
-  size = 64,
+  size = 84,
   closedOffset = 4,
   onPress,
   itemSpacing = 10,
@@ -40,7 +40,7 @@ export function UserRatingDetailScreen({
           const translateY = isOpen ? -35 : closedOffset;
           const opacity = isOpen ? 1 : 0;
           const backgroundColor =
-            isSelected === menuItem.displayText ? colors.buttonDarker : '#D9774A'; //colors.imdbYellow;
+            isSelected === menuItem.displayText ? colors.buttonDarker : colors.button; //'#ffcc00'; //colors.imdbYellow;
           const scale = isSelected === menuItem.displayText ? 1.2 : 1;
 
           return (

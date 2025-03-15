@@ -22,16 +22,15 @@ const SortManager = ({
   const sortSettings = sortBy(currentSortSettings, ['position']);
   // console.log(sortSettings);
   const renderItem = useCallback<SortableGridRenderItem<SortField>>(({ item, index }) => {
-    console.log('SortItem', item.sortField, index);
     return (
-      // <Sortable.Handle disabled={!item.active}>
-      <SortItem
-        key={item.id}
-        item={item}
-        updateActiveFlag={updateActiveFlag}
-        updateSortDirection={updateSortDirection}
-      />
-      // </Sortable.Handle>
+      <Sortable.Handle disabled={!item.active}>
+        <SortItem
+          key={item.id}
+          item={item}
+          updateActiveFlag={updateActiveFlag}
+          updateSortDirection={updateSortDirection}
+        />
+      </Sortable.Handle>
     );
   }, []);
 
@@ -55,7 +54,7 @@ const SortManager = ({
         // itemEntering={BounceInRight}
         hapticsEnabled={true}
         strategy={'insert'}
-        //        customHandle
+        customHandle
       />
     </View>
   );
