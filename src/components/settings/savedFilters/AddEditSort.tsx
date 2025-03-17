@@ -16,20 +16,10 @@ const AddEditSort = ({
   updateSortDirection,
   savedSortReorder,
 }: Props) => {
-  // sortFields = sortFields || defaultSort;
-  const reOrder = (sortedIds: string[]) => {
-    console.log(
-      'Reorder',
-      sortFields?.map((el) => el.id),
-      sortedIds
-    );
-    reorderSorts(sortedIds, sortFields);
-  };
-
   return (
     <View>
       <SortManager
-        currentSortSettings={sortFields}
+        currentSortSettings={sortFields || []}
         reorderSorts={savedSortReorder}
         updateActiveFlag={updateActiveFlag}
         updateSortDirection={updateSortDirection}

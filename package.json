@@ -22,6 +22,8 @@
     "@legendapp/list": "^1.0.0-beta.11",
     "@legendapp/state": "^3.0.0-beta.23",
     "@markmccoid/tmdb_api": "^0.4.0",
+    "@nandorojo/galeria": "^1.1.0",
+    "@react-native-menu/menu": "^1.2.2",
     "@react-native-segmented-control/segmented-control": "2.5.4",
     "@react-navigation/native": "^7.0.3",
     "@tanstack/react-query": "^5.64.2",
@@ -51,6 +53,8 @@
     "react-native-gesture-handler": "~2.20.2",
     "react-native-get-item-layout-section-list": "^0.1.0",
     "react-native-haptic-feedback": "^2.3.3",
+    "react-native-ios-context-menu": "^3.1.0",
+    "react-native-ios-utilities": "^5.1.2",
     "react-native-mmkv": "^3.2.0",
     "react-native-reanimated": "^3.16.2",
     "react-native-safe-area-context": "^5.2.0",
@@ -61,7 +65,7 @@
     "react-native-vector-icons": "^10.2.0",
     "react-native-web": "~0.19.10",
     "vaul": "^1.1.2",
-    "zeego": "^3.0.3"
+    "zeego": "^3.0.5"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

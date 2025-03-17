@@ -1,5 +1,6 @@
 import { use$ } from '@legendapp/state/react';
 import {
+  tvGetImages,
   tvGetShowCredits,
   tvGetShowDetails,
   tvGetShowEpisodeExternalIds,
@@ -86,78 +87,6 @@ export const useShows = () => {
 
   return orderBy(filteredShows, sortFields, sortDirections);
 };
-// export const useShows = () => {
-//   // Need to bring in a filter
-//   const savedShowsObj = use$(savedShows$.shows);
-//   const {
-//     includeGenres = [],
-//     includeTags = [],
-//     excludeGenres = [],
-//     excludeTags = [],
-//   } = use$(filterCriteria$.baseFilters);
-//   const filterIsFavorited = use$(filterCriteria$.baseFilters.filterIsFavorited);
-//   // Show Title filter
-//   const { showName, ignoreOtherFilters } = use$(filterCriteria$.nameFilter);
-
-//   const savedShows = Object.keys(savedShowsObj).map((key) => savedShowsObj[key]);
-//   // If no filter critera are chosen that would affect shows shown, return all records
-//   if (
-//     !showName &&
-//     !includeTags?.length &&
-//     !excludeTags?.length &&
-//     !includeGenres?.length &&
-//     !excludeGenres?.length &&
-//     filterIsFavorited === 'off'
-//   ) {
-//     return savedShows;
-//   }
-//   const filteredShows: SavedShow[] = savedShows.filter((show) => {
-//     // Handle undefined userTags
-//     const userTags = show.userTags || []; // Treat undefined as an empty array
-//     const showGenres = show.genres || [];
-
-//     // Check name match first (case insensitive)
-//     const nameMatches = showName ? show.name.toLowerCase().includes(showName.toLowerCase()) : true;
-
-//     // If ignoreOtherFilters is true and we have a showName, return based on name match only
-//     if (ignoreOtherFilters && showName) {
-//       return nameMatches;
-//     }
-
-//     //~ Check Tags
-//     // NOTE: if includeTags is an empty array, .every will always return true.
-//     const includesAllIncludeTags = includeTags.every((tag) => userTags.includes(tag));
-//     // Check if show includes any excludeTags
-//     const includesAnyExcludeTags = excludeTags.some((tag) => userTags.includes(tag));
-
-//     //~~ Check Genres
-//     const includesAllGenres = includeGenres.every((genre) => showGenres.includes(genre));
-//     const includesAnyExcludeGenres = excludeGenres.some((genre) => showGenres.includes(genre));
-
-//     //~~ Check favorite
-//     // off = true (include); include = true (include) ; exclude = false (exclude)
-//     const isFavorite = !!show.favorite;
-//     const includeShowAsFav =
-//       filterIsFavorited === 'include'
-//         ? isFavorite
-//         : filterIsFavorited === 'exclude'
-//           ? !isFavorite
-//           : true;
-//     // Return true if it includes all include tags and does NOT include any exclude tags
-//     return (
-//       nameMatches &&
-//       includesAllIncludeTags &&
-//       !includesAnyExcludeTags &&
-//       includesAllGenres &&
-//       !includesAnyExcludeGenres &&
-//       includeShowAsFav
-//     );
-//   });
-//   // console.log(savedShowsObj);
-//   // Sort
-
-//   return filteredShows;
-// };
 
 //~ ------------------------------------------------------
 //~ useShowDetail - GET DETAILS For a Shows
@@ -438,4 +367,21 @@ const getSort = (sortSettings: SortField[]) => {
     sortFields,
     sortDirections,
   };
+};
+
+//~~ --------------------------------------------------------------------------------
+//~ Get Show Images
+//~~ --------------------------------------------------------------------------------
+export const useShowImages = (showId: number | undefined) => {
+  // if (!showId) return;
+  const { data, isLoading, ...rest } = useQuery({
+    queryKey: ['showImages', showId],
+    queryFn: async () => {
+      const resp = await tvGetImages(showId, 'posters');
+      return resp.data;
+    },
+    staleTime: 600000,
+  });
+
+  return { data, isLoading, ...rest };
 };

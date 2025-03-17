@@ -36,7 +36,6 @@ const SortManager = ({
 
   return (
     <View>
-      <Text className="mx-3 text-lg font-semibold text-text">Define Sort</Text>
       <Sortable.Grid
         columns={1}
         data={sortSettings} // Pass your data here
@@ -44,7 +43,6 @@ const SortManager = ({
         keyExtractor={(item) => item.id}
         rowGap={1}
         columnGap={10}
-        onOrderChange={() => console.log('Order Changed')}
         onDragEnd={(parms) => {
           reorderSorts(parms.indexToKey);
         }}

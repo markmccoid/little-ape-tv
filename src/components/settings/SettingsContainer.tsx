@@ -16,7 +16,7 @@ const SettingsContainer = () => {
   const showImages = use$(settings$.showImageInEpisode);
   return (
     <ScrollView className="flex-1">
-      <Text className="mx-3 text-2xl" style={{ color: AC.secondaryLabel }}>
+      <Text className="mx-3 text-2xl text-text" style={{ color: AC.secondaryLabel }}>
         Settings
       </Text>
 
@@ -24,21 +24,21 @@ const SettingsContainer = () => {
         onPress={() => router.push('/(authed)/settings/tagsetup')}
         className="mx-2 flex-row items-center justify-between rounded-lg border-hairline p-1 px-2 active:bg-card"
         style={{ backgroundColor: `${colors.card}99` }}>
-        <Text className="p-1 text-lg">Tag Maintenance</Text>
+        <Text className="p-1 text-lg text-text">Tag Maintenance</Text>
         <SymbolView name="chevron.right" tintColor={colors.text} size={20} />
       </Pressable>
       <Pressable
         onPress={() => router.push('/(authed)/settings/savedfiltersmaint')}
         className="mx-2 mt-2 flex-row items-center justify-between rounded-lg border-hairline p-1 px-2 active:bg-card"
         style={{ backgroundColor: `${colors.card}99` }}>
-        <Text className="p-1 text-lg">Saved Filters</Text>
+        <Text className="p-1 text-lg text-text">Saved Filters</Text>
         <SymbolView name="chevron.right" tintColor={colors.text} size={20} />
       </Pressable>
       <Pressable
         onPress={() => router.push('/(authed)/settings/tagsetup')}
         className="mx-2 mt-2 flex-row items-center justify-between rounded-lg border-hairline p-1 pl-2 active:bg-card"
         style={{ backgroundColor: `${colors.card}99` }}>
-        <Text className="p-1 text-lg">Show Images on Episode List</Text>
+        <Text className="p-1 text-lg text-text">Show Images on Episode List</Text>
         <Switch
           style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
           trackColor={{ false: '#767577', true: '#34C759' }}

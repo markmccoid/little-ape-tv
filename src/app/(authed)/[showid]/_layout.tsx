@@ -23,6 +23,14 @@ export default function ShowIdLayout() {
           headerShown: false,
         }}
       />
+      <Stack.Screen
+        name="detailimagemodal"
+        options={{
+          presentation: 'modal',
+          title: 'Images',
+          headerShown: true,
+        }}
+      />
     </Stack>
   );
 }

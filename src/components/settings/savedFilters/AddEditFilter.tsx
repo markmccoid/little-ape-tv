@@ -8,13 +8,35 @@ import AddEditFilterGenres from './AddEditFilterGenres';
 import AddEditSort from './AddEditSort';
 import { useSavedFilterSort } from './useSavedFilterSort';
 import uuid from 'react-native-uuid';
-import { useRouter } from 'expo-router';
+import { useNavigation, useRouter } from 'expo-router';
+import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
 import AddEditFavorites from './AddEditFavorites';
+import { SymbolView } from 'expo-symbols';
+import { useCustomTheme } from '~/utils/customColorTheme';
+import TransparentBackground from '~/components/common/TransparentBackground';
+import { ScrollView } from 'react-native-gesture-handler';
 
 type Props = {
   filterId?: string;
 };
 const AddEditFilter = ({ filterId }: Props) => {
+  const navigation = useNavigation();
+  const { colors } = useCustomTheme();
+  React.useEffect(() => {
+    const options: NativeStackNavigationOptions = {
+      headerRight: () => (
+        <Pressable onPress={handleSaveFilter} className=" p-2">
+          <SymbolView name="square.and.arrow.down" tintColor={colors.primary} size={30} />
+        </Pressable>
+      ),
+      headerLeft: () => (
+        <Pressable onPress={() => router.dismiss()} className="ml-[-10] p-2">
+          <SymbolView name="x.square.fill" tintColor={colors.primary} size={30} />
+        </Pressable>
+      ),
+    };
+    navigation.setOptions(options);
+  }, []);
   const router = useRouter();
   const savedFilter = use$(() =>
     filterCriteria$.savedFilters.peek().find((el) => el.id === filterId)
@@ -68,7 +90,7 @@ const AddEditFilter = ({ filterId }: Props) => {
     router.dismiss();
   };
   return (
-    <View>
+    <ScrollView>
       <View className="mx-3 my-2 flex-row items-center">
         <Text className="text-lg">Filter Name</Text>
         <TextInput
@@ -78,19 +100,39 @@ const AddEditFilter = ({ filterId }: Props) => {
           placeholder="Filter Name"
         />
       </View>
-      <AddEditFavorites isFavorited={isFav} setFavorite={setFavorite} />
-      <AddEditFilterTags tagStateArrays={stateArrays} tagFunctions={tagFunctions} />
-      <AddEditFilterGenres genreStateArrays={genreStateArrays} genreFunctions={genreFunctions} />
-      <AddEditSort
-        sortFields={workingSortFields}
-        updateActiveFlag={updateActiveFlag}
-        updateSortDirection={updateSortDirection}
-        savedSortReorder={savedSortReorder}
-      />
-      <Pressable onPress={handleSaveFilter} className="border bg-button p-2">
-        <Text className="text-buttontext">Save Filter</Text>
-      </Pressable>
-    </View>
+      <View className="m-1">
+        <AddEditFavorites isFavorited={isFav} setFavorite={setFavorite} />
+      </View>
+
+      <View className="m-1 p-1">
+        <TransparentBackground />
+        <Text className="px-3 text-lg font-semibold text-text">Tags</Text>
+        <AddEditFilterTags tagStateArrays={stateArrays} tagFunctions={tagFunctions} />
+      </View>
+
+      <View className="m-1 p-1">
+        <TransparentBackground />
+        <Text className="px-3 text-lg font-semibold text-text">Genres</Text>
+        <AddEditFilterGenres genreStateArrays={genreStateArrays} genreFunctions={genreFunctions} />
+      </View>
+
+      <View className="m-1 p-1 pb-5">
+        <TransparentBackground />
+        <Text className="px-3 text-lg font-semibold text-text">Sort</Text>
+        <AddEditSort
+          sortFields={workingSortFields}
+          updateActiveFlag={updateActiveFlag}
+          updateSortDirection={updateSortDirection}
+          savedSortReorder={savedSortReorder}
+        />
+      </View>
+      <View className="mx-2 mt-2 flex-row justify-end">
+        <Pressable onPress={handleSaveFilter} className=" items-center p-2">
+          <SymbolView name="square.and.arrow.down" tintColor={colors.primary} size={35} />
+          <Text className="text-text">Save</Text>
+        </Pressable>
+      </View>
+    </ScrollView>
   );
 };
 

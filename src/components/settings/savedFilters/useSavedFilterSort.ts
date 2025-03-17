@@ -21,7 +21,6 @@ export const useSavedFilterSort = (initSort: SortField[] | undefined) => {
       setWorkingSortFields((prev) => {
         const newSortSettings = prev.map((sort) => {
           if (sort.id === newSortFieldValues.id) {
-            console.log('Updating', newSortFieldValues);
             return newSortFieldValues;
           } else {
             return sort;
