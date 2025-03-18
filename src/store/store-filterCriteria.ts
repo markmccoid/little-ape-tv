@@ -111,6 +111,8 @@ export type FilterCriteria = {
 type FilterCriteriaFunctions = {
   actionClearTags: () => void;
   actionClearGenres: () => void;
+  // This will clear all filter criteria
+  actionClearAllCriteria: () => void;
   updateSortSettings: (newSortFieldValues: SortField) => void;
   reorderSortSettings: (sortedIds: string[]) => void;
   saveFilter: (newSavedFilter: SavedFilter) => void;
@@ -135,6 +137,10 @@ const filterCriteriaFunctions: FilterCriteriaFunctions = {
       includeGenres: [],
       excludeGenres: [],
     });
+  },
+  actionClearAllCriteria: () => {
+    filterCriteria$.actionClearGenres();
+    filterCriteria$.actionClearTags();
   },
   updateSortSettings: (newSortFieldValues) => {
     const sortSettings = filterCriteria$.sortSettings.peek();

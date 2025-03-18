@@ -40,7 +40,7 @@ export function UserRatingDetailScreen({
           const translateY = isOpen ? -35 : closedOffset;
           const opacity = isOpen ? 1 : 0;
           const backgroundColor =
-            isSelected === menuItem.displayText ? colors.buttonDarker : colors.button; //'#ffcc00'; //colors.imdbYellow;
+            isSelected === menuItem.displayText ? 'yellow' : colors.buttonDarker; //'#ffcc00'; //colors.imdbYellow;
           const scale = isSelected === menuItem.displayText ? 1.2 : 1;
 
           return (
@@ -51,6 +51,7 @@ export function UserRatingDetailScreen({
                 setIsOpen((isOpen) => !isOpen);
                 onPress(menuItem);
               }}
+              disabled={!isOpen}
               animate={{
                 translateX,
                 translateY,
@@ -68,7 +69,8 @@ export function UserRatingDetailScreen({
                   width: size,
                   height: size,
                   borderRadius: 10,
-                  // borderWidth: StyleSheet.hairlineWidth,
+                  borderWidth: isSelected === menuItem.displayText ? 1 : 0,
+                  borderColor: isSelected === menuItem.displayText ? colors.imdbYellow : '',
                 },
               ]}
               transition={{
@@ -87,7 +89,8 @@ export function UserRatingDetailScreen({
                   duration: 200, // Fast scale animation
                   delay: 0, // No delay, happens before translate
                 }}
-                className={`text-lg font-bold ${isSelected === menuItem.displayText ? 'text-buttondarkertext' : 'text-[#000000]'} `}>
+                className={`text-lg font-bold ${isSelected === menuItem.displayText ? 'text-black' : 'text-white'} `}>
+                {/* className={`text-lg font-bold ${isSelected === menuItem.displayText ? 'text-buttondarkertext' : 'text-[#000000]'} `}> */}
                 {menuItem.displayText}
               </MotiText>
             </MotiPressable>
@@ -111,12 +114,12 @@ export function UserRatingDetailScreen({
           }}
           style={[
             styles.circle,
-            { backgroundColor: colors.buttonDarker },
+            { backgroundColor: 'yellow', borderWidth: 1, borderColor: colors.imdbYellow },
             { width: 40, height: size, borderRadius: 10 },
           ]}>
           <MotiText
             animate={{ rotate: isOpen ? '-45deg' : '0deg' }}
-            className="font-bold text-buttondarkertext"
+            className="font-bold text-black"
             style={{ fontSize: 20 }}>
             {currentRating}
           </MotiText>

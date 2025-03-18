@@ -10,18 +10,11 @@ import { filterCriteria$ } from '~/store/store-filterCriteria';
 export function QuickFilters() {
   const { colors } = useCustomTheme();
   const savedFilters = use$(filterCriteria$.savedFilters);
-  console.log(savedFilters.map((el) => el.name));
 
   const applyFilter = (filterId: string) => {
     filterCriteria$.applySavedFilter(filterId);
   };
 
-  const changeFieldSort = (fieldIn: any) => {
-    console.log('change fields', fieldIn);
-  };
-  const changeSortDirection = (directionIn: any) => {
-    console.log('chang srot dir', directionIn);
-  };
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger>

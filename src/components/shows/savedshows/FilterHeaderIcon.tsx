@@ -14,7 +14,7 @@ const FilterHeaderIcon = () => {
 
   return (
     <Link href="./filtermodal" asChild>
-      <Pressable className="mr-[5]">
+      <Pressable className="mr-[5]" onLongPress={filterCriteria$.actionClearAllCriteria}>
         {({ pressed }) => (
           <>
             <FilterIcon size={25} color={colors.primary} style={{ opacity: pressed ? 0.5 : 1 }} />

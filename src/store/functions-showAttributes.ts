@@ -76,10 +76,10 @@ export const useWatchedEpisodeCount = (
   });
 
   // console.log('Season Episode Counts', seasonEpisodeCounts);
-  seasons.map((season) => ({
-    seasonNumber: season.seasonNumber,
-    episodeCount: season.episodes.length,
-  }));
+  // seasons.map((season) => ({
+  //   seasonNumber: season.seasonNumber,
+  //   episodeCount: season.episodes.length,
+  // }));
   // Get all of the showId's attributes
   const tempSeasonEpisodeState = use$(savedShows$.showAttributes[showId]);
   if (!tempSeasonEpisodeState) return;

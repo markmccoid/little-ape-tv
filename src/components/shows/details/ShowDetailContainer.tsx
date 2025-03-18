@@ -148,27 +148,29 @@ const ShowDetailContainer = ({ showId }: Props) => {
                 alignItems: 'center',
               },
             ]}>
-            <UserRatingDetailScreen
-              menu={[
-                { displayText: '1' },
-                { displayText: '2' },
-                { displayText: '3' },
-                { displayText: '4' },
-                { displayText: '5' },
-                { displayText: '6' },
-                { displayText: '7' },
-                { displayText: '8' },
-                { displayText: '9' },
-                { displayText: '10' },
-              ]} // Explicitly pass the 10-item menu
-              onPress={(selectedItem: MenuItem) =>
-                savedShows$.updateShowUserRating(data.tmdbId, parseInt(selectedItem.displayText))
-              }
-              size={32} // Optional: Customize the size
-              closedOffset={4} // Optional: Customize the closed offset
-              itemSpacing={5}
-              currentRating={data.userRating || 0}
-            />
+            {data?.isStoredLocally && (
+              <UserRatingDetailScreen
+                menu={[
+                  { displayText: '1' },
+                  { displayText: '2' },
+                  { displayText: '3' },
+                  { displayText: '4' },
+                  { displayText: '5' },
+                  { displayText: '6' },
+                  { displayText: '7' },
+                  { displayText: '8' },
+                  { displayText: '9' },
+                  { displayText: '10' },
+                ]} // Explicitly pass the 10-item menu
+                onPress={(selectedItem: MenuItem) =>
+                  savedShows$.updateShowUserRating(data.tmdbId, parseInt(selectedItem.displayText))
+                }
+                size={32} // Optional: Customize the size
+                closedOffset={4} // Optional: Customize the closed offset
+                itemSpacing={5}
+                currentRating={data.userRating || 0}
+              />
+            )}
           </View>
           {/* <UserRatingContainer showId={data.tmdbId} /> */}
           {/* <View className="flex-1 flex-row gap-1">

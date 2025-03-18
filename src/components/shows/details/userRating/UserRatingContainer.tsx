@@ -32,7 +32,6 @@ const ExpandingTextList = ({ showId }: Props) => {
   const animation = useSharedValue(0);
   const fadeAnimation = useSharedValue(1); // 1 for visible, 0 for hidden
   const currUserRating = use$(savedShows$.shows[showId].userRating) || 0;
-  console.log(currUserRating);
 
   const handleLongPress = (event) => {
     if (event.nativeEvent.state === State.ACTIVE) {

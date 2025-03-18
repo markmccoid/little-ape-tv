@@ -22,21 +22,7 @@ type Props = {
 const AddEditFilter = ({ filterId }: Props) => {
   const navigation = useNavigation();
   const { colors } = useCustomTheme();
-  React.useEffect(() => {
-    const options: NativeStackNavigationOptions = {
-      headerRight: () => (
-        <Pressable onPress={handleSaveFilter} className=" p-2">
-          <SymbolView name="square.and.arrow.down" tintColor={colors.primary} size={30} />
-        </Pressable>
-      ),
-      headerLeft: () => (
-        <Pressable onPress={() => router.dismiss()} className="ml-[-10] p-2">
-          <SymbolView name="x.square.fill" tintColor={colors.primary} size={30} />
-        </Pressable>
-      ),
-    };
-    navigation.setOptions(options);
-  }, []);
+
   const router = useRouter();
   const savedFilter = use$(() =>
     filterCriteria$.savedFilters.peek().find((el) => el.id === filterId)
@@ -89,6 +75,24 @@ const AddEditFilter = ({ filterId }: Props) => {
     filterCriteria$.saveFilter(newFilter);
     router.dismiss();
   };
+
+  //# Set Header Icons
+  React.useEffect(() => {
+    const options: NativeStackNavigationOptions = {
+      headerRight: () => (
+        <Pressable onPress={handleSaveFilter} className=" p-2">
+          <SymbolView name="square.and.arrow.down" tintColor={colors.primary} size={30} />
+        </Pressable>
+      ),
+      headerLeft: () => (
+        <Pressable onPress={() => router.dismiss()} className="ml-[-10] p-2">
+          <SymbolView name="x.square.fill" tintColor={colors.primary} size={30} />
+        </Pressable>
+      ),
+    };
+    navigation.setOptions(options);
+  }, [handleSaveFilter]);
+
   return (
     <ScrollView>
       <View className="mx-3 my-2 flex-row items-center">
