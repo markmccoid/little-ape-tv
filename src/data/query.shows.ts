@@ -100,7 +100,7 @@ export const useShowDetails = (showId: number) => {
   // This query will immediately return the placeholder data if available (locally saved show)
   // Then pull details from tmdb_api and merge with localShow if available.
   const { data, ...rest } = useQuery<Partial<SavedShow> & Partial<TVShowDetails>, Error>({
-    queryKey: ['movidedetails', showId, localShow?.isStoredLocally || false],
+    queryKey: ['showdetails', showId, localShow?.isStoredLocally || false],
     queryFn: async () => {
       const showDetails = await tvGetShowDetails(showId, [
         'recommendations',

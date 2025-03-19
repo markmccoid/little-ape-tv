@@ -214,9 +214,10 @@ export const getShowDetails = async (showId: number) => {
   // Expectation is this will always return NULL as we use this
   // in adding function so we will assume this data is not already stored
   // and always query and use "false" as last part of query key
-  const queryKey = ['movidedetails', showId, false];
+  const queryKey = ['showdetails', showId, false];
+
   let data: TVShowDetails | undefined = queryClient.getQueryData(queryKey);
-  console.log('DATA from getShowDetails', data);
+
   if (!data) {
     const result = await tvGetShowDetails(showId, ['recommendations']);
     data = result.data;

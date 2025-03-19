@@ -39,8 +39,9 @@ const ShowNameSearch = ({ isVisible, handleSetVisible, searchY }: Props) => {
   }, [isVisible]);
 
   const animStyle = useAnimatedStyle(() => {
+    // console.log('searchY', searchY.value);
     return {
-      opacity: searchY.value === -40 ? withTiming(0, { duration: 300 }) : 1,
+      opacity: searchY.value === -50 ? withTiming(0, { duration: 300 }) : 1,
     };
   });
   return (

@@ -15,7 +15,7 @@ module.exports = {
       },
       colors: {
         primary: 'var(--color-primary)',
-        primarytext: 'var(color-primary-text)',
+        primarytext: 'var(--color-primary-text)',
         secondary: {
           DEFAULT: 'var(--color-secondary)',
         },

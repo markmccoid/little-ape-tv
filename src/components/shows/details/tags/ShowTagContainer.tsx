@@ -105,7 +105,9 @@ const ShowTagContainer = ({ showId }: Props) => {
                 from={{ opacity: 0 }}
                 animate={{ opacity: showTags ? 0 : 1 }}
                 transition={{ type: 'timing', duration: 700 }}>
-                <Text className="text-secondary-foreground ml-3 mr-2 text-base font-semibold">
+                <Text
+                  className="ml-3 mr-2 text-base font-semibold"
+                  style={{ color: colors.primarytext }}>
                   Add Tags
                 </Text>
               </MotiView>

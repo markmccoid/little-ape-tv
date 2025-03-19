@@ -7,8 +7,7 @@ import { use$ } from '@legendapp/state/react';
 import { synced } from '@legendapp/state/sync';
 import { ObservablePersistMMKV } from '@legendapp/state/persist-plugins/mmkv';
 import { authManager } from '~/authentication/AuthProvider';
-import { Ionicons } from '@expo/vector-icons';
-import { filter, update } from 'lodash';
+
 //**
 // store-settings contains
 //  */
@@ -108,6 +107,7 @@ export type FilterCriteria = {
   savedFilters: SavedFilter[]; // Saved filters
 } & FilterCriteriaFunctions;
 
+//NOTE: Tag/Genre updates to BaseFilters done in fcUpdateTagsGenres
 type FilterCriteriaFunctions = {
   actionClearTags: () => void;
   actionClearGenres: () => void;
@@ -216,9 +216,10 @@ const filterCriteriaFunctions: FilterCriteriaFunctions = {
     const savedFilters = filterCriteria$.savedFilters.peek();
     const filterToApply = savedFilters.find((filter) => filter.id === filterId);
     if (!filterToApply) return;
-
-    filterCriteria$.baseFilters.set(filterToApply.filter);
-    filterCriteria$.sortSettings.set(filterToApply.sort);
+    filterCriteria$.actionClearAllCriteria();
+    // Need to spread the filterToApply.xx because if the savedFilters values were being updated
+    filterCriteria$.baseFilters.set({ ...filterToApply.filter });
+    filterCriteria$.sortSettings.set([...filterToApply.sort]);
   },
 };
 
@@ -247,6 +248,9 @@ export const filterCriteria$ = observable<FilterCriteria>(
 );
 
 filterCriteria$.set({ ...initialState, ...filterCriteriaFunctions });
+filterCriteria$.savedFilters.onChange(({ value }) => {
+  console.log('savedFilters changed:', value);
+});
 
 // export const filterCriteria$ = observable<FilterCriteria>({
 //   baseFilters: {},

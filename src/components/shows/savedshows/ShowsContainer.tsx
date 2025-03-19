@@ -1,6 +1,6 @@
 import React, { useCallback, useDeferredValue, useState } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View, Dimensions } from 'react-native';
-import { Link, Stack, useFocusEffect } from 'expo-router';
+import { Link, Stack, useFocusEffect, useRouter } from 'expo-router';
 import { useAuth } from '~/authentication/AuthProvider';
 import { savedShows$ } from '~/store/store-shows';
 import { useShows } from '~/data/query.shows';
@@ -16,9 +16,16 @@ import ShowItem from './ShowItem';
 import ShowNameSearch from './ShowSearch';
 import { use$ } from '@legendapp/state/react';
 import { filterCriteria$ } from '~/store/store-filterCriteria';
+import { SymbolView } from 'expo-symbols';
+import { FilterIcon } from '~/components/common/Icons';
+import { useCustomTheme } from '~/utils/customColorTheme';
+import { search$ } from '~/store/store-search';
 
 const ShowsContainer = () => {
   const showsInit = useShows();
+  const router = useRouter();
+  const { colors } = useCustomTheme();
+
   // Defers the render of the shows.  Seems to let things like the filter screen update more smoothly
   const shows = useDeferredValue(showsInit); // Defers updates
   const titleSearchValue = use$(filterCriteria$.nameFilter.showName);
@@ -28,7 +35,6 @@ const ShowsContainer = () => {
   const scrollY = useSharedValue(0);
   const animHeight = useSharedValue(0);
   const searchY = useSharedValue(-40);
-
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
       scrollY.value = event.contentOffset.y;
@@ -64,7 +70,7 @@ const ShowsContainer = () => {
   const listStyle = useAnimatedStyle(() => {
     // console.log("Flatlist PAdding", searchY.value);
     return {
-      paddingTop: searchY.value + 50,
+      paddingTop: searchY.value + 55,
     };
   });
 
@@ -84,6 +90,38 @@ const ShowsContainer = () => {
             handleSetVisible={handleSetVisible}
           />
         </Animated.View>
+
+        {shows.length === 0 && (
+          <View className="flex-1 items-center justify-center">
+            <Pressable
+              onPress={() => {
+                if (`search` === 'search') {
+                  router.push('/(authed)/(tabs)/(search)');
+                  search$.searchVal.set(titleSearchValue);
+                  return;
+                }
+                // send to filter route
+                router.push('/(auth)/(drawer)/(tabs)/home/filtermodal');
+              }}
+              className="items-center justify-center">
+              <Text className="mb-2 text-xl font-semibold text-text">No Shows Found</Text>
+              <View className="flex-row items-center rounded-lg border border-border bg-card px-2 py-1">
+                {'search' === 'search' ? (
+                  <View className="flex-row items-center p-2">
+                    <SymbolView name="popcorn" size={50} tintColor={colors.primary} />
+                    <Text className="ml-3 text-xl font-semibold">Search?</Text>
+                  </View>
+                ) : (
+                  <View className="flex-row items-center p-2">
+                    <FilterIcon color={colors.primary} size={50} />
+                    <Text className="ml-3 text-xl font-semibold">Change Filter?</Text>
+                  </View>
+                )}
+              </View>
+            </Pressable>
+          </View>
+        )}
+
         <Animated.FlatList
           data={shows}
           ref={flatListRef}
