@@ -39,6 +39,12 @@ const ScrollerMain = ({ show, imageWidth, imageHeight, index, scrollX }: Props) 
   return (
     <Animated.View style={[animStyle]}>
       <Pressable
+        onLongPress={() =>
+          router.push({
+            pathname: `/seasonslistmodal`,
+            params: { showid: parseInt(show.tmdbId) },
+          })
+        }
         onPress={() =>
           router.push({ pathname: `/[showid]`, params: { showid: parseInt(show.tmdbId) } })
         }

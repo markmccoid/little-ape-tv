@@ -183,8 +183,9 @@ const ShowDetailContainer = ({ showId }: Props) => {
           {/* Buttons */}
           <View className="flex-row justify-end gap-2">
             <Pressable
-              onPress={() =>
-                router.push({ pathname: `/[showid]/seasonslist`, params: { showid: showId } })
+              onPress={
+                () => router.push({ pathname: `/seasonslistmodal`, params: { showid: showId } })
+                // router.push({ pathname: `/[showid]/seasonslist`, params: { showid: showId } })
               }
               className="rounded-lg border-hairline bg-buttondarker px-3 py-1">
               <Text className="font-semibold text-buttondarkertext">Seasons</Text>

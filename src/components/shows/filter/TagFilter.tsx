@@ -1,11 +1,6 @@
 import { View, Text, Pressable } from 'react-native';
 import React, { useEffect } from 'react';
-import {
-  fcUpdateTagsGenres,
-  filterCriteria$,
-  getFilterTags,
-  useFilterTags,
-} from '~/store/store-filterCriteria';
+import { fcUpdateTagsGenres, filterCriteria$, useFilterTags } from '~/store/store-filterCriteria';
 import TagCloudEnhanced, { TagItem } from '~/components/common/TagCloud/TagCloudEnhanced';
 import { EraserIcon } from '~/components/common/Icons';
 import { use$ } from '@legendapp/state/react';

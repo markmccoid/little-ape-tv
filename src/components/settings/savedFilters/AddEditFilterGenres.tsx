@@ -46,7 +46,6 @@ const AddEditFilterGenres = ({ genreFunctions, genreStateArrays }: Props) => {
   const mappedGenres = mergeGenres(genres, genreStateArrays);
 
   const handleToggleGenre = (genre: string, newGenreState: 'include' | 'exclude' | 'off') => {
-    console.log('HANDLE Toggle', genre, newGenreState);
     if (newGenreState === 'include') genreFunctions.addIncludedTag(genre);
     if (newGenreState === 'exclude') genreFunctions.addExcludedTag(genre);
     if (newGenreState === 'off') {

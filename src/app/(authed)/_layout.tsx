@@ -20,6 +20,14 @@ export default function AuthedLayout() {
         getId={({ params }) => params?.showid}
       />
       <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+      <Stack.Screen
+        name="seasonslistmodal"
+        options={{
+          presentation: 'modal',
+          title: 'Seasons',
+          headerShown: false,
+        }}
+      />
     </Stack>
   );
 }

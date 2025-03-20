@@ -9,10 +9,7 @@ import Animated, {
   useAnimatedStyle,
 } from 'react-native-reanimated';
 import { SavedShow } from '~/store/functions-shows';
-import { useRouter } from 'expo-router';
-import ShadowBackground from '~/components/common/ShadowBackground';
-import { savedShows$ } from '~/store/store-shows';
-import SetFavoriteButton from '../details/tags/SetFavoriteButton';
+import dayjs from 'dayjs';
 const missingPosterURI = require('../../../../assets/missingPoster.png');
 
 type Props = {
@@ -68,7 +65,9 @@ const ScrollerSecond = ({ show, imageWidth, imageHeight, index, scrollX }: Props
             numberOfLines={2}>
             {show.name}
           </Text>
-          <Text className="text-center text-lg font-semibold">{show.dateAddedEpoch}</Text>
+          <Text className="text-center text-lg font-semibold">
+            {dayjs.unix(show.dateAddedEpoch).format('MM/DD/YYYY')}
+          </Text>
         </View>
       </Animated.View>
     </View>

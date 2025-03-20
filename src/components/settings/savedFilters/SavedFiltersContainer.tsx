@@ -12,6 +12,10 @@ const SavedFiltersContainer = () => {
   const { colors } = useCustomTheme();
   const savedFilters = use$(filterCriteria$.savedFilters);
   const router = useRouter();
+  console.log(
+    'SavedFilters',
+    savedFilters.map((el) => el.name)
+  );
 
   const handleDeleteFilter = (filterId: string) => {
     filterCriteria$.deleteSavedFilter(filterId);
@@ -25,7 +29,7 @@ const SavedFiltersContainer = () => {
       <View
         key={filter.id}
         className="flex-row items-center justify-between border bg-white p-2 dark:bg-slate-600">
-        <View className="flex-row items-center gap-3">
+        <View className="flex-1 flex-row items-center gap-3">
           <Pressable onPress={() => handleFavorite(filter.id)}>
             {filter.favorite ? (
               <SymbolView name="heart" />
@@ -36,6 +40,11 @@ const SavedFiltersContainer = () => {
           <Pressable onPress={() => filterCriteria$.applySavedFilter(filter.id)}>
             <Text className="text-xl font-semibold text-text">{filter.name}</Text>
           </Pressable>
+        </View>
+        <View className="flex-1">
+          {filter.loadOnStartup && (
+            <SymbolView name="slider.horizontal.3" tintColor={colors.primary} />
+          )}
         </View>
         <View className="flex-row items-center">
           <Pressable

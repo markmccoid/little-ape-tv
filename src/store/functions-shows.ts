@@ -102,7 +102,6 @@ export const createShowFunctions = (
     removeShow: (showId) => {
       savedShows$.shows[showId].delete();
       savedShows$.showAttributes[showId].delete();
-      console.log('Remove Attr', savedShows$.showAttributes[showId].peek());
       //Retag items in search
       reTagSearch(savedShows$);
       // Need to resync list of genres in genres$.  Can't just filter out, must recalc

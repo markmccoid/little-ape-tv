@@ -16,19 +16,20 @@ export default function ShowIdLayout() {
         getId={({ params }) => params.showid}
       />
       <Stack.Screen
-        name="seasonslist"
-        options={{
-          presentation: 'modal',
-          title: 'Seasons',
-          headerShown: false,
-        }}
-      />
-      <Stack.Screen
         name="detailimagemodal"
         options={{
           presentation: 'modal',
           title: 'Images',
           headerShown: true,
+        }}
+      />
+      {/* NO LONGER USED - Use the seasonslistmodal at the root so we can access anywhere */}
+      <Stack.Screen
+        name="seasonslist"
+        options={{
+          presentation: 'modal',
+          title: 'Seasons',
+          headerShown: false,
         }}
       />
     </Stack>

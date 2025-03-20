@@ -6,10 +6,12 @@ import { CloseIcon } from '../common/Icons';
 import { SymbolView } from 'expo-symbols';
 import { use$ } from '@legendapp/state/react';
 import { filterCriteria$ } from '~/store/store-filterCriteria';
+import { reverse } from 'lodash';
 
 export function QuickFilters() {
   const { colors } = useCustomTheme();
-  const savedFilters = use$(filterCriteria$.savedFilters);
+  const savedFiltersTemp = use$(filterCriteria$.savedFilters);
+  const savedFilters = reverse([...savedFiltersTemp]);
 
   const applyFilter = (filterId: string) => {
     filterCriteria$.applySavedFilter(filterId);

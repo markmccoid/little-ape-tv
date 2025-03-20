@@ -10,7 +10,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { CustomLightTheme, CustomDarkTheme } from '../utils/customColorTheme';
 // import { useColorScheme } from 'nativewind';
 import { ThemeProvider } from '@react-navigation/native';
-import { useReactQueryDevTools } from '@dev-plugins/react-query';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Asul_400Regular, Asul_700Bold } from '@expo-google-fonts/asul';
 import { useFonts } from '@expo-google-fonts/asul';

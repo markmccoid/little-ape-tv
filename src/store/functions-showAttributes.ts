@@ -136,7 +136,6 @@ export const useWatchedEpisodeCount = (
     },
     {} as SeasonEpisodesState
   );
-  console.log(seasonEpisodesState.numEpisodesWatched);
   return seasonEpisodesState;
 };
 

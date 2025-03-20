@@ -14,10 +14,10 @@ const SeasonsContainer = () => {
   const router = useRouter();
   const { bottom } = useSafeAreaInsets();
   const { data: showData } = useShowDetails(parseInt(showid as string));
-  // console.log('SeasonsContainer', showid, showData.tmdbId);
+
   const seasons = useMemo(() => {
     return showData.seasons?.map((el) => el.seasonNumber) || [];
-  }, [showid, showData.tmdbId]);
+  }, [showid, showData]);
   // console.log('SEASONS', seasons);
   const { data, isLoading } = useShowSeasonData(showid as string, seasons);
   // console.log('SeasonEpisode Data', data[0]);

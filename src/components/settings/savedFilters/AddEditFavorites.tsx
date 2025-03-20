@@ -15,7 +15,6 @@ const AddEditFavorites = ({ isFavorited = 'off', setFavorite }: Props) => {
         values={['Ignore', 'Favorites', 'Exclude Favs']}
         selectedIndex={getInclusionIndex(isFavorited)}
         onChange={(event) => {
-          console.log('W Changed', event.nativeEvent.selectedSegmentIndex);
           const state = event.nativeEvent.selectedSegmentIndex;
           setFavorite(getInclusionValue(state as 0 | 1 | 2));
           // console.log('FAV?', filterCriteria$.baseFilters.filterIsFavorited.get());

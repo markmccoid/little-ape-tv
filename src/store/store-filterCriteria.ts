@@ -66,6 +66,7 @@ export type SavedFilter = {
   position: number;
   filter: BaseFilters;
   sort: SortField[];
+  loadOnStartup?: boolean;
 };
 
 export const defaultSort: SortField[] = [
@@ -162,14 +163,20 @@ const filterCriteriaFunctions: FilterCriteriaFunctions = {
   saveFilter: (newSavedFilter: SavedFilter) => {
     const savedFilters = filterCriteria$.savedFilters.peek();
     let filterFound = false;
+
     const finalFilters = savedFilters.map((filter) => {
       if (filter.id === newSavedFilter.id) {
         filterFound = true;
         return newSavedFilter; // Replace the old filter
       } else {
+        // If the new filter is set to loadOnStartup, make sure no others have this set
+        if (newSavedFilter?.loadOnStartup) {
+          return { ...filter, loadOnStartup: false };
+        }
         return filter; // Keep the existing filter
       }
     });
+
     if (!filterFound) {
       finalFilters.push({ ...newSavedFilter, position: finalFilters.length });
     }
@@ -216,7 +223,7 @@ const filterCriteriaFunctions: FilterCriteriaFunctions = {
     const savedFilters = filterCriteria$.savedFilters.peek();
     const filterToApply = savedFilters.find((filter) => filter.id === filterId);
     if (!filterToApply) return;
-    filterCriteria$.actionClearAllCriteria();
+    // filterCriteria$.actionClearAllCriteria();
     // Need to spread the filterToApply.xx because if the savedFilters values were being updated
     filterCriteria$.baseFilters.set({ ...filterToApply.filter });
     filterCriteria$.sortSettings.set([...filterToApply.sort]);
@@ -248,45 +255,13 @@ export const filterCriteria$ = observable<FilterCriteria>(
 );
 
 filterCriteria$.set({ ...initialState, ...filterCriteriaFunctions });
-filterCriteria$.savedFilters.onChange(({ value }) => {
-  console.log('savedFilters changed:', value);
-});
 
-// export const filterCriteria$ = observable<FilterCriteria>({
-//   baseFilters: {},
-//   nameFilter: { showName: '', ignoreOtherFilters: true },
-//   sortSettings: defaultSort,
-//   actionClearTags: () => {
-//     filterCriteria$.baseFilters.assign({
-//       includeTags: [],
-//       excludeTags: [],
-//     });
-//   },
-//   actionClearGenres: () => {
-//     filterCriteria$.baseFilters.assign({
-//       includeGenres: [],
-//       excludeGenres: [],
-//     });
-//   },
-//   updateSortSettings: (sortFields) => {
-//     filterCriteria$.sortSettings.set(sortFields);
-//   },
-//   reorderSortSettings: (sortedIds) => {
-//     const sorts = filterCriteria$.sortSettings.peek();
-//     const updatedSorts = sortedIds
-//       .map((id, index) => {
-//         const sort = sorts.find((sort) => sort.id === id);
-//         if (sort) {
-//           return { ...sort, position: index + 1 }; // Update position (starting from 1)
-//         } else {
-//           console.warn(`Sort with ID ${id} not found in the original sortSettings array.`);
-//           return null; // Or handle the missing tag as appropriate for your application
-//         }
-//       })
-//       .filter((sort) => sort !== null); // Remove any nulls caused by missing IDs
-//     filterCriteria$.sortSettings.set(updatedSorts);
-//   },
-// });
+// Load the default filter on startup
+const filters = filterCriteria$.savedFilters.peek();
+const defaultFilterId = filters.find((el) => el.loadOnStartup)?.id;
+if (defaultFilterId) {
+  filterCriteria$.applySavedFilter(defaultFilterId);
+}
 
 // ---------------------------------------
 //-- filterCriteria$ Observable Functions

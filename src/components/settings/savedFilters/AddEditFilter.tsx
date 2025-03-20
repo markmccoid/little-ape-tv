@@ -15,6 +15,7 @@ import { SymbolView } from 'expo-symbols';
 import { useCustomTheme } from '~/utils/customColorTheme';
 import TransparentBackground from '~/components/common/TransparentBackground';
 import { ScrollView } from 'react-native-gesture-handler';
+import Checkbox from 'expo-checkbox';
 
 type Props = {
   filterId?: string;
@@ -47,6 +48,9 @@ const AddEditFilter = ({ filterId }: Props) => {
   const setFavorite = (inclusionState: InclusionState) => {
     setIsFav(inclusionState);
   };
+
+  //~ Load on Startup
+  const [loadOnStartup, setLoadonStartup] = useState(savedFilter?.loadOnStartup || false);
   //# --- Sort Info
   const sortFields = savedFilter?.sort;
   const { workingSortFields, savedSortReorder, updateSortDirection, updateActiveFlag } =
@@ -71,6 +75,7 @@ const AddEditFilter = ({ filterId }: Props) => {
       },
       sort: workingSortFields,
       favorite: savedFilter?.favorite || false,
+      loadOnStartup,
     };
     filterCriteria$.saveFilter(newFilter);
     router.dismiss();
@@ -102,6 +107,12 @@ const AddEditFilter = ({ filterId }: Props) => {
           onChangeText={setFilterName}
           className="mx-3 flex-1 rounded-md border-hairline bg-white p-2"
           placeholder="Filter Name"
+        />
+        <Checkbox
+          style={{ margin: 8 }}
+          value={loadOnStartup}
+          onValueChange={setLoadonStartup}
+          color={loadOnStartup ? colors.primary : undefined}
         />
       </View>
       <View className="m-1">

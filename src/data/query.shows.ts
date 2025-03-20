@@ -32,15 +32,16 @@ export const useShows = () => {
   const sortSettings = use$(filterCriteria$.sortSettings);
   const savedShows = Object.values(savedShowsObj); // More performant than Object.keys().map()
 
-  // Early return for no filters
-  const hasNoFilters =
-    !includeTags.length &&
-    !excludeTags.length &&
-    !includeGenres.length &&
-    !excludeGenres.length &&
-    filterIsFavorited === 'off' &&
-    !showName;
-  if (hasNoFilters) return savedShows;
+  // NO Early return for no filters because we also want a change in the sort to run.
+  // This shouldn't be triggered unless a change in the baseFilters, nameFilter or sortSettings
+  // const hasNoFilters =
+  //   !includeTags.length &&
+  //   !excludeTags.length &&
+  //   !includeGenres.length &&
+  //   !excludeGenres.length &&
+  //   filterIsFavorited === 'off' &&
+  //   !showName;
+  // if (hasNoFilters) return savedShows;
 
   // Pre-process showName for better performance
   const normalizedShowName = showName?.toLowerCase() || '';
@@ -221,37 +222,6 @@ export const useWatchProviders = (showId: string, region: string = 'US') => {
   });
 };
 
-type movieRecommendationsResults = {
-  id: number;
-  title: string;
-  releaseDate: { date: Date; epoch: number; formatted: string };
-  overview: string;
-  posterURL: string;
-  backdropURL: string;
-  genres: string[];
-  popularity: number;
-  voteAverage: number;
-  voteCount: number;
-};
-export const useShowRecommendations = (movieId: number) => {
-  console.log('Query movie recs');
-  const { data, isLoading, ...rest } = useQuery({
-    queryKey: ['movierecommendations', movieId],
-    queryFn: async () => {
-      const resp = await movieGetRecommendations(movieId);
-      return resp.data.results as movieRecommendationsResults[];
-    },
-    staleTime: 600000,
-  });
-
-  // Tag the data
-  const finalData = (data || []).map((movie) => ({
-    ...movie,
-    existsInSaved: useMovieStore.getState().shows.some((savedMovie) => savedMovie.id === movie.id),
-  }));
-  return { data: finalData, isLoading, ...rest };
-};
-
 //~ ------------------------------------------------------
 //~ useOMDBData
 //~ ------------------------------------------------------
@@ -357,7 +327,7 @@ export const useOMDBData = (imdbId: string | undefined) => {
 const getSort = (sortSettings: SortField[]) => {
   const filteredAndSortedFields = sortSettings
     .filter((field) => field.active) // Filter for active fields
-    .sort((a, b) => a.index - b.index); // Sort by index in ascending order
+    .sort((a, b) => a.position - b.position); // Sort by index in ascending order
 
   const sortFields = filteredAndSortedFields.map((field) => field.sortField);
   const sortDirections = filteredAndSortedFields.map((field) => field.sortDirection);
