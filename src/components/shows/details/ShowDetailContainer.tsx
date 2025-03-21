@@ -49,7 +49,7 @@ const ShowDetailContainer = ({ showId }: Props) => {
   const handleSaveShow = useCallback(() => {
     if (!data?.id || !data?.name || !showId) return;
     savedShows$.addShow(data.id.toString());
-  }, [data]);
+  }, [data?.id]);
 
   // Set title and left/right header buttons
   useLayoutEffect(() => {
@@ -91,7 +91,7 @@ const ShowDetailContainer = ({ showId }: Props) => {
       ),
     };
     navigation.setOptions(options);
-  }, [data]);
+  }, [data?.id, data?.isStoredLocally]);
 
   return (
     <View className={`relative w-full flex-1`}>
@@ -104,13 +104,6 @@ const ShowDetailContainer = ({ showId }: Props) => {
           <HomeIcon size={25} />
         </Pressable>
       </MotiView>
-      {/* <MotiView
-        key={data?.isStoredLocally ? 'add' : 'delete'}
-        from={{ opacity: 0 }}
-        animate={{ opacity: data?.isStoredLocally ? 0.15 : 0 }}
-        style={[StyleSheet.absoluteFill]}>
-        <Image source={data?.backdropURL} style={[StyleSheet.absoluteFill]} />
-      </MotiView> */}
 
       <ScrollView
         className="flex-1 flex-col pt-2"
@@ -172,14 +165,7 @@ const ShowDetailContainer = ({ showId }: Props) => {
               />
             )}
           </View>
-          {/* <UserRatingContainer showId={data.tmdbId} /> */}
-          {/* <View className="flex-1 flex-row gap-1">
-            {new Array(11).fill(undefined).map((_, index) => (
-              <View className="z-20 h-[25] w-[25] flex-row items-center justify-center rounded-lg border-hairline bg-white">
-                <Text className="text-base font-semibold">{index}</Text>
-              </View>
-            ))}
-          </View> */}
+
           {/* Buttons */}
           <View className="flex-row justify-end gap-2">
             <Pressable
@@ -209,10 +195,9 @@ const ShowDetailContainer = ({ showId }: Props) => {
           </View>
         </View>
 
-        {/* Show Tags - If null passed for showId, this container will not show */}
-        <View className="my-2 ">
-          <ShowTagContainer showId={data?.tmdbId} />
-        </View>
+        {/* Show Tags - If null passed for showId, this container will not show, however, it causes issues with react, so also not
+        showing using && */}
+        <View className="my-2 ">{data?.tmdbId && <ShowTagContainer showId={data?.tmdbId} />}</View>
 
         {/* Show Information */}
         <HiddenContainerAnimated title="Where To Watch" extraHeight={10}>

@@ -139,7 +139,8 @@ const EpisodeRow = ({ showId, isStoredLocally, item }: Props) => {
             className={`flex-row items-center justify-center ${isStoredLocally ? 'opacity-100' : 'opacity-0'}`}
             onPress={() => {
               toggleEpisodeFavorited(showId, item.seasonNumber, item.episodeNumber);
-            }}>
+            }}
+            disabled={!isStoredLocally}>
             {!!attributes?.favorited ? (
               <View className="flex-row items-center justify-center">
                 <SymbolView name="heart.fill" size={25} tintColor={'red'} />
@@ -156,7 +157,8 @@ const EpisodeRow = ({ showId, isStoredLocally, item }: Props) => {
             className={`flex-row items-center justify-center ${isStoredLocally ? 'opacity-100' : 'opacity-0'}`}
             onPress={() => {
               toggleEpisodeWatched(showId, item.seasonNumber, item.episodeNumber);
-            }}>
+            }}
+            disabled={!isStoredLocally}>
             {!!attributes?.watched ? (
               <View className="flex-row items-center justify-center">
                 <ViewTVShowIcon size={25} color={'green'} />

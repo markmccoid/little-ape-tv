@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { savedShows$, tags$ } from '~/store/store-shows';
 import { use$ } from '@legendapp/state/react';
 import TagCloudEnhanced, { TagItem } from '~/components/common/TagCloud/TagCloudEnhanced';
@@ -42,6 +42,7 @@ const ShowTagContainer = ({ showId }: Props) => {
       savedShows$.updateShowTags(showId, tagId, 'add');
     }
   };
+
   const onLayout = (event: LayoutChangeEvent) => {
     if (isMeasured) return;
     const height = event.nativeEvent.layout.height;
@@ -50,19 +51,53 @@ const ShowTagContainer = ({ showId }: Props) => {
     setIsMeasured(true);
   };
 
-  const tagViewStyle = useAnimatedStyle(() => {
-    toHeight.value = showTags ? withTiming(containerHeight) : withTiming(0);
+  useEffect(() => {
+    toHeight.value = withTiming(showTags ? containerHeight : 0, { duration: 300 });
+  }, [showTags, containerHeight]);
 
+  const tagViewStyle = useAnimatedStyle(() => {
+    const targetHeight = toHeight.value;
     return {
-      height: toHeight.value,
-      opacity: interpolate(toHeight.value, [containerHeight, 0], [1, 0]),
+      height: targetHeight,
+      opacity: interpolate(targetHeight, [containerHeight, 0], [1, 0]),
       marginTop: interpolate(
-        toHeight.value,
-        [containerHeight, 0],
-        [containerHeight === 0 ? 0 : 10, 0]
+        targetHeight,
+        targetHeight === 0 ? [containerHeight, 0] : [containerHeight + 10, 0],
+        targetHeight === 0 ? [0, 0] : [10, 0]
       ),
     };
-  }, [isMeasured, showTags]);
+  }, [containerHeight]);
+
+  // const tagViewStyle = useAnimatedStyle(() => {
+  //   return {
+  //     height: toHeight.value,
+  //     opacity: interpolate(toHeight.value, [containerHeight, 0], [1, 0]),
+  //     marginTop: interpolate(
+  //       toHeight.value,
+  //       [containerHeight, 0],
+  //       [containerHeight === 0 ? 0 : 10, 0]
+  //     ),
+  //   };
+  // }, [isMeasured, showTags]);
+  const renderItem = useCallback(
+    ({ item }) => {
+      return (
+        <Pressable onPress={toggleShowTags}>
+          {/* <Pressable onPress={() => toggleTagState(item.id)}> */}
+          <Animated.View
+            className={`mr-[5] flex-row items-center justify-center rounded-lg border-hairline px-[5] py-[2]
+        ${showTags ? 'opacity-55' : 'opacity-100'} `}
+            style={{ backgroundColor: colors.includeGreen }}
+            key={item.id}
+            entering={BounceIn.duration(100)}
+            exiting={BounceOut.duration(100)}>
+            <Text>{item.name}</Text>
+          </Animated.View>
+        </Pressable>
+      );
+    },
+    [showTags]
+  );
 
   return (
     <MotiView
@@ -120,22 +155,7 @@ const ShowTagContainer = ({ showId }: Props) => {
           showsHorizontalScrollIndicator={false}
           data={matchedTags.filter((el) => el.state === 'include')}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => {
-            return (
-              <Pressable onPress={toggleShowTags}>
-                {/* <Pressable onPress={() => toggleTagState(item.id)}> */}
-                <Animated.View
-                  className={`mr-[5] flex-row items-center justify-center rounded-lg border-hairline px-[5] py-[2]
-                  ${showTags ? 'opacity-55' : 'opacity-100'} `}
-                  style={{ backgroundColor: colors.includeGreen }}
-                  key={item.id}
-                  entering={BounceIn.duration(100)}
-                  exiting={BounceOut.duration(100)}>
-                  <Text>{item.name}</Text>
-                </Animated.View>
-              </Pressable>
-            );
-          }}
+          renderItem={renderItem}
           itemLayoutAnimation={LinearTransition}
         />
       </View>

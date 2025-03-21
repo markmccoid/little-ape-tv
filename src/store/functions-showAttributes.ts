@@ -108,6 +108,7 @@ export const useWatchedEpisodeCount = (
       }
       // Assign how many episodes in each season are favorited, watched or downloaded
       fin[seasonNumber].favorited = fin[seasonNumber].favorited + isFavorited;
+
       // WATCHED
       fin[seasonNumber].watched = fin[seasonNumber].watched + isWatched;
       fin[seasonNumber].allWatched =

@@ -34,7 +34,7 @@ const TVShowSectionList: React.FC<Props> = ({ seasons, showData }) => {
   const sectionListRef = useRef<SectionList>(null);
   const seasonScrollRef = useRef<ScrollView>(null);
   const watchedCounts = useWatchedEpisodeCount(showid as string, seasons);
-
+  const isStoredLocally = showData.isStoredLocally;
   // Map seasons to SectionList sections
   const sections = useMemo(
     () =>
@@ -87,11 +87,11 @@ const TVShowSectionList: React.FC<Props> = ({ seasons, showData }) => {
   //==============================================
   const renderSectionHeader = useCallback(
     ({ section }: { section: SeasonsSection }) => {
-      // console.log('header', Object.keys(sections[0].data[0]));
       return (
         <SeasonHeader
           showId={showid as string}
           section={section}
+          isStoredLocally={isStoredLocally}
           headerHeight={SECTION_HEADER_HEIGHT}
         />
       );

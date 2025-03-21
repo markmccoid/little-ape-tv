@@ -9,6 +9,7 @@ import { useCustomTheme } from '~/utils/customColorTheme';
 import { HomeIcon } from '../common/Icons';
 import { useRouter } from 'expo-router';
 import { settings$ } from '~/store/store-settings';
+import AnimatedGridButton from './AnimatedGridButton';
 
 const SearchInput = () => {
   const [searchValue, setSearchValue] = React.useState('');
@@ -49,14 +50,19 @@ const SearchInput = () => {
       />
 
       <View className="flex-row items-center justify-end pl-1">
-        <View className="mx-1 rounded-lg border bg-button p-1">
+        {/* <View className="mx-1 rounded-lg border bg-button p-1">
           <SymbolView name="movieclapper" tintColor={colors.buttontext} size={25} />
-        </View>
-        <Pressable
+        </View> */}
+        <AnimatedGridButton />
+        {/* <Pressable
           onPress={() => settings$.searchNumColumns.set((prev) => (prev === 2 ? 3 : 2))}
-          className="mx-1 rounded-lg border bg-button p-1">
-          <SymbolView name="movieclapper" tintColor={colors.buttontext} size={25} />
-        </Pressable>
+          className="mx-1 rounded-lg  p-1">
+          {settings$.searchNumColumns.peek() === 3 ? (
+            <SymbolView name="square.grid.2x2.fill" tintColor={colors.buttontext} size={25} />
+          ) : (
+            <SymbolView name="square.grid.3x3.fill" tintColor={colors.buttontext} size={25} />
+          )}
+        </Pressable> */}
       </View>
     </View>
   );

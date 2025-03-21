@@ -18,9 +18,10 @@ import Ticker from './EpisodeWatchAnimation';
 type Props = {
   showId: string;
   section: SeasonsSection;
+  isStoredLocally: boolean;
   headerHeight: number;
 };
-const SeasonHeader = ({ showId, section, headerHeight }: Props) => {
+const SeasonHeader = ({ showId, section, isStoredLocally, headerHeight }: Props) => {
   const allWatched = section.counts.allWatched;
   const allDownloaded = section.counts.allDownloaded;
 
@@ -36,56 +37,60 @@ const SeasonHeader = ({ showId, section, headerHeight }: Props) => {
         </Text>
       </View>
       {/* Second Line */}
-      <View className="flex-1 flex-row justify-start">
-        {/* DOWNLOADED Buttons */}
-        <View className="flex-start flex-row">
-          <Pressable
-            onPress={() => setSeasonToDownloaded(showId, section.seasonNumber, section.numEpisodes)}
-            className={`mr-2 rounded border-hairline bg-gray-300 px-[3] py-[1] ${allDownloaded ? 'opacity-50' : ''}`}
-            disabled={allDownloaded}>
-            <TelevisionIcon size={25} />
-          </Pressable>
-          <Pressable
-            onPress={() =>
-              removeSeasonFromDownloaded(showId, section.seasonNumber, section.numEpisodes)
-            }
-            className={`mr-2 rounded border-hairline bg-red-200 px-[3] py-[1] ${section.counts.downloaded === 0 ? 'opacity-50' : 0}`}>
-            <TelevisionOffIcon size={25} />
-          </Pressable>
+      {isStoredLocally && (
+        <View className="flex-1 flex-row justify-start">
+          {/* DOWNLOADED Buttons */}
+          <View className="flex-start flex-row">
+            <Pressable
+              onPress={() =>
+                setSeasonToDownloaded(showId, section.seasonNumber, section.numEpisodes)
+              }
+              className={`mr-2 rounded border-hairline bg-gray-300 px-[3] py-[1] ${allDownloaded ? 'opacity-50' : ''}`}
+              disabled={allDownloaded}>
+              <TelevisionIcon size={25} />
+            </Pressable>
+            <Pressable
+              onPress={() =>
+                removeSeasonFromDownloaded(showId, section.seasonNumber, section.numEpisodes)
+              }
+              className={`mr-2 rounded border-hairline bg-red-200 px-[3] py-[1] ${section.counts.downloaded === 0 ? 'opacity-50' : 0}`}>
+              <TelevisionOffIcon size={25} />
+            </Pressable>
+          </View>
+          {/* Viewed Show Count */}
+          {/* <View className="flex-1 flex-row"> */}
+          <View className="h-full flex-1 flex-row items-center justify-center">
+            <Ticker value={section.counts.watched} fontSize={16} />
+            <Text
+              style={{
+                fontSize: 16,
+                lineHeight: 16 * 1.1,
+                fontWeight: '600',
+                height: 16,
+                fontVariant: ['tabular-nums'],
+              }}>
+              {' '}
+              of {section.numEpisodes}
+            </Text>
+          </View>
+          {/* WATCHED Buttons */}
+          <View className="flex-row justify-end ">
+            <Pressable
+              onPress={() => setSeasonToWatched(showId, section.seasonNumber, section.numEpisodes)}
+              className={`mr-2 rounded border-hairline bg-gray-300 px-[3] py-[1] ${allWatched ? 'opacity-50' : ''}`}
+              disabled={allWatched}>
+              <EyeWatchedIcon size={25} />
+            </Pressable>
+            <Pressable
+              onPress={() =>
+                removeSeasonFromWatched(showId, section.seasonNumber, section.numEpisodes)
+              }
+              className={`mr-2 rounded border-hairline bg-red-200 px-[3] py-[1] ${section.counts.watched === 0 ? 'opacity-50' : 0}`}>
+              <EyeNotWatchedIcon size={25} />
+            </Pressable>
+          </View>
         </View>
-        {/* Viewed Show Count */}
-        {/* <View className="flex-1 flex-row"> */}
-        <View className="h-full flex-1 flex-row items-center justify-center">
-          <Ticker value={section.counts.watched} fontSize={16} />
-          <Text
-            style={{
-              fontSize: 16,
-              lineHeight: 16 * 1.1,
-              fontWeight: '600',
-              height: 16,
-              fontVariant: ['tabular-nums'],
-            }}>
-            {' '}
-            of {section.numEpisodes}
-          </Text>
-        </View>
-        {/* WATCHED Buttons */}
-        <View className="flex-row justify-end ">
-          <Pressable
-            onPress={() => setSeasonToWatched(showId, section.seasonNumber, section.numEpisodes)}
-            className={`mr-2 rounded border-hairline bg-gray-300 px-[3] py-[1] ${allWatched ? 'opacity-50' : ''}`}
-            disabled={allWatched}>
-            <EyeWatchedIcon size={25} />
-          </Pressable>
-          <Pressable
-            onPress={() =>
-              removeSeasonFromWatched(showId, section.seasonNumber, section.numEpisodes)
-            }
-            className={`mr-2 rounded border-hairline bg-red-200 px-[3] py-[1] ${section.counts.watched === 0 ? 'opacity-50' : 0}`}>
-            <EyeNotWatchedIcon size={25} />
-          </Pressable>
-        </View>
-      </View>
+      )}
     </View>
   );
 };

@@ -62,4 +62,4 @@ const ShowDeleteButton = ({ showId }: Props) => {
   );
 };
 
-export default ShowDeleteButton;
+export default React.memo(ShowDeleteButton);

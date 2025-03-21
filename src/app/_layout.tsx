@@ -6,26 +6,28 @@ import { Appearance, View, useColorScheme } from 'react-native';
 import { AuthProvider, useAuth } from '~/authentication/AuthProvider';
 import * as SplashScreen from 'expo-splash-screen';
 import { initTMDB } from '@markmccoid/tmdb_api';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { CustomLightTheme, CustomDarkTheme } from '../utils/customColorTheme';
 // import { useColorScheme } from 'nativewind';
 import { ThemeProvider } from '@react-navigation/native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Asul_400Regular, Asul_700Bold } from '@expo-google-fonts/asul';
 import { useFonts } from '@expo-google-fonts/asul';
+import { setupEvents } from '~/utils/events';
+import { queryClient } from '~/utils/queryClient';
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
   initialRouteName: 'signin',
 };
 
-export const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 10 * 60000, // n * 1 minute
-    },
-  },
-});
+// export const queryClient = new QueryClient({
+//   defaultOptions: {
+//     queries: {
+//       staleTime: 10 * 60000, // n * 1 minute
+//     },
+//   },
+// });
 
 const InitialLayout = () => {
   const router = useRouter();
@@ -41,6 +43,7 @@ const InitialLayout = () => {
       const tmdbKey = process.env.EXPO_PUBLIC_TMDB_API_KEY;
       if (!tmdbKey) throw new Error('TMDB API Key not defined');
       await initTMDB(tmdbKey);
+      setupEvents(queryClient);
     };
 
     mainInit();

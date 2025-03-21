@@ -5,16 +5,18 @@ import { genres$ } from '~/store/store-genres';
 import { Observable } from '@legendapp/state';
 import {
   tvGetShowDetails,
+  tvGetShowSeasonDetails,
   TVSearchResultItem,
   TVShowDetails,
   TVShowDetailsBase,
 } from '@markmccoid/tmdb_api';
-import { queryClient } from '~/app/_layout';
 import { search$ } from './store-search';
 // import { savedShows$ } from './store-shows';
 import { InfiniteData } from '@tanstack/react-query';
 import { formatEpoch } from '~/utils/utils';
 import { SavedShowObservable } from './store-shows';
+import { eventDispatcher, EventName } from '~/utils/EventDispatcher';
+import { queryClient } from '~/utils/queryClient';
 
 //~ -----------------------------------------------
 export type SavedShow = {
@@ -68,6 +70,7 @@ export const createShowFunctions = (
     addShow: async (showId) => {
       //! Need to deal with undefined posterURL and backdropURL
       const data = await getShowDetails(parseInt(showId));
+
       savedShows$.shows[showId].set({
         isStoredLocally: true,
         tmdbId: data.id.toString(),
@@ -90,13 +93,17 @@ export const createShowFunctions = (
         //   providers: []
         // };
       });
-      // console.log('Show Added', showId, data.name);
 
       //Retag items in search
       reTagSearch(savedShows$);
       // Add genres from this new show to our master list of genres
       genres$.genreList.set(
         Array.from(new Set([...(data?.genres || []), ...genres$.genreList.peek()]))
+      );
+      eventDispatcher.emit(
+        EventName.UpdateAvgEpisodeRuntime,
+        showId,
+        data.seasons.map((el) => el.seasonNumber) || []
       );
     },
     removeShow: (showId) => {

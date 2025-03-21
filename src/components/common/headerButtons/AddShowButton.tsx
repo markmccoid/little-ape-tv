@@ -31,4 +31,4 @@ const ShowButtonAdd = ({ addShow }: Props) => {
   );
 };
 
-export default ShowButtonAdd;
+export default React.memo(ShowButtonAdd);

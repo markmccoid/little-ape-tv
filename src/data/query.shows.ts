@@ -156,6 +156,35 @@ export const useShowSeasonData = (showId: string, seasonNumbers: number[]) => {
   });
 };
 
+export const fetchSeasonsData = async (showId: number, seasonNumbers: number[]) => {
+  // Return details for each season
+  // console.log('IN FETCH');
+  const allSeasons = await Promise.all(
+    seasonNumbers.map(async (season) => {
+      // Need to pull off just the data piece.
+      return tvGetShowSeasonDetails(showId, season).then((resp) => {
+        return resp.data;
+      });
+    })
+  );
+  const sortedSeasons = sortBy(allSeasons, ['seasonNumber']);
+  if (sortedSeasons[0].seasonNumber === 0) {
+    const holdSeasonZero = sortedSeasons[0];
+    sortedSeasons.shift();
+    sortedSeasons.push(holdSeasonZero);
+  }
+  // just grab first seasons avg episode runtime and add to saved
+  // const avgShowRuntime = Math.trunc(sortedSeasons[0].episodeAvgRunTime);
+  // console.log('Show Exists', Object.keys(savedShows$.shows[showId]).length > 0);
+  // console.log(sortedSeasons.map((el) => `${el.name}-${Math.trunc(el.episodeAvgRunTime)}`));
+  // if (
+  //   Object.keys(savedShows$.shows[showId]).length > 0 &&
+  //   !savedShows$.shows[showId].avgEpisodeRunTime.peek()
+  // ) {
+  //   savedShows$.shows[showId].avgEpisodeRunTime.set(avgShowRuntime);
+  // }
+  return sortedSeasons;
+};
 //*=================================
 //*- Get Episode IMDB URL from TMDB Api
 //*=================================
