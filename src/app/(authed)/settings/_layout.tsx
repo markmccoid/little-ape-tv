@@ -27,7 +27,7 @@ export default function SettingsLayout() {
       />
       <Stack.Screen
         name="addeditfiltermodal"
-        options={{ headerShown: true, title: 'Change Me', presentation: 'modal' }}
+        options={{ headerShown: true, title: 'Change Me', presentation: 'fullScreenModal' }}
       />
     </Stack>
   );

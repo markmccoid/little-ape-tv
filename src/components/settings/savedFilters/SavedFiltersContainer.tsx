@@ -12,10 +12,6 @@ const SavedFiltersContainer = () => {
   const { colors } = useCustomTheme();
   const savedFilters = use$(filterCriteria$.savedFilters);
   const router = useRouter();
-  console.log(
-    'SavedFilters',
-    savedFilters.map((el) => el.name)
-  );
 
   const handleDeleteFilter = (filterId: string) => {
     filterCriteria$.deleteSavedFilter(filterId);

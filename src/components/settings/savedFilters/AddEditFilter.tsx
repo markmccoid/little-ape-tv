@@ -16,6 +16,7 @@ import { useCustomTheme } from '~/utils/customColorTheme';
 import TransparentBackground from '~/components/common/TransparentBackground';
 import { ScrollView } from 'react-native-gesture-handler';
 import Checkbox from 'expo-checkbox';
+import * as Burnt from 'burnt';
 
 type Props = {
   filterId?: string;
@@ -62,6 +63,7 @@ const AddEditFilter = ({ filterId }: Props) => {
       Alert.alert('Error', 'You Must Enter a Filter Name');
       return;
     }
+
     const newFilter: SavedFilter = {
       id: savedFilter?.id || uuid.v4(),
       name: filterName,
@@ -78,6 +80,7 @@ const AddEditFilter = ({ filterId }: Props) => {
       loadOnStartup,
     };
     filterCriteria$.saveFilter(newFilter);
+
     router.dismiss();
   };
 
@@ -111,7 +114,17 @@ const AddEditFilter = ({ filterId }: Props) => {
         <Checkbox
           style={{ margin: 8 }}
           value={loadOnStartup}
-          onValueChange={setLoadonStartup}
+          onValueChange={(val) => {
+            setLoadonStartup(val);
+
+            Burnt.toast({
+              title: `Startup Filter ${val ? ' SET' : ' REMOVED'}`,
+              preset: 'done',
+              message: `Filter to Run on Startup ${val ? 'SET' : 'REMOVED'}`,
+              shouldDismissByDrag: true,
+              duration: 1,
+            });
+          }}
           color={loadOnStartup ? colors.primary : undefined}
         />
       </View>

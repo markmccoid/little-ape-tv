@@ -2,7 +2,7 @@
   "expo": {
     "name": "Little Ape TV",
     "slug": "little-ape-tv",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "scheme": "little-ape-tv",
     "newArchEnabled": true,
     "web": {
@@ -18,7 +18,16 @@
           "launchMode": "most-recent"
         }
       ],
-      "expo-font"
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "deploymentTarget": "15.1"
+          }
+        }
+      ],
+      "expo-font",
+      "expo-build-properties"
     ],
     "experiments": {
       "typedRoutes": true,

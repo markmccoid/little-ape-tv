@@ -7,13 +7,16 @@ import { SymbolView } from 'expo-symbols';
 import { use$ } from '@legendapp/state/react';
 import { filterCriteria$ } from '~/store/store-filterCriteria';
 import { reverse } from 'lodash';
+import { useRouter } from 'expo-router';
 
 export function QuickFilters() {
   const { colors } = useCustomTheme();
+  const router = useRouter();
   const savedFiltersTemp = use$(filterCriteria$.savedFilters);
   const savedFilters = reverse([...savedFiltersTemp]);
 
   const applyFilter = (filterId: string) => {
+    router.push('/(authed)/(tabs)/(home)');
     filterCriteria$.applySavedFilter(filterId);
   };
 
