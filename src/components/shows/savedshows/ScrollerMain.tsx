@@ -1,3 +1,4 @@
+import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { Image } from 'expo-image';
 import Animated, {
@@ -65,4 +66,4 @@ const ScrollerMain = ({ show, imageWidth, imageHeight, index, scrollX }: Props) 
   );
 };
 
-export default ScrollerMain;
+export default React.memo(ScrollerMain);

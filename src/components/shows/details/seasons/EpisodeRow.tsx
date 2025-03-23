@@ -10,7 +10,6 @@ import {
 } from '~/components/common/Icons';
 import { savedShows$ } from '~/store/store-shows';
 import {
-  buildSeasonEpisodeKey,
   toggleEpisodeDownloaded,
   toggleEpisodeFavorited,
   toggleEpisodeWatched,
@@ -23,6 +22,7 @@ import { useCustomTheme } from '~/utils/customColorTheme';
 import { MotiView } from 'moti';
 import { settings$ } from '~/store/store-settings';
 import { imdbLinkToEpisode } from '~/utils/imdbLinks';
+import { useEpisodeAttributes } from '~/store/functions-showAttributes';
 
 // Define fixed heights for performance
 const ITEM_HEIGHT = 125;
@@ -36,9 +36,12 @@ type Props = {
 //~~ Component EpisodeRow
 const EpisodeRow = ({ showId, isStoredLocally, item }: Props) => {
   const { colors } = useCustomTheme();
-  const attributes = use$(
-    savedShows$.showAttributes[showId][buildSeasonEpisodeKey(item.seasonNumber, item.episodeNumber)]
+  //!! CREATE a hook that will return (isWatched, isDownloaded, isFavorited fields for season/episode
+  //!!  Need to keep details of where this info is stored OUT OF components
+  const attributesold = use$(
+    savedShows$.showAttributes[showId].seasons[item.seasonNumber].episodes[item.episodeNumber]
   );
+  const attributes = useEpisodeAttributes(showId, item.seasonNumber, item.episodeNumber);
   const showImage = use$(settings$.showImageInEpisode);
 
   return (

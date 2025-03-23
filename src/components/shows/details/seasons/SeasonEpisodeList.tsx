@@ -7,7 +7,7 @@ import { getEpisodeIMDBURL, ShowDetailsData, UseShowDetailsReturn } from '~/data
 import { useLocalSearchParams } from 'expo-router';
 import EpisodeRow from './EpisodeRow';
 import { CheckIcon, TelevisionIcon, TelevisionOffIcon } from '~/components/common/Icons';
-import { useWatchedEpisodeCount } from '~/store/functions-showAttributes';
+import { useSeasonSummary, useWatchedEpisodeCount } from '~/store/functions-showAttributes';
 import SeasonHeader from './SeasonHeader';
 
 // Define fixed heights for performance
@@ -33,7 +33,9 @@ const TVShowSectionList: React.FC<Props> = ({ seasons, showData }) => {
   const { showid } = useLocalSearchParams();
   const sectionListRef = useRef<SectionList>(null);
   const seasonScrollRef = useRef<ScrollView>(null);
-  const watchedCounts = useWatchedEpisodeCount(showid as string, seasons);
+  const watchedCounts = {}; //useWatchedEpisodeCount(showid as string, seasons);
+  const seasonSummary = useSeasonSummary(showid as string, seasons);
+
   const isStoredLocally = showData.isStoredLocally;
   // Map seasons to SectionList sections
   const sections = useMemo(
@@ -42,7 +44,7 @@ const TVShowSectionList: React.FC<Props> = ({ seasons, showData }) => {
         title: season.seasonNumber === 0 ? season.name : `Season ${season.seasonNumber}`,
         numEpisodes: season.episodes.length,
         seasonNumber: season.seasonNumber,
-        counts: watchedCounts?.[season.seasonNumber] || {
+        counts: seasonSummary?.[season.seasonNumber] || {
           favorited: 0,
           watched: 0,
           downloaded: 0,
@@ -51,7 +53,7 @@ const TVShowSectionList: React.FC<Props> = ({ seasons, showData }) => {
         }, //Return watched/download counts if they exists
         data: season.episodes,
       })),
-    [seasons, watchedCounts]
+    [seasons, seasonSummary]
   );
 
   //!! ----- DEBUG GET ITEM LAYOUT ---
@@ -71,17 +73,45 @@ const TVShowSectionList: React.FC<Props> = ({ seasons, showData }) => {
   }, []);
 
   //!! ----- DEBUG GET ITEM LAYOUT ---
-  useEffect(() => {
-    if (seasonScrollRef.current) {
-      // Button Width = 105
-      // find last watched season and multiple by button width
-      const xOffset = (watchedCounts?.lastWatchedSeason || 0 - 1) * 105;
-      if (xOffset < 0) return;
-      // console.log('watched', watchedCounts?.lastWatchedSeason, xOffset);
-      setTimeout(() => seasonScrollRef.current.scrollTo({ x: xOffset, animated: false }), 0);
-    }
-  }, [watchedCounts?.lastWatchedSeason, seasonScrollRef]);
+  // useEffect(() => {
+  //   if (seasonScrollRef.current) {
+  //     // Button Width = 105
+  //     // find last watched season and multiple by button width
+  //     const xOffset = (seasonSummary?.lastWatchedSeason || 0 - 1) * 105;
+  //     if (xOffset < 0) return;
+  //     // console.log('watched', watchedCounts?.lastWatchedSeason, xOffset);
+  //     setTimeout(() => seasonScrollRef.current.scrollTo({ x: xOffset, animated: false }), 0);
+  //   }
+  // }, [seasonSummary?.lastWatchedSeason, seasonScrollRef]);
+  // Scroll horizontal season buttons
 
+  // Scroll to last watched season/episode after mount
+  useEffect(() => {
+    if (!seasonSummary?.lastWatchedSeason) return;
+
+    const lastSeasonWatched = seasonSummary.lastWatchedSeason;
+    const episodeIndex =
+      lastSeasonWatched + 1 <= seasons.length
+        ? seasonSummary?.[lastSeasonWatched + 1]?.watched || 0
+        : 0;
+    const seasonIndexToScroll =
+      lastSeasonWatched === seasons.length ? lastSeasonWatched - 1 : lastSeasonWatched;
+
+    // Initial scroll to season
+    scrollToLocation(seasonIndexToScroll, 0);
+
+    // Scroll to specific episode after a slight delay
+    setTimeout(() => scrollToLocation(seasonIndexToScroll, episodeIndex), 100);
+  }, [seasonSummary?.lastWatchedSeason, seasons.length, scrollToLocation]);
+
+  useEffect(() => {
+    if (seasonScrollRef.current && seasonSummary?.lastWatchedSeason) {
+      const xOffset = (seasonSummary.lastWatchedSeason - 1) * 105;
+      if (xOffset >= 0) {
+        setTimeout(() => seasonScrollRef.current?.scrollTo({ x: xOffset, animated: false }), 0);
+      }
+    }
+  }, [seasonSummary?.lastWatchedSeason]);
   //==============================================
   // Render section header (season name)
   //==============================================
@@ -157,40 +187,40 @@ const TVShowSectionList: React.FC<Props> = ({ seasons, showData }) => {
         style={{ width: '100%', paddingBottom: 55, height: '100%' }}
         getItemLayout={buildGetItemLayout}
         // This will scroll us to the latest episode in the season being watched.
-        onLayout={() => {
-          // Bail if no seasons watched
-          let lastSeasonWatched = 0;
-          if (watchedCounts?.lastWatchedSeason) {
-            lastSeasonWatched = watchedCounts?.lastWatchedSeason;
-          }
+        // onLayout={() => {
+        //   // Bail if no seasons watched
+        //   let lastSeasonWatched = 0;
+        //   if (seasonSummary?.lastWatchedSeason) {
+        //     lastSeasonWatched = seasonSummary?.lastWatchedSeason;
+        //   }
 
-          const episodeIndex =
-            lastSeasonWatched + 1 <= seasons.length
-              ? watchedCounts?.[lastSeasonWatched + 1]?.watched || 0
-              : 0;
+        //   const episodeIndex =
+        //     lastSeasonWatched + 1 <= seasons.length
+        //       ? seasonSummary?.[lastSeasonWatched + 1]?.watched || 0
+        //       : 0;
 
-          const seasonIndexToScroll =
-            lastSeasonWatched === seasons.length ? lastSeasonWatched - 1 : lastSeasonWatched;
-          // try and scroll to latest season/episode
-          // const [latestSeason, latestEpisode] = getLastestEpisodeWatched(tvShowId);
-          sectionListRef.current?.scrollToLocation({
-            sectionIndex: seasonIndexToScroll,
-            itemIndex: 0,
-            viewPosition: 0,
-            animated: true,
-          });
-          setTimeout(
-            () =>
-              sectionListRef.current?.scrollToLocation({
-                sectionIndex: seasonIndexToScroll,
-                itemIndex: episodeIndex,
-                viewPosition: 0,
-                animated: true,
-              }),
-            100
-          );
-        }}
-        initialScrollIndex={watchedCounts?.numEpisodesWatched || 0}
+        //   const seasonIndexToScroll =
+        //     lastSeasonWatched === seasons.length ? lastSeasonWatched - 1 : lastSeasonWatched;
+        //   // try and scroll to latest season/episode
+        //   // const [latestSeason, latestEpisode] = getLastestEpisodeWatched(tvShowId);
+        //   sectionListRef.current?.scrollToLocation({
+        //     sectionIndex: seasonIndexToScroll,
+        //     itemIndex: 0,
+        //     viewPosition: 0,
+        //     animated: true,
+        //   });
+        //   setTimeout(
+        //     () =>
+        //       sectionListRef.current?.scrollToLocation({
+        //         sectionIndex: seasonIndexToScroll,
+        //         itemIndex: episodeIndex,
+        //         viewPosition: 0,
+        //         animated: true,
+        //       }),
+        //     100
+        //   );
+        // }}
+        initialScrollIndex={seasonSummary?.grandTotalWatched || 0}
       />
     </View>
   );

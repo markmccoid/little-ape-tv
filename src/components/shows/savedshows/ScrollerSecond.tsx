@@ -1,3 +1,4 @@
+import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { Image } from 'expo-image';
 import Animated, {
@@ -10,6 +11,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import { SavedShow } from '~/store/functions-shows';
 import dayjs from 'dayjs';
+import { useSavedSeasonSummary } from '~/store/functions-showAttributes';
+import { useRouter } from 'expo-router';
 const missingPosterURI = require('../../../../assets/missingPoster.png');
 
 type Props = {
@@ -20,6 +23,9 @@ type Props = {
   scrollX: SharedValue<number>;
 };
 const ScrollerSecond = ({ show, imageWidth, imageHeight, index, scrollX }: Props) => {
+  const seasonsSummary = useSavedSeasonSummary(show.tmdbId);
+  const router = useRouter();
+
   const animStyle = useAnimatedStyle(() => {
     return {
       transform: [
@@ -68,10 +74,20 @@ const ScrollerSecond = ({ show, imageWidth, imageHeight, index, scrollX }: Props
           <Text className="text-center text-lg font-semibold">
             {dayjs.unix(show.dateAddedEpoch).format('MM/DD/YYYY')}
           </Text>
+          <Text>Season {seasonsSummary?.['1']?.watched}</Text>
+          <Pressable
+            onPress={() =>
+              router.push({
+                pathname: `/seasonslistmodal`,
+                params: { showid: parseInt(show.tmdbId) },
+              })
+            }>
+            <Text>See Seasons</Text>
+          </Pressable>
         </View>
       </Animated.View>
     </View>
   );
 };
 
-export default ScrollerSecond;
+export default React.memo(ScrollerSecond);

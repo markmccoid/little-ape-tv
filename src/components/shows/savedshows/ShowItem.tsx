@@ -39,7 +39,20 @@ const ShowItem = ({ show }: Props) => {
   const onScroll = useAnimatedScrollHandler((e) => {
     scrollX.value = e.contentOffset.x;
   });
-  const cardData = [
+
+  //~ Types for cardData
+  interface Props {
+    show: any; // Adjust this based on what 'show' actually is
+    imageWidth: number;
+    imageHeight: number;
+    index: number;
+    scrollX: any; // Adjust this based on what 'scrollX' actually is
+  }
+  type CardDataItem = {
+    id: string;
+    component: React.ComponentType<Props>; // General type for React components
+  };
+  const cardData: CardDataItem[] = [
     {
       id: 'main',
       component: ScrollerMain,
@@ -86,29 +99,58 @@ const ShowItem = ({ show }: Props) => {
     };
   });
 
+  // const renderItem = useCallback(
+  //   ({ item, index }: { item: CardDataItem; index: number }) => {
+  //     const Comp = React.memo(item.component);
+  //     // Only render if it's the current index or adjacent
+  //     const shouldRender = Math.abs(index - currIndex) <= 1;
+
+  //     return (
+  //       <View
+  //         style={{
+  //           width: IMG_WIDTH + 1,
+  //         }}>
+  //         {shouldRender ? (
+  //           <Comp
+  //             show={show}
+  //             imageWidth={IMG_WIDTH}
+  //             imageHeight={IMG_HEIGHT}
+  //             index={index}
+  //             scrollX={scrollX}
+  //           />
+  //         ) : (
+  //           // Placeholder to maintain layout
+  //           <View style={{ width: IMG_WIDTH, height: IMG_HEIGHT }} />
+  //         )}
+  //       </View>
+  //     );
+  //   },
+  //   [currIndex]  );
+  const renderItem = useCallback(({ item, index }: { item: CardDataItem; index: number }) => {
+    const Comp = React.memo(item.component);
+    return (
+      <View
+        style={{
+          width: IMG_WIDTH + 1,
+        }}>
+        <Comp
+          show={show}
+          imageWidth={IMG_WIDTH}
+          imageHeight={IMG_HEIGHT}
+          index={index}
+          scrollX={scrollX}
+        />
+      </View>
+    );
+  }, []);
+
   return (
     <Animated.View className="relative mb-[25]" exiting={FadeOutLeft} entering={FadeIn}>
       <Animated.FlatList
         onScroll={handleScroll}
         data={cardData}
         getItemLayout={getItemLayout}
-        renderItem={({ item, index }) => {
-          const Comp = item.component;
-          return (
-            <View
-              style={{
-                width: IMG_WIDTH + 1,
-              }}>
-              <Comp
-                show={show}
-                imageWidth={IMG_WIDTH}
-                imageHeight={IMG_HEIGHT}
-                index={index}
-                scrollX={scrollX}
-              />
-            </View>
-          );
-        }}
+        renderItem={renderItem}
         keyExtractor={(item) => item.id}
         horizontal={true}
         decelerationRate="fast"

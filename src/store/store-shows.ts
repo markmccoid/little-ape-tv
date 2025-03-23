@@ -2,7 +2,7 @@ import { authManager } from '~/authentication/AuthProvider';
 import { observable, Observable, syncState } from '@legendapp/state';
 import { createShowFunctions } from './functions-shows';
 import type { ShowFunctions, SavedShow, SavedShows } from './functions-shows';
-import type { SavedShowsAttributes } from './functions-showAttributes';
+import type { ShowAttributes } from './functions-showAttributes';
 import { type TagFunctions, type Tag, createTagFunctions } from './functions-tags';
 import { synced } from '@legendapp/state/sync';
 import { ObservablePersistMMKV } from '@legendapp/state/persist-plugins/mmkv';
@@ -19,7 +19,7 @@ const defaultTagListValue: Tag[] = [];
 // const storedTags = authManager.userStorage?.getItem('tags');
 
 // Create the initial state, if nothing loaded from MMKV then the default will be used
-const initialState: { shows: SavedShows; showAttributes: SavedShowsAttributes } = {
+const initialState: { shows: SavedShows; showAttributes: ShowAttributes } = {
   shows: {},
   showAttributes: {},
 };
@@ -31,7 +31,7 @@ const tagInitialState: { tagList: Tag[] } = { tagList: [] };
 //~ ==================
 export type SavedShowObservable = {
   shows: SavedShows;
-  showAttributes: SavedShowsAttributes;
+  showAttributes: ShowAttributes;
 } & ShowFunctions;
 export const savedShows$ = observable<SavedShowObservable>(
   synced({
