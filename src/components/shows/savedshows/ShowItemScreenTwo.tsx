@@ -13,19 +13,24 @@ import { SavedShow } from '~/store/functions-shows';
 import dayjs from 'dayjs';
 import { useSavedSeasonSummary } from '~/store/functions-showAttributes';
 import { useRouter } from 'expo-router';
+import ShowItemBottom from './ShowItemBottom';
+import { use$ } from '@legendapp/state/react';
+import { savedShows$ } from '~/store/store-shows';
 const missingPosterURI = require('../../../../assets/missingPoster.png');
 
 type Props = {
-  show: SavedShow;
+  showId: string;
   imageWidth: number;
   imageHeight: number;
   index: number;
   scrollX: SharedValue<number>;
 };
-const ScrollerSecond = ({ show, imageWidth, imageHeight, index, scrollX }: Props) => {
-  const seasonsSummary = useSavedSeasonSummary(show.tmdbId);
+const ScrollerSecond = ({ showId, imageWidth, imageHeight, index, scrollX }: Props) => {
+  const seasonsSummary = useSavedSeasonSummary(showId);
+  // const favorite = use$(savedShows$.shows[showId].favorite); // Subscribe to favorite status
+  // const posterURL = use$(savedShows$.shows[showId].posterURL); // Subscribe to favorite status
+  const { favorite, posterURL, name, dateAddedEpoch } = use$(savedShows$.shows[showId]); // Subscribe to favorite status
   const router = useRouter();
-
   const animStyle = useAnimatedStyle(() => {
     return {
       transform: [
@@ -42,16 +47,16 @@ const ScrollerSecond = ({ show, imageWidth, imageHeight, index, scrollX }: Props
   });
 
   return (
-    <View>
+    <View style={{ width: imageWidth, height: imageHeight }}>
       {/* <View className="absolute top-[-10] z-10">
-        <SetFavoriteButton showId={show.tmdbId} isFavorited={!!show.favorite} />
-      </View> */}
+          <SetFavoriteButton showId={show.tmdbId} isFavorited={!!show.favorite} />
+        </View> */}
       <Animated.View
         style={[animStyle, { width: imageWidth, height: imageHeight, position: 'relative' }]}
         className="overflow-hidden rounded-lg border-hairline border-primary bg-white">
         <Image
           className="absolute"
-          source={show.posterURL || missingPosterURI}
+          source={posterURL || missingPosterURI}
           contentFit="cover"
           style={{
             width: imageWidth,
@@ -63,29 +68,30 @@ const ScrollerSecond = ({ show, imageWidth, imageHeight, index, scrollX }: Props
             zIndex: -1,
           }}
         />
-
         <View className="relative z-30 mx-[9] my-[5]">
           <Text
             className="text-center text-lg font-semibold"
             lineBreakMode="tail"
             numberOfLines={2}>
-            {show.name}
+            {name}
           </Text>
           <Text className="text-center text-lg font-semibold">
-            {dayjs.unix(show.dateAddedEpoch).format('MM/DD/YYYY')}
+            {dayjs.unix(dateAddedEpoch).format('MM/DD/YYYY')}
           </Text>
           <Text>Season {seasonsSummary?.['1']?.watched}</Text>
+          <Text>Show Favorited?: {favorite}</Text>
           <Pressable
             onPress={() =>
               router.push({
                 pathname: `/seasonslistmodal`,
-                params: { showid: parseInt(show.tmdbId) },
+                params: { showid: parseInt(showId) },
               })
             }>
             <Text>See Seasons</Text>
           </Pressable>
         </View>
       </Animated.View>
+      <ShowItemBottom showId={showId} />
     </View>
   );
 };

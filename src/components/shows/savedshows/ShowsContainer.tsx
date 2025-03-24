@@ -21,6 +21,12 @@ import { FilterIcon } from '~/components/common/Icons';
 import { useCustomTheme } from '~/utils/customColorTheme';
 import { search$ } from '~/store/store-search';
 
+//!! MOVE TO A FUNCTION SO ONE source of TRUTH
+const { width, height } = Dimensions.get('window');
+const MARGIN = 10;
+const IMG_WIDTH = (width - MARGIN * 3) / 2;
+const IMG_HEIGHT = IMG_WIDTH * 1.5;
+
 const ShowsContainer = () => {
   const showsInit = useShows();
   const router = useRouter();
@@ -76,9 +82,16 @@ const ShowsContainer = () => {
 
   //!!
   const renderShow = useCallback(({ item }: { item: SavedShow }) => {
-    return <ShowItem show={item} />;
+    return <ShowItem show={item} showId={item.tmdbId} />;
   }, []);
 
+  const getItemLayout = (_: any, index: number) => {
+    return {
+      length: IMG_HEIGHT + 26,
+      offset: (IMG_HEIGHT + 26) * index, // Remove the -1 here as it was causing incorrect offsets
+      index,
+    };
+  };
   return (
     <>
       <Stack.Screen options={{ title: 'Shows' }} />
@@ -125,7 +138,7 @@ const ShowsContainer = () => {
         <Animated.FlatList
           data={shows}
           ref={flatListRef}
-          className="px-[10] pt-[10]"
+          className="px-[10]"
           columnWrapperClassName="flex-row justify-between flex-1"
           // contentContainerClassName="flex-row justify-center flex-wrap border"
           keyExtractor={(item) => item.tmdbId}
@@ -133,6 +146,7 @@ const ShowsContainer = () => {
           numColumns={2}
           style={[listStyle, { zIndex: 10 }]}
           onScroll={scrollHandler}
+          getItemLayout={getItemLayout}
           showsVerticalScrollIndicator={false}
           keyboardDismissMode="on-drag"
         />

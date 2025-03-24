@@ -11,23 +11,27 @@ import { SymbolView } from 'expo-symbols';
 import { savedShows$ } from '~/store/store-shows';
 import { TVSearchResultItem } from '@markmccoid/tmdb_api';
 import { SavedShow } from '~/store/functions-shows';
+import SetFavoriteButton from '../details/tags/SetFavoriteButton';
+import DeleteShowButton from './DeleteShowButton';
+import { use$ } from '@legendapp/state/react';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 type Props = {
-  show: SavedShow;
+  showId: string;
 };
 
-const SearchItemButtonAnim = ({ show }: Props) => {
+const SearchItemButtonAnim = ({ showId }: Props) => {
   const { colors } = useCustomTheme();
-  const [isStoredLocally, setIsStoredLocally] = useState(show.isStoredLocally);
-  const transition = useSharedValue(show.isStoredLocally ? 1 : 0); // 1 for true, 0 for false
+  const { isStoredLocally, favorite } = use$(savedShows$.shows[showId]);
+  // const [isStoredLocally, setIsStoredLocally] = useState(show.isStoredLocally);
+  const transition = useSharedValue(isStoredLocally ? 1 : 0); // 1 for true, 0 for false
   useEffect(() => {
     transition.value = withTiming(isStoredLocally ? 1 : 0, { duration: 500 });
   }, [isStoredLocally]);
 
-  useEffect(() => {
-    setIsStoredLocally(show?.isStoredLocally);
-  }, [show]);
+  // useEffect(() => {
+  //   setIsStoredLocally(show?.isStoredLocally);
+  // }, [show]);
 
   const backgroundColor = useAnimatedStyle(() => {
     return {
@@ -50,17 +54,24 @@ const SearchItemButtonAnim = ({ show }: Props) => {
   });
 
   const handleRemovePress = () => {
-    savedShows$.removeShow(show.tmdbId);
-    setIsStoredLocally(false);
+    savedShows$.removeShow(showId);
+    // setIsStoredLocally(false);
   };
 
   return (
     <Animated.View
       className="z-10 mx-3 my-[-15] h-[25] flex-row items-center justify-center rounded-lg border p-1"
       style={[backgroundColor, styles.container]}>
-      <AnimatedPressable style={[styles.button, minusButtonStyle]} onPress={handleRemovePress}>
+      <Animated.View style={[{ position: 'absolute', left: 0, top: -5 }]}>
+        <SetFavoriteButton showId={showId} isFavorited={!!favorite} />
+      </Animated.View>
+      <Animated.View style={[{ position: 'absolute', right: 0, top: -5 }]}>
+        <DeleteShowButton showId={showId} />
+      </Animated.View>
+
+      {/* <AnimatedPressable style={[styles.button, minusButtonStyle]} onPress={handleRemovePress}>
         <SymbolView name="minus.circle.fill" tintColor={colors.deleteRed} size={40} />
-      </AnimatedPressable>
+      </AnimatedPressable> */}
     </Animated.View>
   );
 };

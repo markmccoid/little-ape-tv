@@ -11,17 +11,20 @@ import Animated, {
 } from 'react-native-reanimated';
 import { SavedShow } from '~/store/functions-shows';
 import { useRouter } from 'expo-router';
+import { use$ } from '@legendapp/state/react';
+import { savedShows$ } from '~/store/store-shows';
 const missingPosterURI = require('../../../../assets/missingPoster.png');
 
 type Props = {
-  show: SavedShow;
+  showId: string;
   imageWidth: number;
   imageHeight: number;
   index: number;
   scrollX: SharedValue<number>;
 };
-const ScrollerMain = ({ show, imageWidth, imageHeight, index, scrollX }: Props) => {
+const ScrollerMain = ({ showId, imageWidth, imageHeight, index, scrollX }: Props) => {
   const router = useRouter();
+  const { posterURL } = use$(savedShows$.shows[showId]);
   const animStyle = useAnimatedStyle(() => {
     return {
       transform: [
@@ -43,12 +46,10 @@ const ScrollerMain = ({ show, imageWidth, imageHeight, index, scrollX }: Props) 
         onLongPress={() =>
           router.push({
             pathname: `/seasonslistmodal`,
-            params: { showid: parseInt(show.tmdbId) },
+            params: { showid: parseInt(showId) },
           })
         }
-        onPress={() =>
-          router.push({ pathname: `/[showid]`, params: { showid: parseInt(show.tmdbId) } })
-        }
+        onPress={() => router.push({ pathname: `/[showid]`, params: { showid: parseInt(showId) } })}
         className="rounded-lg border-hairline border-primary active:border-hairline">
         <View
           style={{
@@ -56,7 +57,7 @@ const ScrollerMain = ({ show, imageWidth, imageHeight, index, scrollX }: Props) 
           }}
           className="overflow-hidden rounded-lg border-hairline">
           <Image
-            source={show.posterURL || missingPosterURI}
+            source={posterURL || missingPosterURI}
             contentFit="cover"
             style={{ width: imageWidth, height: imageHeight }}
           />

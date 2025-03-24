@@ -28,8 +28,9 @@ const SetFavoriteButton = ({ showId, isDisplayed = true, isFavorited }: Props) =
       className={`${isDisplayed ? 'pointer-events-auto' : 'pointer-events-none opacity-0'} `}>
       <MotiView
         key="A"
-        from={{ opacity: 0, scale: 0 }}
-        animate={{ opacity: isDisplayed ? 100 : 0, scale: isDisplayed ? 1 : 0 }}
+        from={{ opacity: 1, scale: 1 }}
+        animate={{ opacity: 1, scale: 1 }}
+        // animate={{ opacity: isDisplayed ? 1 : 0, scale: 1 }}
         transition={{ type: 'timing', duration: 300 }}
         exit={{ opacity: 0 }}>
         <SymbolView
@@ -37,7 +38,7 @@ const SetFavoriteButton = ({ showId, isDisplayed = true, isFavorited }: Props) =
           type="palette"
           colors={[isFavoritedLocal ? 'red' : 'white', colors.primary]}
           size={35}
-          style={{ opacity: isFavoritedLocal ? 1 : 0.5 }}
+          style={{ opacity: isFavoritedLocal ? 1 : 1 }}
         />
       </MotiView>
     </Pressable>

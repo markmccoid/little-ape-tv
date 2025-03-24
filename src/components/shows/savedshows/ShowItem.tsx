@@ -17,8 +17,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import SearchItemButtonAnim from '~/components/search/SearchItemButtonAnim';
 import ShowItemBottom from './ShowItemBottom';
-import ScrollerMain from './ScrollerMain';
-import ScrollerSecond from './ScrollerSecond';
+import ShowItemMain from './ShowItemMain';
+import ShowItemScreenTwo from './ShowItemScreenTwo';
 import { MotiView } from 'moti';
 import SetFavoriteButton from '../details/tags/SetFavoriteButton';
 import DeleteShowButton from './DeleteShowButton';
@@ -30,19 +30,20 @@ const IMG_HEIGHT = IMG_WIDTH * 1.5;
 
 type Props = {
   show: SavedShow;
+  showId: string;
 };
 
-const ShowItem = ({ show }: Props) => {
+const ShowItem = ({ show, showId }: Props) => {
   const scrollX = useSharedValue(0);
 
   const [currIndex, setCurrIndex] = useState(0);
-  const onScroll = useAnimatedScrollHandler((e) => {
-    scrollX.value = e.contentOffset.x;
-  });
+  // const onScroll = useAnimatedScrollHandler((e) => {
+  //   scrollX.value = e.contentOffset.x;
+  // });
 
   //~ Types for cardData
   interface Props {
-    show: any; // Adjust this based on what 'show' actually is
+    showId: string; // Adjust this based on what 'show' actually is
     imageWidth: number;
     imageHeight: number;
     index: number;
@@ -55,11 +56,11 @@ const ShowItem = ({ show }: Props) => {
   const cardData: CardDataItem[] = [
     {
       id: 'main',
-      component: ScrollerMain,
+      component: ShowItemMain,
     },
     {
-      id: 'second',
-      component: ScrollerSecond,
+      id: 'screenTwo',
+      component: ShowItemScreenTwo,
     },
   ];
 
@@ -99,42 +100,17 @@ const ShowItem = ({ show }: Props) => {
     };
   });
 
-  // const renderItem = useCallback(
-  //   ({ item, index }: { item: CardDataItem; index: number }) => {
-  //     const Comp = React.memo(item.component);
-  //     // Only render if it's the current index or adjacent
-  //     const shouldRender = Math.abs(index - currIndex) <= 1;
-
-  //     return (
-  //       <View
-  //         style={{
-  //           width: IMG_WIDTH + 1,
-  //         }}>
-  //         {shouldRender ? (
-  //           <Comp
-  //             show={show}
-  //             imageWidth={IMG_WIDTH}
-  //             imageHeight={IMG_HEIGHT}
-  //             index={index}
-  //             scrollX={scrollX}
-  //           />
-  //         ) : (
-  //           // Placeholder to maintain layout
-  //           <View style={{ width: IMG_WIDTH, height: IMG_HEIGHT }} />
-  //         )}
-  //       </View>
-  //     );
-  //   },
-  //   [currIndex]  );
   const renderItem = useCallback(({ item, index }: { item: CardDataItem; index: number }) => {
-    const Comp = React.memo(item.component);
+    const Comp = item.component;
     return (
       <View
         style={{
           width: IMG_WIDTH + 1,
+          height: IMG_HEIGHT + 26,
+          // borderWidth: 1,
         }}>
         <Comp
-          show={show}
+          showId={showId}
           imageWidth={IMG_WIDTH}
           imageHeight={IMG_HEIGHT}
           index={index}
@@ -145,7 +121,7 @@ const ShowItem = ({ show }: Props) => {
   }, []);
 
   return (
-    <Animated.View className="relative mb-[25]" exiting={FadeOutLeft} entering={FadeIn}>
+    <Animated.View className="relative" exiting={FadeOutLeft} entering={FadeIn}>
       <Animated.FlatList
         onScroll={handleScroll}
         data={cardData}
@@ -165,7 +141,7 @@ const ShowItem = ({ show }: Props) => {
         }}
       />
 
-      {currIndex === 1 && (
+      {/* {currIndex === 1 && (
         <>
           <Animated.View style={[buttonStyle, { position: 'absolute', left: 0, top: -10 }]}>
             <SetFavoriteButton showId={show.tmdbId} isFavorited={!!show.favorite} />
@@ -174,7 +150,7 @@ const ShowItem = ({ show }: Props) => {
             <DeleteShowButton showId={show.tmdbId} />
           </Animated.View>
         </>
-      )}
+      )} */}
 
       {/* Future Home of dynamic Info screen.  Maybe button (circle) in corner of image when long press
           reveals more info screen */}
