@@ -33,7 +33,6 @@ const TVShowSectionList: React.FC<Props> = ({ seasons, showData }) => {
   const { showid } = useLocalSearchParams();
   const sectionListRef = useRef<SectionList>(null);
   const seasonScrollRef = useRef<ScrollView>(null);
-  const watchedCounts = {}; //useWatchedEpisodeCount(showid as string, seasons);
   const seasonSummary = useSeasonSummary(showid as string, seasons);
   // console.log('SEASON SUMMARY', seasonSummary);
 

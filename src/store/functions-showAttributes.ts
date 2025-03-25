@@ -33,12 +33,7 @@ interface SeasonSummary {
 export type SeasonsSummary = {
   lws: number; // lastWatchedSeason
   gtw: number; // grandTotalWatched
-  nds: {
-    season?: number;
-    episode?: number;
-    airDate?: string;
-    status: 's' | 'a' | 'n';
-  };
+  nds: NextDownloadEpisode; // nextDownloadEpisode
 } & {
   [seasonNum: number]: SeasonSummary;
 };
@@ -74,59 +69,6 @@ export type SeasonEpisodesState = {
   };
 } & { lastWatchedSeason: number; numEpisodesWatched: number };
 export type SeasonStateKeys = keyof SeasonEpisodesState;
-
-export const useWatchedEpisodeCount = (
-  showId: string,
-  seasons: TVShowSeasonDetails[]
-): SeasonEpisodesState => {
-  const seasonEpisodeCounts: Record<number, number> = {};
-  seasons.forEach((season) => {
-    seasonEpisodeCounts[season.seasonNumber] = season.episodes.length;
-  });
-
-  const tempShowAttributes = use$(savedShows$.showAttributes[showId]);
-  if (!tempShowAttributes || !tempShowAttributes.seasons) return {} as SeasonEpisodesState;
-
-  const seasonEpisodesState = Object.entries(tempShowAttributes.seasons).reduce(
-    (fin: SeasonEpisodesState, [seasonNumber, seasonData]: [string, Season]) => {
-      const numSeason = Number(seasonNumber);
-
-      // Initialize season data if it doesn't exist
-      if (!fin[seasonNumber]) {
-        fin[seasonNumber] = {
-          watched: 0,
-          downloaded: 0,
-          favorited: 0,
-          allWatched: false,
-          allDownloaded: false,
-          episodeCount: seasonEpisodeCounts[numSeason] || 0,
-        };
-      }
-
-      // Use summary data directly
-      fin[seasonNumber].watched = seasonData.summary.tw;
-      fin[seasonNumber].downloaded = seasonData.summary.td;
-      fin[seasonNumber].favorited = seasonData.summary.tf;
-      fin[seasonNumber].allWatched = seasonData.summary.tw === seasonData.summary.te;
-      fin[seasonNumber].allDownloaded = seasonData.summary.td === seasonData.summary.te;
-
-      // Update aggregate counts
-      let episodes = fin['numEpisodesWatched'] || 0;
-      episodes = fin[seasonNumber].allWatched
-        ? episodes + seasonEpisodeCounts[numSeason]
-        : episodes;
-      fin['numEpisodesWatched'] = episodes;
-
-      fin['lastWatchedSeason'] = fin[seasonNumber].allWatched
-        ? numSeason
-        : fin['lastWatchedSeason'] || 0;
-
-      return fin;
-    },
-    {} as SeasonEpisodesState
-  );
-  return seasonEpisodesState;
-};
 
 //~ -----------------------------------------------
 //~ Toggle Watched Status
@@ -291,9 +233,18 @@ export const useEpisodeAttributes = (showId: string, seasonNum: number, episodeN
   { '2': { te: 8, tw: 8, td: 4, tf: 2 } }
   ]
   */
+type NextDownloadEpisode =
+  | {
+      season?: number;
+      episode?: number;
+      airDate?: string;
+      status: 's' | 'a' | 'n';
+    }
+  | undefined;
 type SeasonsSummaryVerbose = {
   lastWatchedSeason: number;
   grandTotalWatched: number;
+  nextDownloadEpisode: NextDownloadEpisode;
 } & {
   [seasonNum: number]: SeasonSummaryVerbose;
 };
@@ -323,14 +274,7 @@ export const useSeasonSummary = (
 
   // status
   // s = "some downloaded", a = "all downloaded" n = "none downloaded"
-  let nextDownloadEpisode:
-    | {
-        season?: number;
-        episode?: number;
-        airDate?: string;
-        status: 's' | 'a' | 'n';
-      }
-    | undefined = undefined;
+  let nextDownloadEpisode: NextDownloadEpisode = undefined;
   let allDownloaded = true;
 
   // First, find the last downloaded episode
@@ -494,7 +438,8 @@ function getSeasonTotalsByType(
 // Expand the seasons summary names from their shortened to full
 // We shorten to save space when storing
 function expandSummaryNames(summaryData: SeasonsSummary): SeasonsSummaryVerbose {
-  if (!summaryData) return { lastWatchedSeason: 0, grandTotalWatched: 0 };
+  if (!summaryData)
+    return { lastWatchedSeason: 0, grandTotalWatched: 0, nextDownloadEpisode: { status: 'n' } };
   let newData = { lastWatchedSeason: 0, grandTotalWatched: 0 };
 
   for (let season in summaryData) {
@@ -502,6 +447,7 @@ function expandSummaryNames(summaryData: SeasonsSummary): SeasonsSummaryVerbose 
       ...newData,
       lastWatchedSeason: summaryData.lws,
       grandTotalWatched: summaryData.gtw,
+      nextDownloadEpisode: summaryData.nds,
       [season]: {
         totalEpisodes: summaryData[season].te,
         watched: summaryData[season].tw,
