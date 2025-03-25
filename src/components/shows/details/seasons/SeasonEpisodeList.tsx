@@ -35,6 +35,7 @@ const TVShowSectionList: React.FC<Props> = ({ seasons, showData }) => {
   const seasonScrollRef = useRef<ScrollView>(null);
   const watchedCounts = {}; //useWatchedEpisodeCount(showid as string, seasons);
   const seasonSummary = useSeasonSummary(showid as string, seasons);
+  // console.log('SEASON SUMMARY', seasonSummary);
 
   const isStoredLocally = showData.isStoredLocally;
   // Map seasons to SectionList sections

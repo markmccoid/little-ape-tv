@@ -33,6 +33,12 @@ interface SeasonSummary {
 export type SeasonsSummary = {
   lws: number; // lastWatchedSeason
   gtw: number; // grandTotalWatched
+  nds: {
+    season?: number;
+    episode?: number;
+    airDate?: string;
+    status: 's' | 'a' | 'n';
+  };
 } & {
   [seasonNum: number]: SeasonSummary;
 };
@@ -306,25 +312,115 @@ export const useSeasonSummary = (
   showId: string,
   seasons: TVShowSeasonDetails[]
 ): SeasonsSummaryVerbose => {
-  const seasonData = use$(savedShows$.showAttributes[showId]?.seasons) || {};
-  // Get the episode count for each season.
+  const seasonsAttributeData = use$(savedShows$.showAttributes[showId]?.seasons) || {};
   const seasonEpisodeCounts: Record<number, number> = {};
   seasons.forEach((season) => {
     seasonEpisodeCounts[season.seasonNumber] = season.episodes.length;
   });
 
-  // Loop through saved season attribute data and reduce data down into a summary Object
-  /*
-  { 1: { totalEpisodes, watched, allWatched, downloaded, allDownloaded, favorited }}
-  */
-
   let lastWatchedSeason = 0;
   let grandTotalWatched = 0;
-  const seasonsSummary: SeasonsSummary = Object.keys(seasonData).reduce(
+
+  // status
+  // s = "some downloaded", a = "all downloaded" n = "none downloaded"
+  let nextDownloadEpisode:
+    | {
+        season?: number;
+        episode?: number;
+        airDate?: string;
+        status: 's' | 'a' | 'n';
+      }
+    | undefined = undefined;
+  let allDownloaded = true;
+
+  // First, find the last downloaded episode
+  let lastDownloadedSeason = 0;
+  let lastDownloadedEpisode = 0;
+
+  // Loop through seasons in order
+  seasons.forEach((season) => {
+    if (season.seasonNumber === 0) return; // Skip special season
+
+    //# --------- DOWNLOAD Status START ---------------------
+    // Get only "d" download attribuetes
+    /*
+    {"episodes": {"1": {"w": true}, "2": {"w": true}, "3": {"w": true}}}
+    */
+    const result = { episodes: {} as { [key: number]: { d: boolean } } };
+    const tempAttribs = seasonsAttributeData[season.seasonNumber] || { episodes: {} };
+    for (const episode in tempAttribs.episodes) {
+      if (tempAttribs?.episodes?.[episode].hasOwnProperty('d')) {
+        result.episodes[episode] = { d: tempAttribs.episodes[episode].d };
+      }
+    }
+    const seasonAttribData = result; //seasonsAttributeData[season.seasonNumber];
+
+    if (Object.keys(seasonAttribData.episodes).length === 0) {
+      allDownloaded = false;
+      if (!nextDownloadEpisode) {
+        //~ If you wanted to show that nothing or at least the first has not yet been downloaded
+        //~ uncomment.  Otherwise we want it to be null
+        nextDownloadEpisode = {
+          season: season.seasonNumber,
+          episode: 1,
+          airDate: season.episodes[0].airDate.formatted,
+          status: 's',
+        };
+      }
+      return;
+    }
+
+    // Check each episode in the season
+    season.episodes.forEach((ep, idx) => {
+      const isDownloaded = seasonAttribData.episodes[ep.episodeNumber]?.d;
+      if (isDownloaded) {
+        lastDownloadedSeason = season.seasonNumber;
+        lastDownloadedEpisode = ep.episodeNumber;
+      } else {
+        allDownloaded = false;
+        if (
+          !nextDownloadEpisode &&
+          lastDownloadedSeason <= season.seasonNumber &&
+          lastDownloadedSeason > 0
+        ) {
+          console.log('Setting next episode.', lastDownloadedSeason, season.seasonNumber);
+          nextDownloadEpisode = {
+            season: season.seasonNumber,
+            episode: ep.episodeNumber,
+            airDate: ep.airDate.formatted,
+            status: 's',
+          };
+        }
+        return;
+      }
+    });
+  });
+
+  if (lastDownloadedSeason === 0 && lastDownloadedEpisode === 0) {
+    nextDownloadEpisode = {
+      ...(typeof nextDownloadEpisode === 'object' && nextDownloadEpisode !== null
+        ? nextDownloadEpisode
+        : {}),
+      status: 'n',
+    };
+  }
+
+  if (allDownloaded) {
+    nextDownloadEpisode = {
+      season: undefined,
+      episode: undefined,
+      airDate: undefined,
+      status: 'a',
+    };
+  }
+  console.log('Next DL', allDownloaded, nextDownloadEpisode);
+  //# --------- DOWNLOAD Status END ---------------------
+
+  const seasonsSummary = Object.keys(seasonsAttributeData).reduce<SeasonsSummary>(
     (final, season: string) => {
       const seasonNum = parseInt(season);
-      const numDownloaded = getSeasonTotalsByType(seasonData[seasonNum].episodes, 'd');
-      const numWatched = getSeasonTotalsByType(seasonData[seasonNum].episodes, 'w');
+      const numDownloaded = getSeasonTotalsByType(seasonsAttributeData[seasonNum].episodes, 'd');
+      const numWatched = getSeasonTotalsByType(seasonsAttributeData[seasonNum].episodes, 'w');
       if (numWatched === seasonEpisodeCounts[seasonNum]) {
         lastWatchedSeason = parseInt(season);
       }
@@ -333,17 +429,18 @@ export const useSeasonSummary = (
         ...final,
         lws: lastWatchedSeason,
         gtw: grandTotalWatched,
+        nds: nextDownloadEpisode || { status: 'n' },
         [season]: {
           te: seasonEpisodeCounts[seasonNum],
           tw: numWatched,
           aw: numWatched === seasonEpisodeCounts[seasonNum],
           td: numDownloaded,
           ad: numDownloaded === seasonEpisodeCounts[seasonNum],
-          tf: getSeasonTotalsByType(seasonData[seasonNum].episodes, 'f'),
+          tf: getSeasonTotalsByType(seasonsAttributeData[seasonNum].episodes, 'f'),
         },
       };
     },
-    { lws: 0 }
+    { lws: 0, gtw: 0, nds: { status: 'n' } } as SeasonsSummary
   );
 
   // Store the seasonSummary data on savedShow$.showAttributes observable
