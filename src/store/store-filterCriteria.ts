@@ -97,6 +97,15 @@ export const defaultSort: SortField[] = [
     title: 'Show Name',
     type: 'alpha',
   },
+  {
+    id: '4',
+    position: 4,
+    active: false,
+    sortDirection: 'asc',
+    sortField: 'avgEpisodeRunTime',
+    title: 'Run Time',
+    type: 'number',
+  },
 ];
 //----------------------------
 //-- MAIN Filter Type
