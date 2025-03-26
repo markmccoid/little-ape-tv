@@ -9,10 +9,8 @@ import Animated, {
   SharedValue,
   useAnimatedStyle,
 } from 'react-native-reanimated';
-import { SavedShow } from '~/store/functions-shows';
 import { useRouter } from 'expo-router';
-import { use$ } from '@legendapp/state/react';
-import { savedShows$ } from '~/store/store-shows';
+import { useSavedShow } from '~/store/store-shows';
 const missingPosterURI = require('../../../../assets/missingPoster.png');
 
 type Props = {
@@ -24,7 +22,8 @@ type Props = {
 };
 const ScrollerMain = ({ showId, imageWidth, imageHeight, index, scrollX }: Props) => {
   const router = useRouter();
-  const { posterURL } = use$(savedShows$.shows[showId]);
+  // const { posterURL, avgEpisodeRunTime } = use$(savedShows$.shows[showId]);
+  const { posterURL, avgEpisodeRunTime } = useSavedShow(showId);
   const animStyle = useAnimatedStyle(() => {
     return {
       transform: [
@@ -63,6 +62,9 @@ const ScrollerMain = ({ showId, imageWidth, imageHeight, index, scrollX }: Props
           />
         </View>
       </Pressable>
+      <View className="absolute top-0 w-full flex-row justify-center bg-white/70 p-1">
+        {avgEpisodeRunTime && <Text>{avgEpisodeRunTime} Mins</Text>}
+      </View>
     </Animated.View>
   );
 };

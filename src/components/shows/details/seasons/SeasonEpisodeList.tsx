@@ -7,7 +7,7 @@ import { getEpisodeIMDBURL, ShowDetailsData, UseShowDetailsReturn } from '~/data
 import { useLocalSearchParams } from 'expo-router';
 import EpisodeRow from './EpisodeRow';
 import { CheckIcon, TelevisionIcon, TelevisionOffIcon } from '~/components/common/Icons';
-import { useSeasonSummary, useWatchedEpisodeCount } from '~/store/functions-showAttributes';
+import { useSeasonSummary } from '~/store/functions-showAttributes';
 import SeasonHeader from './SeasonHeader';
 
 // Define fixed heights for performance

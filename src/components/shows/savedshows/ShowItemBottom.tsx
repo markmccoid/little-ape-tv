@@ -7,14 +7,13 @@ import Animated, {
   interpolateColor,
 } from 'react-native-reanimated';
 import { useCustomTheme } from '~/utils/customColorTheme';
-import { SymbolView } from 'expo-symbols';
 import { savedShows$ } from '~/store/store-shows';
-import { TVSearchResultItem } from '@markmccoid/tmdb_api';
-import { SavedShow } from '~/store/functions-shows';
 import SetFavoriteButton from '../details/tags/SetFavoriteButton';
 import DeleteShowButton from './DeleteShowButton';
 import { use$ } from '@legendapp/state/react';
 import { useSavedSeasonSummary } from '~/store/functions-showAttributes';
+import { settings$ } from '~/store/store-settings';
+import { useSavedShow } from '~/store/store-shows';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 type Props = {
@@ -23,44 +22,23 @@ type Props = {
 
 const SearchItemButtonAnim = ({ showId }: Props) => {
   const { colors } = useCustomTheme();
-  const { isStoredLocally, favorite } = use$(savedShows$.shows[showId]);
+  // const { isStoredLocally, favorite } = use$(savedShows$.shows[showId]);
+  const { isStoredLocally, favorite } = useSavedShow(showId);
   // const [isStoredLocally, setIsStoredLocally] = useState(show.isStoredLocally);
   const transition = useSharedValue(isStoredLocally ? 1 : 0); // 1 for true, 0 for false
   const savedAttributesSummary = useSavedSeasonSummary(showId);
+  const showNextDL = use$(settings$.downloadOptions.showNextDownloadInfo);
   // console.log('savedAttributesSummary', savedAttributesSummary.nextDownloadEpisode);
 
   useEffect(() => {
     transition.value = withTiming(isStoredLocally ? 1 : 0, { duration: 500 });
   }, [isStoredLocally]);
 
-  // useEffect(() => {
-  //   setIsStoredLocally(show?.isStoredLocally);
-  // }, [show]);
-
   const backgroundColor = useAnimatedStyle(() => {
     return {
       backgroundColor: interpolateColor(transition.value, [0, 1], ['white', colors.includeGreen]),
     };
   });
-
-  const plusButtonStyle = useAnimatedStyle(() => {
-    return {
-      opacity: 1 - transition.value,
-      transform: [{ scale: 1 - transition.value }],
-    };
-  });
-
-  const minusButtonStyle = useAnimatedStyle(() => {
-    return {
-      opacity: transition.value,
-      transform: [{ scale: transition.value }],
-    };
-  });
-
-  const handleRemovePress = () => {
-    savedShows$.removeShow(showId);
-    // setIsStoredLocally(false);
-  };
 
   return (
     <Animated.View
@@ -70,13 +48,15 @@ const SearchItemButtonAnim = ({ showId }: Props) => {
         <SetFavoriteButton showId={showId} isFavorited={!!favorite} />
       </Animated.View>
 
-      <View>
-        <Text>
-          {savedAttributesSummary?.nextDownloadEpisode?.status === 'a'
-            ? 'DONE'
-            : savedAttributesSummary?.nextDownloadEpisode?.airDate}
-        </Text>
-      </View>
+      {showNextDL && (
+        <View>
+          <Text>
+            {savedAttributesSummary?.nextDownloadEpisode?.status === 'a'
+              ? 'DONE'
+              : savedAttributesSummary?.nextDownloadEpisode?.airDate}
+          </Text>
+        </View>
+      )}
 
       <Animated.View style={[{ position: 'absolute', right: 0, top: -5 }]}>
         <DeleteShowButton showId={showId} />

@@ -14,12 +14,13 @@ const SettingsContainer = () => {
   const router = useRouter();
   const { colors } = useCustomTheme();
   const showImages = use$(settings$.showImageInEpisode);
+  const showNextDownloadEpisode = use$(settings$.downloadOptions.showNextDownloadInfo);
   return (
     <ScrollView className="flex-1">
       <Text className="mx-3 text-2xl text-text" style={{ color: AC.secondaryLabel }}>
         Settings
       </Text>
-
+      {/* Tag Maintenance */}
       <Pressable
         onPress={() => router.push('/(authed)/settings/tagsetup')}
         className="mx-2 flex-row items-center justify-between rounded-lg border-hairline p-1 px-2 active:bg-card"
@@ -27,6 +28,7 @@ const SettingsContainer = () => {
         <Text className="p-1 text-lg text-text">Tag Maintenance</Text>
         <SymbolView name="chevron.right" tintColor={colors.text} size={20} />
       </Pressable>
+      {/* SAVED Filters */}
       <Pressable
         onPress={() => router.push('/(authed)/settings/savedfiltersmaint')}
         className="mx-2 mt-2 flex-row items-center justify-between rounded-lg border-hairline p-1 px-2 active:bg-card"
@@ -34,8 +36,9 @@ const SettingsContainer = () => {
         <Text className="p-1 text-lg text-text">Saved Filters</Text>
         <SymbolView name="chevron.right" tintColor={colors.text} size={20} />
       </Pressable>
-      <Pressable
-        onPress={() => router.push('/(authed)/settings/tagsetup')}
+
+      {/* Show Images on Episode List */}
+      <View
         className="mx-2 mt-2 flex-row items-center justify-between rounded-lg border-hairline p-1 pl-2 active:bg-card"
         style={{ backgroundColor: `${colors.card}99` }}>
         <Text className="p-1 text-lg text-text">Show Images on Episode List</Text>
@@ -47,7 +50,21 @@ const SettingsContainer = () => {
           onValueChange={() => settings$.showImageInEpisode.set((prev) => !prev)}
           value={showImages}
         />
-      </Pressable>
+      </View>
+      {/* Show Next Download Episode */}
+      <View
+        className="mx-2 mt-2 flex-row items-center justify-between rounded-lg border-hairline p-1 pl-2 active:bg-card"
+        style={{ backgroundColor: `${colors.card}99` }}>
+        <Text className="p-1 text-lg text-text">Show Next Download Episode</Text>
+        <Switch
+          style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
+          trackColor={{ false: '#767577', true: '#34C759' }}
+          thumbColor={showNextDownloadEpisode ? '#FFFFFF' : '#F2F2F2'}
+          ios_backgroundColor="#767577"
+          onValueChange={() => settings$.downloadOptions.showNextDownloadInfo.set((prev) => !prev)}
+          value={showNextDownloadEpisode}
+        />
+      </View>
     </ScrollView>
   );
 };

@@ -5,7 +5,8 @@ import { TVShowSeasonDetails } from '@markmccoid/tmdb_api';
 import { savedShows$ } from './store-shows';
 import { use$ } from '@legendapp/state/react';
 import { confirmAlert } from '~/utils/alert';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { eventDispatcher, EventName } from '~/utils/EventDispatcher';
 
 // ====================================================
 // ====================================================
@@ -357,7 +358,6 @@ export const useSeasonSummary = (
       status: 'a',
     };
   }
-  console.log('Next DL', allDownloaded, nextDownloadEpisode);
   //# --------- DOWNLOAD Status END ---------------------
 
   const seasonsSummary = Object.keys(seasonsAttributeData).reduce<SeasonsSummary>(
@@ -390,6 +390,12 @@ export const useSeasonSummary = (
   // Store the seasonSummary data on savedShow$.showAttributes observable
   savedShows$.showAttributes[showId].summary.set(seasonsSummary);
 
+  //emit event to update the average runtime
+  eventDispatcher.emit(
+    EventName.UpdateAvgEpisodeRuntime,
+    showId,
+    seasons.map((el) => el.seasonNumber)
+  );
   return expandSummaryNames(seasonsSummary);
 };
 
@@ -397,8 +403,25 @@ export const useSeasonSummary = (
 //# returns the SAVED seasonSummary, does not calculate anything!!
 //# ----------------------------------------------------------------------------
 export const useSavedSeasonSummary = (showId: string): SeasonsSummaryVerbose => {
-  const [seasonsSummary, setSeasonsSummary] = useState<SeasonsSummaryVerbose>();
+  const [seasonsSummary, setSeasonsSummary] = useState<SeasonsSummaryVerbose>(
+    {} as SeasonsSummaryVerbose
+  );
+  const summary = use$(savedShows$.showAttributes[showId].summary);
+  return useMemo(() => expandSummaryNames(summary || {}), [summary]);
 
+  // const summary = use$(savedShows$.showAttributes[showId].summary);
+
+  useEffect(() => {
+    const newSummary = expandSummaryNames(summary);
+    const frameId = requestAnimationFrame(() => {
+      setSeasonsSummary(newSummary);
+    });
+
+    // Cleanup to prevent memory leaks or updates after unmount
+    return () => cancelAnimationFrame(frameId);
+  }, [summary]);
+
+  return seasonsSummary;
   // We can't subscribe directly, as I was getting react errors about updates happening while other rerending
   // this way with requestAnimationFrame, we wait to update state until the rendering is finished and then
   // component using this hook with update with new summary data.

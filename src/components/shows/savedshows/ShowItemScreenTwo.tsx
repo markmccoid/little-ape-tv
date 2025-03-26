@@ -9,7 +9,8 @@ import Animated, {
   SharedValue,
   useAnimatedStyle,
 } from 'react-native-reanimated';
-import { SavedShow } from '~/store/functions-shows';
+// import { SavedShow, useSavedShow } from '~/store/functions-shows';
+import { useSavedShow } from '~/store/store-shows';
 import dayjs from 'dayjs';
 import { useSavedSeasonSummary } from '~/store/functions-showAttributes';
 import { useRouter } from 'expo-router';
@@ -29,7 +30,8 @@ const ScrollerSecond = ({ showId, imageWidth, imageHeight, index, scrollX }: Pro
   const seasonsSummary = useSavedSeasonSummary(showId);
   // const favorite = use$(savedShows$.shows[showId].favorite); // Subscribe to favorite status
   // const posterURL = use$(savedShows$.shows[showId].posterURL); // Subscribe to favorite status
-  const { favorite, posterURL, name, dateAddedEpoch } = use$(savedShows$.shows[showId]); // Subscribe to favorite status
+  // const { favorite, posterURL, name, dateAddedEpoch } = use$(savedShows$.shows[showId]); // Subscribe to favorite status
+  const { favorite, posterURL, name, dateAddedEpoch } = useSavedShow(showId); // Subscribe to favorite status
   const router = useRouter();
   const animStyle = useAnimatedStyle(() => {
     return {

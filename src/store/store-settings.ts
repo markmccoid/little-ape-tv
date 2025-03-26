@@ -5,14 +5,22 @@ import { authManager } from '~/authentication/AuthProvider';
 import { synced } from '@legendapp/state/sync';
 //**
 
+type DownloadOptions = {
+  showNextDownloadInfo: boolean;
+};
 type Settings = {
   searchNumColumns: 2 | 3;
   showImageInEpisode: boolean;
+  downloadOptions: DownloadOptions;
 };
 //~ - - - - - - - - - - - - - - - - - -
 //~ settings$ Observable
 //~ - - - - - - - - - - - - - - - - - -
-const initialState = { searchNumColumns: 2, showImageInEpisode: true };
+const initialState = {
+  searchNumColumns: 2,
+  showImageInEpisode: true,
+  downloadOptions: { showNextDownloadInfo: false },
+};
 export const settings$ = observable<Settings>(
   synced({
     initial: initialState,
