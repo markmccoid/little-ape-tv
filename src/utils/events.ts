@@ -16,6 +16,6 @@ export const setupEvents = (queryClient: QueryClient) => {
   eventDispatcher.on(EventName.UpdateAvgEpisodeRuntime, async (showId, seasonsArray) => {
     const seasonData = await fetchSeasonsData(parseInt(showId), seasonsArray);
     savedShows$.shows[showId].avgEpisodeRunTime.set(Math.trunc(seasonData[0].episodeAvgRunTime));
-    // console.log('emitted');
+    // console.log('emitted runtime', Math.trunc(seasonData[0].episodeAvgRunTime));
   });
 };

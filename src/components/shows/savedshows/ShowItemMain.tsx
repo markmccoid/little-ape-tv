@@ -23,6 +23,7 @@ type Props = {
 const ScrollerMain = ({ showId, imageWidth, imageHeight, index, scrollX }: Props) => {
   const router = useRouter();
   // const { posterURL, avgEpisodeRunTime } = use$(savedShows$.shows[showId]);
+  // console.log('SHOWID ShowItemMain', showId);
   const { posterURL, avgEpisodeRunTime } = useSavedShow(showId);
   const animStyle = useAnimatedStyle(() => {
     return {

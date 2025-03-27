@@ -26,8 +26,10 @@ type Props = {
   index: number;
   scrollX: SharedValue<number>;
 };
-const ScrollerSecond = ({ showId, imageWidth, imageHeight, index, scrollX }: Props) => {
+const ShowItemScreenTwo = ({ showId, imageWidth, imageHeight, index, scrollX }: Props) => {
   const seasonsSummary = useSavedSeasonSummary(showId);
+  // console.log('ScreenTwo', seasonsSummary["1"]);
+  // const seasonsSummary = use$(savedShows$.showAttributes[showId].summary);
   // const favorite = use$(savedShows$.shows[showId].favorite); // Subscribe to favorite status
   // const posterURL = use$(savedShows$.shows[showId].posterURL); // Subscribe to favorite status
   // const { favorite, posterURL, name, dateAddedEpoch } = use$(savedShows$.shows[showId]); // Subscribe to favorite status
@@ -98,4 +100,4 @@ const ScrollerSecond = ({ showId, imageWidth, imageHeight, index, scrollX }: Pro
   );
 };
 
-export default React.memo(ScrollerSecond);
+export default React.memo(ShowItemScreenTwo);

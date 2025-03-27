@@ -80,6 +80,7 @@ tags$.set({ ...tagInitialState, ...createTagFunctions(tags$) });
 //# returns the detail for a savedShow
 //# ----------------------------------------------------------------------------
 export const useSavedShow = (showId: string) => {
+  if (!showId) return {};
   const [showDetail, setShowDetail] = useState({} as SavedShow);
   const show = use$(savedShows$.shows[showId]);
   useEffect(() => {

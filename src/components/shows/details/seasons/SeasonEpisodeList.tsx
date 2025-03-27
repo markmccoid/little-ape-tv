@@ -7,8 +7,14 @@ import { getEpisodeIMDBURL, ShowDetailsData, UseShowDetailsReturn } from '~/data
 import { useLocalSearchParams } from 'expo-router';
 import EpisodeRow from './EpisodeRow';
 import { CheckIcon, TelevisionIcon, TelevisionOffIcon } from '~/components/common/Icons';
-import { useSeasonSummary } from '~/store/functions-showAttributes';
+import {
+  updateSeasonSummary,
+  useSavedSeasonSummary,
+  useSeasonSummary,
+} from '~/store/functions-showAttributes';
 import SeasonHeader from './SeasonHeader';
+import { useObservable, useObserveEffect } from '@legendapp/state/react';
+import { savedShows$ } from '~/store/store-shows';
 
 // Define fixed heights for performance
 const SECTION_HEADER_HEIGHT = 70;
@@ -29,12 +35,20 @@ export type SeasonsSection = {
   seasonNumber: number;
   counts: { watched: number; downloaded: number; allWatched: boolean; allDownloaded: boolean };
 };
-const TVShowSectionList: React.FC<Props> = ({ seasons, showData }) => {
+const SeasonEpisodeList: React.FC<Props> = ({ seasons, showData }) => {
   const { showid } = useLocalSearchParams();
   const sectionListRef = useRef<SectionList>(null);
   const seasonScrollRef = useRef<ScrollView>(null);
-  const seasonSummary = useSeasonSummary(showid as string, seasons);
+  const seasonSummary = useSavedSeasonSummary(showid as string);
   // console.log('SEASON SUMMARY', seasonSummary);
+
+  //# this legend state hook will fire when a change is made to the showAttributes
+  //# which will in turn update the seasonSummary data on the showAttributes[showId] observable
+  // This makes sure our summary object is updated when items are marked as watched/downloaded/etc.
+  useObserveEffect(() => {
+    savedShows$.showAttributes[showid as string].get();
+    updateSeasonSummary(showid as string, seasons);
+  });
 
   const isStoredLocally = showData.isStoredLocally;
   // Map seasons to SectionList sections
@@ -72,20 +86,6 @@ const TVShowSectionList: React.FC<Props> = ({ seasons, showData }) => {
     });
   }, []);
 
-  //!! ----- DEBUG GET ITEM LAYOUT ---
-  // useEffect(() => {
-  //   if (seasonScrollRef.current) {
-  //     // Button Width = 105
-  //     // find last watched season and multiple by button width
-  //     const xOffset = (seasonSummary?.lastWatchedSeason || 0 - 1) * 105;
-  //     if (xOffset < 0) return;
-  //     // console.log('watched', watchedCounts?.lastWatchedSeason, xOffset);
-  //     setTimeout(() => seasonScrollRef.current.scrollTo({ x: xOffset, animated: false }), 0);
-  //   }
-  // }, [seasonSummary?.lastWatchedSeason, seasonScrollRef]);
-  // Scroll horizontal season buttons
-
-  // Scroll to last watched season/episode after mount
   useEffect(() => {
     if (!seasonSummary?.lastWatchedSeason) return;
 
@@ -226,4 +226,4 @@ const TVShowSectionList: React.FC<Props> = ({ seasons, showData }) => {
   );
 };
 
-export default memo(TVShowSectionList);
+export default memo(SeasonEpisodeList);

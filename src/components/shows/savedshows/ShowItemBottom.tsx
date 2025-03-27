@@ -28,7 +28,6 @@ const SearchItemButtonAnim = ({ showId }: Props) => {
   const transition = useSharedValue(isStoredLocally ? 1 : 0); // 1 for true, 0 for false
   const savedAttributesSummary = useSavedSeasonSummary(showId);
   const showNextDL = use$(settings$.downloadOptions.showNextDownloadInfo);
-  // console.log('savedAttributesSummary', savedAttributesSummary.nextDownloadEpisode);
 
   useEffect(() => {
     transition.value = withTiming(isStoredLocally ? 1 : 0, { duration: 500 });

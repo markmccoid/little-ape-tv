@@ -15,25 +15,19 @@ import { Asul_400Regular, Asul_700Bold } from '@expo-google-fonts/asul';
 import { useFonts } from '@expo-google-fonts/asul';
 import { setupEvents } from '~/utils/events';
 import { queryClient } from '~/utils/queryClient';
+import { useSyncQueries } from 'tanstack-query-dev-tools-expo-plugin';
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
   initialRouteName: 'signin',
 };
 
-// export const queryClient = new QueryClient({
-//   defaultOptions: {
-//     queries: {
-//       staleTime: 10 * 60000, // n * 1 minute
-//     },
-//   },
-// });
-
 const InitialLayout = () => {
   const router = useRouter();
   const { currentUser, initialized } = useAuth();
   const segments = useSegments();
   const [fontsLoaded, error] = useFonts({ Asul_700Bold });
+  useSyncQueries({ queryClient });
   //~~ ------------------------------------------------------
   //~ Initialize TMDB API
   //~ handle any app initialization

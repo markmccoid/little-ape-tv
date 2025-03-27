@@ -15,6 +15,7 @@ import { savedShows$ } from '~/store/store-shows';
 import axios from 'axios';
 import { filterCriteria$, SortField } from '~/store/store-filterCriteria';
 import { orderBy, sortBy } from 'lodash';
+import { queryClient } from '~/utils/queryClient';
 
 //~ ------------------------------------------------------
 //~ useShows - FILTERED SAVED Shows
@@ -132,41 +133,50 @@ export const useShowDetails = (showId: number) => {
 export const useShowSeasonData = (showId: string, seasonNumbers: number[]) => {
   // console.log('useseasons', showId, seasonNumbers);
   if (!showId || !seasonNumbers) return [];
+
   return useQuery<TVShowSeasonDetails[], Error>({
     queryKey: ['seasons', showId, seasonNumbers],
-    queryFn: async () => {
-      // Return details for each season
-      // console.log('IN FETCH');
-      const allSeasons = await Promise.all(
-        seasonNumbers.map(async (season) => {
-          // Need to pull off just the data piece.
-          return tvGetShowSeasonDetails(parseInt(showId), season).then((resp) => {
-            return resp.data;
-          });
-        })
-      );
-      const sortedSeasons = sortBy(allSeasons, ['seasonNumber']);
-      if (sortedSeasons[0].seasonNumber === 0) {
-        const holdSeasonZero = sortedSeasons[0];
-        sortedSeasons.shift();
-        sortedSeasons.push(holdSeasonZero);
-      }
-      return sortedSeasons;
-    },
+    queryFn: async () => await fetchSeasonsData(parseInt(showId), seasonNumbers),
+    //   {
+    //   // Return details for each season
+    //   // console.log('IN FETCH');
+    //   const allSeasons = await Promise.all(
+    //     seasonNumbers.map(async (season) => {
+    //       // Need to pull off just the data piece.
+    //       return tvGetShowSeasonDetails(parseInt(showId), season).then((resp) => {
+    //         return resp.data;
+    //       });
+    //     })
+    //   );
+    //   const sortedSeasons = sortBy(allSeasons, ['seasonNumber']);
+    //   if (sortedSeasons[0].seasonNumber === 0) {
+    //     const holdSeasonZero = sortedSeasons[0];
+    //     sortedSeasons.shift();
+    //     sortedSeasons.push(holdSeasonZero);
+    //   }
+    //   return sortedSeasons;
+    // },
   });
 };
 
+//# Used in the EventName.UpdateAvgEpisodeRuntime events.ts
 export const fetchSeasonsData = async (showId: number, seasonNumbers: number[]) => {
-  // Return details for each season
-  // console.log('IN FETCH');
-  const allSeasons = await Promise.all(
-    seasonNumbers.map(async (season) => {
-      // Need to pull off just the data piece.
-      return tvGetShowSeasonDetails(showId, season).then((resp) => {
-        return resp.data;
-      });
-    })
-  );
+  // Match the query key for useShowSeasonData so we can grab cached data if available
+  const queryKey = ['seasons', showId.toString(), seasonNumbers];
+
+  let allSeasons: TVShowSeasonDetails[] | undefined = queryClient.getQueryData(queryKey);
+  // No cache data so fetch it.
+  if (!allSeasons) {
+    allSeasons = await Promise.all(
+      seasonNumbers.map(async (season) => {
+        // Need to pull off just the data piece.
+        return tvGetShowSeasonDetails(showId, season).then((resp) => {
+          return resp.data;
+        });
+      })
+    );
+  }
+
   const sortedSeasons = sortBy(allSeasons, ['seasonNumber']);
   if (sortedSeasons[0].seasonNumber === 0) {
     const holdSeasonZero = sortedSeasons[0];
