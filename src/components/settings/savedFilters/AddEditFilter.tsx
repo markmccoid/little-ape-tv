@@ -3,7 +3,12 @@ import React, { useState } from 'react';
 import { use$ } from '@legendapp/state/react';
 import AddEditFilterTags from './AddEditFilterTags';
 import { useTagManagement } from './useTagManagement';
-import { filterCriteria$, InclusionState, SavedFilter } from '~/store/store-filterCriteria';
+import {
+  defaultSort,
+  filterCriteria$,
+  InclusionState,
+  SavedFilter,
+} from '~/store/store-filterCriteria';
 import AddEditFilterGenres from './AddEditFilterGenres';
 import AddEditSort from './AddEditSort';
 import { useSavedFilterSort } from './useSavedFilterSort';
@@ -17,6 +22,7 @@ import TransparentBackground from '~/components/common/TransparentBackground';
 import { ScrollView } from 'react-native-gesture-handler';
 import Checkbox from 'expo-checkbox';
 import * as Burnt from 'burnt';
+import { priorityMergeArrays } from '~/utils/utils';
 
 type Props = {
   filterId?: string;
@@ -52,8 +58,8 @@ const AddEditFilter = ({ filterId }: Props) => {
 
   //~ Load on Startup
   const [loadOnStartup, setLoadonStartup] = useState(savedFilter?.loadOnStartup || false);
-  //# --- Sort Info
-  const sortFields = savedFilter?.sort;
+  //# --- Sort Info, adding default sort fields at end
+  const sortFields = priorityMergeArrays(savedFilter?.sort || [], defaultSort);
   const { workingSortFields, savedSortReorder, updateSortDirection, updateActiveFlag } =
     useSavedFilterSort(sortFields);
 

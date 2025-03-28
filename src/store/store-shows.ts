@@ -8,6 +8,7 @@ import { synced } from '@legendapp/state/sync';
 import { ObservablePersistMMKV } from '@legendapp/state/persist-plugins/mmkv';
 import { useEffect, useState } from 'react';
 import { use$ } from '@legendapp/state/react';
+import { Alert } from 'react-native';
 
 //~ -----------------------------------------------
 //~ Observer Creation
@@ -80,38 +81,22 @@ tags$.set({ ...tagInitialState, ...createTagFunctions(tags$) });
 //# returns the detail for a savedShow
 //# ----------------------------------------------------------------------------
 export const useSavedShow = (showId: string) => {
-  if (!showId) return {};
-  const [showDetail, setShowDetail] = useState({} as SavedShow);
-  const show = use$(savedShows$.shows[showId]);
-  useEffect(() => {
-    requestAnimationFrame(() => setShowDetail(show));
-  }, [show]);
-  return showDetail;
-  // We can't subscribe directly, as I was getting react errors about updates happening while other rerending
+  if (savedShows$.shows?.[showId].peek() === undefined) {
+    console.log('SHOW NOT FOUND removing', showId);
+    // Alert.alert('Show not found', 'Removing show from saved shows');
+    savedShows$.removeShow(showId);
+  }
+  return use$(savedShows$.shows?.[showId]) ?? {};
+  // If an issue with subscribe directly, as I was getting react errors about updates happening while other rerending
   // this way with requestAnimationFrame, we wait to update state until the rendering is finished and then
   // component using this hook with update with new summary data.
-  useEffect(() => {
-    // Subscribe to changes
-    const unsubscribe = savedShows$.shows[showId].onChange(
-      (newValue) => {
-        console.log('newValue UsedSaveShow', newValue);
-        requestAnimationFrame(() => {
-          setShowDetail(newValue.value);
-        });
-      },
-      { initial: true, immediate: true }
-    );
-
-    // // initial populatation of summary data.
-    // requestAnimationFrame(() => {
-    //   const initialValue = savedShows$.shows[showId].peek();
-    //   setShowDetail(initialValue);
-    // });
-
-    return () => unsubscribe();
-  }, [showId]);
-
-  return showDetail;
+  // if (!showId) return {};
+  // const [showDetail, setShowDetail] = useState({} as SavedShow);
+  // const show = use$(savedShows$.shows[showId]);
+  // useEffect(() => {
+  //   requestAnimationFrame(() => setShowDetail(show));
+  // }, [show]);
+  // return showDetail;
 };
 
 //-- ===================

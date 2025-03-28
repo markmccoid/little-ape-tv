@@ -22,9 +22,8 @@ type Props = {
 
 const SearchItemButtonAnim = ({ showId }: Props) => {
   const { colors } = useCustomTheme();
-  // const { isStoredLocally, favorite } = use$(savedShows$.shows[showId]);
   const { isStoredLocally, favorite } = useSavedShow(showId);
-  // const [isStoredLocally, setIsStoredLocally] = useState(show.isStoredLocally);
+
   const transition = useSharedValue(isStoredLocally ? 1 : 0); // 1 for true, 0 for false
   const savedAttributesSummary = useSavedSeasonSummary(showId);
   const showNextDL = use$(settings$.downloadOptions.showNextDownloadInfo);

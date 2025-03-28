@@ -47,6 +47,7 @@ const SeasonEpisodeList: React.FC<Props> = ({ seasons, showData }) => {
   // This makes sure our summary object is updated when items are marked as watched/downloaded/etc.
   useObserveEffect(() => {
     savedShows$.showAttributes[showid as string].get();
+    // updateSeasonSummary will not update anything if the show is not stored locally
     updateSeasonSummary(showid as string, seasons);
   });
 
