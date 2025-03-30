@@ -417,13 +417,24 @@ const calculateSeasonSummary = (
 
     if (Object.keys(seasonAttribData.episodes).length === 0) {
       allDownloaded = false;
+
       if (!nextDownloadEpisode) {
+        //! COuld be a problem.  Test more ---------
+        // Sometimes a season has no episodes. If that is the case
+        // we ASSUME that it is a new season that has no episodes yet and
+        // thus the LAST season.
+        if (season.episodes.length === 0) {
+          allDownloaded = true;
+          return;
+        }
+        //! --------- END Problem
+
         //~ If you wanted to show that nothing or at least the first has not yet been downloaded
         //~ uncomment.  Otherwise we want it to be null
         nextDownloadEpisode = {
           season: season.seasonNumber,
           episode: 1,
-          airDate: season.episodes[0].airDate.formatted,
+          airDate: season?.episodes[0]?.airDate.formatted,
           status: 'n',
         };
       }

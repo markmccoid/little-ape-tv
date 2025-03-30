@@ -106,7 +106,17 @@ export const defaultSort: SortField[] = [
     title: 'Run Time',
     type: 'number',
   },
+  {
+    id: '5',
+    position: 5,
+    active: false,
+    sortDirection: 'asc',
+    sortField: 'sortNextDLDate',
+    title: 'Next DL Date',
+    type: 'alpha',
+  },
 ];
+
 //----------------------------
 //-- MAIN Filter Type
 //----------------------------
@@ -246,7 +256,8 @@ const initialState: Pick<
 > = {
   baseFilters: {},
   nameFilter: { showName: '', ignoreOtherFilters: true },
-  sortSettings: defaultSort,
+  sortSettings: [],
+  // sortSettings: [...defaultSort],
   savedFilters: [],
 };
 
@@ -262,6 +273,7 @@ export const filterCriteria$ = observable<FilterCriteria>(
     },
   })
 );
+// filterCriteria$.sortSettings.set([]);
 
 filterCriteria$.set({ ...initialState, ...filterCriteriaFunctions });
 
@@ -272,6 +284,29 @@ if (defaultFilterId) {
   filterCriteria$.applySavedFilter(defaultFilterId);
 }
 
+//! HOok to pull sortSettings and merge with defaultSort title/sortfield/type
+//! NEED To do similar thing for the savedFilters!!
+
+export const useSortSettings = () => {
+  const sortSettingsStored = use$(filterCriteria$.sortSettings);
+  const sortSettings = sortSettingsStored || defaultSort;
+  // Merge sortSettings with defaultSort, pulling name and title from defaultSort
+
+  const mergedSortSettings = sortSettings.map((sort) => {
+    const defaultSortField = defaultSort.find((el) => el.id === sort.id);
+
+    if (defaultSortField) {
+      return {
+        ...sort,
+        title: defaultSortField.title,
+        name: defaultSortField.sortField,
+        type: defaultSortField.type,
+      };
+    }
+    return sort;
+  });
+  return mergedSortSettings;
+};
 // ---------------------------------------
 //-- filterCriteria$ Observable Functions
 // ---------------------------------------

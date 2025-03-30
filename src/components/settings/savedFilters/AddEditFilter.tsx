@@ -3,12 +3,7 @@ import React, { useState } from 'react';
 import { use$ } from '@legendapp/state/react';
 import AddEditFilterTags from './AddEditFilterTags';
 import { useTagManagement } from './useTagManagement';
-import {
-  defaultSort,
-  filterCriteria$,
-  InclusionState,
-  SavedFilter,
-} from '~/store/store-filterCriteria';
+import { filterCriteria$, InclusionState, SavedFilter } from '~/store/store-filterCriteria';
 import AddEditFilterGenres from './AddEditFilterGenres';
 import AddEditSort from './AddEditSort';
 import { useSavedFilterSort } from './useSavedFilterSort';
@@ -59,7 +54,7 @@ const AddEditFilter = ({ filterId }: Props) => {
   //~ Load on Startup
   const [loadOnStartup, setLoadonStartup] = useState(savedFilter?.loadOnStartup || false);
   //# --- Sort Info, adding default sort fields at end
-  const sortFields = priorityMergeArrays(savedFilter?.sort || [], defaultSort);
+  const sortFields = savedFilter?.sort;
   const { workingSortFields, savedSortReorder, updateSortDirection, updateActiveFlag } =
     useSavedFilterSort(sortFields);
 

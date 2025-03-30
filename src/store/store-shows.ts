@@ -9,6 +9,7 @@ import { ObservablePersistMMKV } from '@legendapp/state/persist-plugins/mmkv';
 import { useEffect, useState } from 'react';
 import { use$ } from '@legendapp/state/react';
 import { Alert } from 'react-native';
+import dayjs from 'dayjs';
 
 //~ -----------------------------------------------
 //~ Observer Creation
@@ -87,6 +88,7 @@ export const useSavedShow = (showId: string) => {
     savedShows$.removeShow(showId);
   }
   return use$(savedShows$.shows?.[showId]) ?? {};
+
   // If an issue with subscribe directly, as I was getting react errors about updates happening while other rerending
   // this way with requestAnimationFrame, we wait to update state until the rendering is finished and then
   // component using this hook with update with new summary data.

@@ -12,6 +12,7 @@ import Animated, {
 import { useRouter } from 'expo-router';
 import { savedShows$, useSavedShow } from '~/store/store-shows';
 import { use$ } from '@legendapp/state/react';
+import { useSavedSeasonSummary } from '~/store/functions-showAttributes';
 const missingPosterURI = require('../../../../assets/missingPoster.png');
 
 type Props = {
@@ -23,8 +24,8 @@ type Props = {
 };
 const ScrollerMain = ({ showId, imageWidth, imageHeight, index, scrollX }: Props) => {
   const router = useRouter();
-
-  const { posterURL, avgEpisodeRunTime } = useSavedShow(showId);
+  const { posterURL, avgEpisodeRunTime, nextDLEpisodeDate } = useSavedShow(showId);
+  const { nextDownloadEpisode } = useSavedSeasonSummary(showId);
 
   const animStyle = useAnimatedStyle(() => {
     return {
@@ -64,8 +65,9 @@ const ScrollerMain = ({ showId, imageWidth, imageHeight, index, scrollX }: Props
           />
         </View>
       </Pressable>
-      <View className="absolute top-0 w-full flex-row justify-center bg-white/70 p-1">
+      <View className="absolute top-0 w-full flex-row justify-between bg-white/70 p-1">
         {avgEpisodeRunTime && <Text>{avgEpisodeRunTime} Mins</Text>}
+        {nextDownloadEpisode?.status !== 'a' && <Text>{nextDownloadEpisode?.airDate}</Text>}
       </View>
     </Animated.View>
   );

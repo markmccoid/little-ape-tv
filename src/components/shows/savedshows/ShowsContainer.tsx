@@ -3,7 +3,7 @@ import { FlatList, Pressable, StyleSheet, Text, View, Dimensions } from 'react-n
 import { Link, Stack, useFocusEffect, useRouter } from 'expo-router';
 import { useAuth } from '~/authentication/AuthProvider';
 import { savedShows$ } from '~/store/store-shows';
-import { useShows } from '~/data/query.shows';
+import { useFilteredShows } from '~/data/query.shows';
 import Animated, {
   runOnJS,
   useAnimatedScrollHandler,
@@ -28,7 +28,7 @@ const IMG_WIDTH = (width - MARGIN * 3) / 2;
 const IMG_HEIGHT = IMG_WIDTH * 1.5;
 
 const ShowsContainer = () => {
-  const showsInit = useShows();
+  const showsInit = useFilteredShows();
   const router = useRouter();
   const { colors } = useCustomTheme();
 

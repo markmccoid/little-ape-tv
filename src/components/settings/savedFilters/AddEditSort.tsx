@@ -1,9 +1,7 @@
 import { View, Text } from 'react-native';
 import React from 'react';
 import SortManager from '~/components/sortmanager/SortManager';
-import { defaultSort, reorderSorts, SortField } from '~/store/store-filterCriteria';
-import { useSavedFilterSort } from './useSavedFilterSort';
-import { priorityMergeArrays } from '~/utils/utils';
+import { reorderSorts, SortField } from '~/store/store-filterCriteria';
 
 type Props = {
   sortFields?: SortField[];
@@ -20,7 +18,7 @@ const AddEditSort = ({
   return (
     <View>
       <SortManager
-        currentSortSettings={priorityMergeArrays(sortFields || [], defaultSort)}
+        currentSortSettings={sortFields || []}
         reorderSorts={savedSortReorder}
         updateActiveFlag={updateActiveFlag}
         updateSortDirection={updateSortDirection}

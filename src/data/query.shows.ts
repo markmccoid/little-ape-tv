@@ -1,3 +1,4 @@
+import { ShowAttributes } from './../store/functions-showAttributes';
 import { use$ } from '@legendapp/state/react';
 import {
   tvGetImages,
@@ -16,11 +17,118 @@ import axios from 'axios';
 import { filterCriteria$, SortField } from '~/store/store-filterCriteria';
 import { orderBy, sortBy } from 'lodash';
 import { queryClient } from '~/utils/queryClient';
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+dayjs.extend(customParseFormat);
 
 //~ ------------------------------------------------------
 //~ useShows - FILTERED SAVED Shows
 //~ ------------------------------------------------------
-export const useShows = () => {
+export const useFilteredShows = () => {
+  const savedShowsObj = use$(savedShows$.shows);
+  const {
+    includeGenres = [],
+    includeTags = [],
+    excludeGenres = [],
+    excludeTags = [],
+  } = use$(filterCriteria$.baseFilters);
+  const filterIsFavorited = use$(filterCriteria$.baseFilters.filterIsFavorited);
+  const { showName, ignoreOtherFilters } = use$(filterCriteria$.nameFilter);
+  const sortSettings = use$(filterCriteria$.sortSettings);
+  const savedShows = Object.values(savedShowsObj);
+  //TODO Just doing this to track changes, heavy handed and will cause
+  //TODO a rerender of the list whenever ANY attribute is chnaged
+  const summaryData = use$(savedShows$.showAttributes);
+
+  const nextDLDateSortDir = sortSettings.find(
+    (el) => el.sortField === 'sortNextDLDate'
+  )?.sortDirection;
+  // Set a value for the value to use when the nextDLEpisodeDate is undefined.  This keeps undefined at the end of the list
+  // whether acsending or descending.
+  const nextDLDateUndefinedValue = nextDLDateSortDir === 'asc' ? Infinity : -Infinity;
+  const normalizedShowName = showName?.toLowerCase() || '';
+
+  // Filter predicates
+  const matchesName = (show: SavedShow) =>
+    !normalizedShowName || show.name.toLowerCase().includes(normalizedShowName);
+
+  const matchesTags = (show: SavedShow) => {
+    const userTags = show.userTags || [];
+    return (
+      includeTags.every((tag) => userTags.includes(tag)) &&
+      !excludeTags.some((tag) => userTags.includes(tag))
+    );
+  };
+
+  const matchesGenres = (show: SavedShow) => {
+    const showGenres = show.genres || [];
+    return (
+      includeGenres.every((genre) => showGenres.includes(genre)) &&
+      !excludeGenres.some((genre) => showGenres.includes(genre))
+    );
+  };
+
+  const matchesFavorite = (show: SavedShow) => {
+    const isFavorite = !!show.favorite;
+    return filterIsFavorited === 'include'
+      ? isFavorite
+      : filterIsFavorited === 'exclude'
+        ? !isFavorite
+        : true;
+  };
+
+  //! Converted to forEach from filter so I could inject the showAttributes summary into the filteredShows
+  const filteredShows: (SavedShow & { nextDLEpisodeDate?: string; sortNextDLDate?: number })[] = [];
+  // Loop through all savedShows checking for matches to our filters
+  // and injecting showAttributes summary into the filteredShows
+  savedShows.forEach((show) => {
+    // Quick name-only filter when ignoring other filters
+    if (ignoreOtherFilters && normalizedShowName) {
+      if (matchesName(show)) {
+        //~ get show Attributes summary and add to filteredShows Also set the sortNextDLDate
+        const showSummaryAttributes = getShowAttributes(
+          show,
+          nextDLDateUndefinedValue,
+          summaryData[show.tmdbId]?.summary?.nde?.airDate
+        );
+        filteredShows.push({ ...show, ...showSummaryAttributes });
+      }
+      return;
+    }
+    // Full filter
+    if (matchesName(show) && matchesTags(show) && matchesGenres(show) && matchesFavorite(show)) {
+      //~ get show Attributes summary and add to filteredShows Also set the sortNextDLDate
+      const showSummaryAttributes = getShowAttributes(
+        show,
+        nextDLDateUndefinedValue,
+        summaryData[show.tmdbId]?.summary?.nde?.airDate
+      );
+      filteredShows.push({ ...show, ...showSummaryAttributes });
+    }
+  });
+
+  const { sortFields, sortDirections } = getSort(sortSettings);
+  return orderBy(filteredShows, sortFields, sortDirections);
+};
+//# useShows Attributes helper
+const getShowAttributes = (
+  show: SavedShow,
+  dateUndefinedValue: number,
+  nextDLEpisodeDate: string | undefined
+) => {
+  // const nextDLEpisodeDate = savedShows$.showAttributes[show.tmdbId]?.summary?.nde?.airDate.peek();
+  // const summaryData = savedShows$.showAttributes[show.tmdbId]?.summary.get();
+  // const nextDLEpisodeDate = summaryData?.nde?.airDate;
+  const sortNextDLDate = !nextDLEpisodeDate
+    ? dateUndefinedValue
+    : dayjs(nextDLEpisodeDate, 'MM-DD-YYYY').unix();
+  //! Potentially remove nextDLEpisodeDate from here and just use sortNextDLDate
+  //! will inject summary data in useShows
+  return { sortNextDLDate, nextDLEpisodeDate };
+};
+
+//!! FILTER useShows
+export const useShowsOLD = () => {
   const savedShowsObj = use$(savedShows$.shows);
   const {
     includeGenres = [],

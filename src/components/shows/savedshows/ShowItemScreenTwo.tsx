@@ -28,12 +28,8 @@ type Props = {
 };
 const ShowItemScreenTwo = ({ showId, imageWidth, imageHeight, index, scrollX }: Props) => {
   const seasonsSummary = useSavedSeasonSummary(showId);
-  // console.log('ScreenTwo', seasonsSummary["1"]);
-  // const seasonsSummary = use$(savedShows$.showAttributes[showId].summary);
-  // const favorite = use$(savedShows$.shows[showId].favorite); // Subscribe to favorite status
-  // const posterURL = use$(savedShows$.shows[showId].posterURL); // Subscribe to favorite status
-  // const { favorite, posterURL, name, dateAddedEpoch } = use$(savedShows$.shows[showId]); // Subscribe to favorite status
-  const { favorite, posterURL, name, dateAddedEpoch } = useSavedShow(showId); // Subscribe to favorite status
+  const { favorite, posterURL, name, dateAddedEpoch } = useSavedShow(showId);
+  // console.log('secondScreen NextDLEpisodeDate', nextDLEpisodeDate);
   const router = useRouter();
   const animStyle = useAnimatedStyle(() => {
     return {
