@@ -29,6 +29,8 @@ import { useHeaderHeight } from '@react-navigation/elements';
 import TransparentBackground from '~/components/common/TransparentBackground';
 import UserRatingContainer from './userRating/UserRatingContainer';
 import { UserRatingDetailScreen, MenuItem } from './userRating/UserRatingDetailScreen';
+import DetailVideos from './watchProviders/DetailVideos';
+import DetailInfo from './DetailInfo';
 
 const { width, height } = Dimensions.get('window');
 
@@ -117,18 +119,10 @@ const ShowDetailContainer = ({ showId }: Props) => {
             <ScrollView className="mb-1 h-1/3 flex-shrink rounded-lg border-hairline bg-[#ffffff77] p-1">
               <Text className="dark:text-text">{data?.overview}</Text>
             </ScrollView>
-            <View className="h-1/2 rounded-lg border-hairline bg-[#ffffff77] p-1">
-              <Text>Avg. Run Time: {data?.avgEpisodeRunTime}</Text>
-              <Text>Status: {data?.status}</Text>
-              <Text>First Episode: {data?.firstAirDate?.formatted}</Text>
-              {data?.lastAirDate?.formatted && (
-                <Text>Last Episode: {data?.lastAirDate?.formatted}</Text>
-              )}
-              <Text>{`${data?.numberOfSeasons} Seasons / ${data?.numberOfEpisodes} Episodes`}</Text>
-            </View>
+            <DetailInfo data={data} />
           </View>
         </View>
-
+        {/* RATING/Button BAR */}
         <View className="mx-2 mt-2 flex-1 flex-row items-center rounded-lg border-hairline p-2">
           <TransparentBackground />
           <View
@@ -207,6 +201,11 @@ const ShowDetailContainer = ({ showId }: Props) => {
         {/* Recommendations */}
         <HiddenContainerAnimated title="Recommendations">
           <DetailRecommendations recommendations={data?.recommendations} />
+        </HiddenContainerAnimated>
+        <View className="h-2" />
+        {/* Videos */}
+        <HiddenContainerAnimated title="Videos" extraHeight={10}>
+          <DetailVideos videoData={data?.videos} />
         </HiddenContainerAnimated>
         <View className="h-2" />
         {/* Cast */}

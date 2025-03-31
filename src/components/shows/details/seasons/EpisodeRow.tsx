@@ -23,6 +23,7 @@ import { MotiView } from 'moti';
 import { settings$ } from '~/store/store-settings';
 import { imdbLinkToEpisode } from '~/utils/imdbLinks';
 import { useEpisodeAttributes } from '~/store/functions-showAttributes';
+import ShowImage from '~/components/common/ShowImage';
 
 // Define fixed heights for performance
 const ITEM_HEIGHT = 125;
@@ -42,7 +43,7 @@ const EpisodeRow = ({ showId, isStoredLocally, item }: Props) => {
     savedShows$.showAttributes[showId].seasons[item.seasonNumber].episodes[item.episodeNumber]
   );
   const attributes = useEpisodeAttributes(showId, item.seasonNumber, item.episodeNumber);
-  const showImage = use$(settings$.showImageInEpisode);
+  const showImageFlag = use$(settings$.showImageInEpisode);
 
   return (
     <View
@@ -52,7 +53,7 @@ const EpisodeRow = ({ showId, isStoredLocally, item }: Props) => {
         // backgroundColor: attributes?.watched ? '#c5d9c3' : '',
       }}>
       {/* IMAGE Dependant upon settings$ if shown or not */}
-      {showImage && (
+      {showImageFlag && (
         <Pressable
           onPress={async () => imdbLinkToEpisode(showId, item.seasonNumber, item.episodeNumber)}>
           <View
@@ -69,7 +70,16 @@ const EpisodeRow = ({ showId, isStoredLocally, item }: Props) => {
               shadowOpacity: 0.25,
               shadowRadius: 3.84,
             }}>
-            <Image
+            <ShowImage
+              posterURL={item.stillURL}
+              imageWidth={100}
+              imageHeight={100}
+              key={1}
+              resizeMode="cover"
+              imageStyle={{ borderRadius: 10 }}
+              title={''}
+            />
+            {/* <Image
               source={item.stillURL}
               style={{
                 width: 100,
@@ -79,7 +89,7 @@ const EpisodeRow = ({ showId, isStoredLocally, item }: Props) => {
                 // borderColor: '#ffffff00',
               }}
               placeholder={require('../../../../../assets/missingPoster.png')}
-            />
+            /> */}
           </View>
         </Pressable>
       )}
@@ -115,7 +125,7 @@ const EpisodeRow = ({ showId, isStoredLocally, item }: Props) => {
           </Text>
         </View>
         {/* NO IMAGE Dependant upon settings$ if shown or not */}
-        {!showImage && (
+        {!showImageFlag && (
           <Pressable
             onPress={async () => imdbLinkToEpisode(showId, item.seasonNumber, item.episodeNumber)}
             className="absolute right-0 top-0">

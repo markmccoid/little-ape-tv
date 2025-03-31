@@ -2,6 +2,11 @@ import React, { useCallback, useState } from 'react';
 import { SortItemProps } from '~/components/sortmanager/SortItem';
 import { defaultSort, reorderSorts, SortField } from '~/store/store-filterCriteria';
 
+//# --------------------------------------
+//# Hook that manages the sort settings for saved filters
+//# before the filter is saved.  Essentially a temp area for the sort settings
+//# while user is working on the filter.
+//# --------------------------------------
 export const useSavedFilterSort = (initSort: SortField[] | undefined) => {
   const [workingSortFields, setWorkingSortFields] = useState<SortField[]>(initSort || defaultSort);
 

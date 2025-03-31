@@ -1,5 +1,49 @@
 import { Share } from 'react-native';
 
+//# --------------------------------------
+//# Default Images
+//# --------------------------------------
+export function getRandomNumber() {
+  const randomNumber = Math.floor(Math.random() * 12) + 1; // Generate random number between 1 and 13
+  return randomNumber.toString().padStart(2, '0'); // Pad number with leading zero if less than 10
+}
+
+const hashStringToNumber = (str: string) => {
+  let hash = 5381;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash * 33) ^ str.charCodeAt(i);
+  }
+  return Math.abs(hash);
+};
+
+export const noImageFound = {
+  noimagefound: require('../../assets/images/noimagefound.jpeg'),
+};
+export const defaultVideosThumbs = {
+  image_01: require('../../assets/images/defaultimages/video_comedy.jpeg'),
+  image_02: require('../../assets/images/defaultimages/video_documentary.jpeg'),
+  image_03: require('../../assets/images/defaultimages/video_drama.jpeg'),
+  image_04: require('../../assets/images/defaultimages/video_horror.jpeg'),
+  image_05: require('../../assets/images/defaultimages/video_romantic.jpeg'),
+  image_06: require('../../assets/images/defaultimages/video_sciencefiction.jpeg'),
+  image_07: require('../../assets/images/defaultimages/video_thriller.jpeg'),
+  // comedy: require('../../assets/images/defaultimages/video_comedy.jpeg'),
+  // documentary: require('../../assets/images/defaultimages/video_documentary.jpeg'),
+  // drama: require('../../assets/images/defaultimages/video_drama.jpeg'),
+  // horror: require('../../assets/images/defaultimages/video_horror.jpeg'),
+  // romantic: require('../../assets/images/defaultimages/video_romantic.jpeg'),
+  // sciencefiction: require('../../assets/images/defaultimages/video_sciencefiction.jpeg'),
+  // thriller: require('../../assets/images/defaultimages/video_thriller.jpeg'),
+};
+export const getDefaultVideoImage = (filename: string) => {
+  const hash = hashStringToNumber(filename);
+  const num = (hash % Object.keys(defaultVideosThumbs).length) + 1;
+  return defaultVideosThumbs[`image${num.toString().padStart(2, '0')}`];
+};
+export const getNoImageFound = () => {
+  return noImageFound[`noimagefound`];
+};
+
 //~  --------------------------------------
 //~  format Epoch number to not include any time information
 //~  You can send either milliseconds or seconds, but you
@@ -15,6 +59,9 @@ export const formatEpoch = (epoch: number) => {
   return Math.floor(newDate.getTime() / 1000);
 };
 
+//# --------------------------------------
+//# Native Share Item
+//# --------------------------------------
 export const nativeShareItem = async ({ message, url }: { message: string; url: string }) => {
   try {
     const result = await Share.share({

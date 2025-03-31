@@ -24,7 +24,7 @@ type Props = {
 };
 const ScrollerMain = ({ showId, imageWidth, imageHeight, index, scrollX }: Props) => {
   const router = useRouter();
-  const { posterURL, avgEpisodeRunTime, nextDLEpisodeDate } = useSavedShow(showId);
+  const { posterURL, avgEpisodeRunTime } = useSavedShow(showId);
   const { nextDownloadEpisode } = useSavedSeasonSummary(showId);
 
   const animStyle = useAnimatedStyle(() => {
@@ -65,9 +65,12 @@ const ScrollerMain = ({ showId, imageWidth, imageHeight, index, scrollX }: Props
           />
         </View>
       </Pressable>
-      <View className="absolute top-0 w-full flex-row justify-between bg-white/70 p-1">
-        {avgEpisodeRunTime && <Text>{avgEpisodeRunTime} Mins</Text>}
-        {nextDownloadEpisode?.status !== 'a' && <Text>{nextDownloadEpisode?.airDate}</Text>}
+      {/* Make pressable to expand to show details? */}
+      <View className="absolute bottom-[-15] w-full flex-row justify-between rounded-b-lg border-hairline bg-green-800 p-1">
+        {avgEpisodeRunTime && <Text className="text-white">{avgEpisodeRunTime} Mins</Text>}
+        {nextDownloadEpisode?.status !== 'a' && (
+          <Text className="text-white">{nextDownloadEpisode?.airDate}</Text>
+        )}
       </View>
     </Animated.View>
   );

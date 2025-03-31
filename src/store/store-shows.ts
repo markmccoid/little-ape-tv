@@ -87,18 +87,20 @@ export const useSavedShow = (showId: string) => {
     // Alert.alert('Show not found', 'Removing show from saved shows');
     savedShows$.removeShow(showId);
   }
+
   return use$(savedShows$.shows?.[showId]) ?? {};
 
-  // If an issue with subscribe directly, as I was getting react errors about updates happening while other rerending
-  // this way with requestAnimationFrame, we wait to update state until the rendering is finished and then
-  // component using this hook with update with new summary data.
-  // if (!showId) return {};
-  // const [showDetail, setShowDetail] = useState({} as SavedShow);
-  // const show = use$(savedShows$.shows[showId]);
-  // useEffect(() => {
-  //   requestAnimationFrame(() => setShowDetail(show));
-  // }, [show]);
-  // return showDetail;
+  /*
+  // This will work, but I don't think it is worth doing.
+  // WIll instead in components needing attributes, use the useSavedSeasonSummary hook
+  const showAttributes = use$(savedShows$.showAttributes?.[showId]);
+  const nextDLEpisodeDate = showAttributes?.summary?.nde?.airDate;
+  const showData = use$(savedShows$.shows?.[showId]) ?? {};
+  return {
+    ...showData,
+    nextDLEpisodeDate: nextDLEpisodeDate,
+  };
+  */
 };
 
 //-- ===================

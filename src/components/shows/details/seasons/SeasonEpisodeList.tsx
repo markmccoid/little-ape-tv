@@ -36,6 +36,7 @@ export type SeasonsSection = {
   counts: { watched: number; downloaded: number; allWatched: boolean; allDownloaded: boolean };
 };
 const SeasonEpisodeList: React.FC<Props> = ({ seasons, showData }) => {
+  // const [sectionPadding, setSectionPadding] = React.useState(110);
   const { showid } = useLocalSearchParams();
   const sectionListRef = useRef<SectionList>(null);
   const seasonScrollRef = useRef<ScrollView>(null);
@@ -55,19 +56,21 @@ const SeasonEpisodeList: React.FC<Props> = ({ seasons, showData }) => {
   // Map seasons to SectionList sections
   const sections = useMemo(
     () =>
-      seasons.map((season) => ({
-        title: season.seasonNumber === 0 ? season.name : `Season ${season.seasonNumber}`,
-        numEpisodes: season.episodes.length,
-        seasonNumber: season.seasonNumber,
-        counts: seasonSummary?.[season.seasonNumber] || {
-          favorited: 0,
-          watched: 0,
-          downloaded: 0,
-          allDownloaded: false,
-          allWatched: false,
-        }, //Return watched/download counts if they exists
-        data: season.episodes,
-      })),
+      seasons
+        .filter((season) => season.episodes.length > 0) //Filter any seasons with no episodes
+        .map((season) => ({
+          title: season.seasonNumber === 0 ? season.name : `Season ${season.seasonNumber}`,
+          numEpisodes: season.episodes.length,
+          seasonNumber: season.seasonNumber,
+          counts: seasonSummary?.[season.seasonNumber] || {
+            favorited: 0,
+            watched: 0,
+            downloaded: 0,
+            allDownloaded: false,
+            allWatched: false,
+          }, //Return watched/download counts if they exists
+          data: season.episodes,
+        })),
     [seasons, seasonSummary]
   );
 
@@ -184,44 +187,13 @@ const SeasonEpisodeList: React.FC<Props> = ({ seasons, showData }) => {
         renderItem={renderItem}
         renderSectionHeader={renderSectionHeader}
         keyExtractor={keyExtractor}
-        contentContainerStyle={{ paddingBottom: 55 }}
-        style={{ width: '100%', paddingBottom: 55, height: '100%' }}
+        contentContainerStyle={{ paddingBottom: 115 }}
+        // style={{ width: '100%', paddingBottom: 105, height: '100%' }}
         getItemLayout={buildGetItemLayout}
-        // This will scroll us to the latest episode in the season being watched.
-        // onLayout={() => {
-        //   // Bail if no seasons watched
-        //   let lastSeasonWatched = 0;
-        //   if (seasonSummary?.lastWatchedSeason) {
-        //     lastSeasonWatched = seasonSummary?.lastWatchedSeason;
-        //   }
-
-        //   const episodeIndex =
-        //     lastSeasonWatched + 1 <= seasons.length
-        //       ? seasonSummary?.[lastSeasonWatched + 1]?.watched || 0
-        //       : 0;
-
-        //   const seasonIndexToScroll =
-        //     lastSeasonWatched === seasons.length ? lastSeasonWatched - 1 : lastSeasonWatched;
-        //   // try and scroll to latest season/episode
-        //   // const [latestSeason, latestEpisode] = getLastestEpisodeWatched(tvShowId);
-        //   sectionListRef.current?.scrollToLocation({
-        //     sectionIndex: seasonIndexToScroll,
-        //     itemIndex: 0,
-        //     viewPosition: 0,
-        //     animated: true,
-        //   });
-        //   setTimeout(
-        //     () =>
-        //       sectionListRef.current?.scrollToLocation({
-        //         sectionIndex: seasonIndexToScroll,
-        //         itemIndex: episodeIndex,
-        //         viewPosition: 0,
-        //         animated: true,
-        //       }),
-        //     100
-        //   );
-        // }}
         initialScrollIndex={seasonSummary?.grandTotalWatched || 0}
+        // onEndReached={() => {
+        //   console.log('End reached');
+        // }}
       />
     </View>
   );

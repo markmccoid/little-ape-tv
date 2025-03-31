@@ -232,6 +232,7 @@ export const useShowDetails = (showId: number) => {
   // We needed to merge the local data outside of the useQuery function so that
   // changes to local data update immediately.  Otherwise only cache data is returned
   // until useQuery reads from API again
+
   return { data: { ...data, ...localShow }, ...rest };
 };
 

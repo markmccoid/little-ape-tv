@@ -36,6 +36,7 @@ const DetailHeader = ({ showData }: Props) => {
         )}
       </AnimatePresence>
       <View className="overflow-hidden  rounded-xl">
+        {/* Zeego Dropdown Menu Wrapped around Image*/}
         <DetailContextMenu
           existsInSaved={showData.isStoredLocally || false}
           showId={showData.id}

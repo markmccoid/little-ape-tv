@@ -7,6 +7,7 @@ import { use$ } from '@legendapp/state/react';
 import { synced } from '@legendapp/state/sync';
 import { ObservablePersistMMKV } from '@legendapp/state/persist-plugins/mmkv';
 import { authManager } from '~/authentication/AuthProvider';
+import { priorityMergeArrays } from '~/utils/utils';
 
 //**
 // store-settings contains
@@ -289,7 +290,7 @@ if (defaultFilterId) {
 
 export const useSortSettings = () => {
   const sortSettingsStored = use$(filterCriteria$.sortSettings);
-  const sortSettings = sortSettingsStored || defaultSort;
+  const sortSettings = priorityMergeArrays(sortSettingsStored, defaultSort);
   // Merge sortSettings with defaultSort, pulling name and title from defaultSort
 
   const mergedSortSettings = sortSettings.map((sort) => {
