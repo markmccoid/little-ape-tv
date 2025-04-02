@@ -21,7 +21,7 @@
     "@expo/vector-icons": "^14.0.0",
     "@legendapp/list": "^1.0.0-beta.11",
     "@legendapp/state": "^3.0.0-beta.23",
-    "@markmccoid/tmdb_api": "^0.4.3",
+    "@markmccoid/tmdb_api": "^0.4.4",
     "@nandorojo/galeria": "^1.1.0",
     "@react-native-menu/menu": "^1.2.2",
     "@react-native-segmented-control/segmented-control": "2.5.4",

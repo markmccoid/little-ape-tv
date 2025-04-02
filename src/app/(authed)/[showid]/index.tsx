@@ -18,6 +18,7 @@ const ShowIdHome = () => {
       {/* <Link href={{ pathname: '/[showid]', params: { showid: '194583' } }} push>
         <Text>GO TO 194583</Text>
       </Link> */}
+
       <ShowDetailContainer key={showid as string} showId={showid as string} />
     </View>
   );

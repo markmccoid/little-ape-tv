@@ -12,6 +12,8 @@ type Settings = {
   searchNumColumns: 2 | 3;
   showImageInEpisode: boolean;
   downloadOptions: DownloadOptions;
+  // List of genres to exclude from a persons list of shows the were cast members in
+  excludeGenresFromPerson: string[];
 };
 //~ - - - - - - - - - - - - - - - - - -
 //~ settings$ Observable
@@ -20,6 +22,9 @@ const initialState = {
   searchNumColumns: 2,
   showImageInEpisode: true,
   downloadOptions: { showNextDownloadInfo: false },
+  // When on, these genres will be excluded when showing a persons shows they were in
+  // PersonContainer.tsx
+  excludeGenresFromPerson: [],
 };
 export const settings$ = observable<Settings>(
   synced({

@@ -1,6 +1,5 @@
 import { View, Text, ScrollView } from 'react-native';
 import React from 'react';
-import { SavedShow } from '~/store/functions-shows';
 import { ShowDetailsData } from '~/data/query.shows';
 
 type Props = {

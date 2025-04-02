@@ -4,6 +4,7 @@ import { genres$ } from '~/store/store-genres';
 
 import { Observable } from '@legendapp/state';
 import {
+  CastTVShows,
   tvGetShowDetails,
   tvGetShowSeasonDetails,
   TVSearchResultItem,
@@ -213,6 +214,15 @@ function reTagSearch(
     }
   );
 }
+
+//# Tag passed in array of values
+export const reTagPersonShows = (savedShows: SavedShows, toTagShows: CastTVShows[]) => {
+  const showIds = new Set(Object.keys(savedShows));
+
+  return toTagShows.map((show) => {
+    return { ...show, isStoredLocally: showIds.has(show.tvShowId.toString()) };
+  });
+};
 
 //~ ------------------------------------------------------
 //~ getShowDetail - GET DETAILS For a Show, used in Add A Show

@@ -16,6 +16,14 @@ export default function ShowIdLayout() {
         getId={({ params }) => params.showid}
       />
       <Stack.Screen
+        name="[personid]"
+        options={{
+          headerShown: false,
+          // headerTransparent: true,
+        }}
+        getId={({ params }) => params.showid}
+      />
+      <Stack.Screen
         name="detailimagemodal"
         options={{
           presentation: 'modal',

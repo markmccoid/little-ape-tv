@@ -15,6 +15,8 @@ const SettingsContainer = () => {
   const { colors } = useCustomTheme();
   const showImages = use$(settings$.showImageInEpisode);
   const showNextDownloadEpisode = use$(settings$.downloadOptions.showNextDownloadInfo);
+  const excludeGenresFromPerson = use$(settings$.excludeGenresFromPerson);
+
   return (
     <ScrollView className="flex-1">
       <Text className="mx-3 text-2xl text-text" style={{ color: AC.secondaryLabel }}>
@@ -63,6 +65,23 @@ const SettingsContainer = () => {
           ios_backgroundColor="#767577"
           onValueChange={() => settings$.downloadOptions.showNextDownloadInfo.set((prev) => !prev)}
           value={showNextDownloadEpisode}
+        />
+      </View>
+      {/* Exclude Talk shows from Person Show List */}
+      <View
+        className="mx-2 mt-2 flex-row items-center justify-between rounded-lg border-hairline p-1 pl-2 active:bg-card"
+        style={{ backgroundColor: `${colors.card}99` }}>
+        <Text className="p-1 text-lg text-text">Exclude Talk Shows/Person List</Text>
+        <Switch
+          style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
+          trackColor={{ false: '#767577', true: '#34C759' }}
+          thumbColor={excludeGenresFromPerson?.length > 0 ? '#FFFFFF' : '#F2F2F2'}
+          ios_backgroundColor="#767577"
+          onValueChange={(val) => {
+            const newVal = val ? ['talk'] : [];
+            settings$.excludeGenresFromPerson.set(newVal);
+          }}
+          value={excludeGenresFromPerson?.length > 0}
         />
       </View>
     </ScrollView>

@@ -78,29 +78,13 @@ tags$.set({ ...tagInitialState, ...createTagFunctions(tags$) });
 //# HOOKS
 //# ============================================================================
 
-//# ---------------------------------------------------ava-------------------------
+//# ----------------------------------------------------------------------------
 //# returns the detail for a savedShow
 //# ----------------------------------------------------------------------------
 export const useSavedShow = (showId: string) => {
-  if (savedShows$.shows?.[showId].peek() === undefined) {
-    console.log('SHOW NOT FOUND removing', showId);
-    // Alert.alert('Show not found', 'Removing show from saved shows');
-    savedShows$.removeShow(showId);
-  }
-
+  // we need to return {} if showId isn't found in savedShows$.shows. This happens whenever we remove a show.
+  // The change causes the main routes to rerender and the showId they have is now gone.
   return use$(savedShows$.shows?.[showId]) ?? {};
-
-  /*
-  // This will work, but I don't think it is worth doing.
-  // WIll instead in components needing attributes, use the useSavedSeasonSummary hook
-  const showAttributes = use$(savedShows$.showAttributes?.[showId]);
-  const nextDLEpisodeDate = showAttributes?.summary?.nde?.airDate;
-  const showData = use$(savedShows$.shows?.[showId]) ?? {};
-  return {
-    ...showData,
-    nextDLEpisodeDate: nextDLEpisodeDate,
-  };
-  */
 };
 
 //-- ===================

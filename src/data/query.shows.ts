@@ -1,7 +1,13 @@
 import { ShowAttributes } from './../store/functions-showAttributes';
 import { use$ } from '@legendapp/state/react';
 import {
+  CastTVShows,
+  getPersonDetails,
+  getPersonDetails_typedef,
+  movieGetPersonCredits,
+  moviePersonCredits_typedef,
   tvGetImages,
+  tvGetPersonCredits,
   tvGetShowCredits,
   tvGetShowDetails,
   tvGetShowEpisodeExternalIds,
@@ -19,6 +25,7 @@ import { orderBy, sortBy } from 'lodash';
 import { queryClient } from '~/utils/queryClient';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { settings$ } from '~/store/store-settings';
 dayjs.extend(customParseFormat);
 
 //~ ------------------------------------------------------
@@ -326,6 +333,56 @@ export const useShowCast = (showId: string | undefined) => {
     queryFn: async () => {
       const resp = await tvGetShowCredits(showId);
       return resp.data.cast;
+    },
+    staleTime: 600000,
+  });
+
+  return { data, isLoading, ...rest };
+};
+
+//~ ------------------------------------------------------
+//~ usePersonDetails
+//~ ------------------------------------------------------
+// --- Combined Type for the Hook's Data ---
+export type PersonCredit = {
+  tvShows: CastTVShows[];
+  movies: moviePersonCredits_typedef['data']['cast'];
+  personDetails: getPersonDetails_typedef['data'];
+};
+export const usePersonDetails = (personId: string | undefined) => {
+  // if (!personId) return;
+  const { data, isLoading, ...rest } = useQuery<PersonCredit>({
+    queryKey: ['personDetails', personId],
+    queryFn: async () => {
+      const [tvResp, movieResp, personDetailsResp] = await Promise.all([
+        tvGetPersonCredits(parseInt(personId)),
+        movieGetPersonCredits(parseInt(personId)),
+        getPersonDetails(parseInt(personId)),
+      ]);
+      //~ dedupe TV Shows and remove any Genres that have been selected in settings.
+      const seenIds = new Set<number>();
+      const tvCast = tvResp.data.cast.filter((credit) => {
+        if (
+          !seenIds.has(credit.tvShowId) &&
+          !credit.genres.some((genre) =>
+            settings$.excludeGenresFromPerson.includes(genre.toLowerCase())
+          )
+        ) {
+          seenIds.add(credit.tvShowId);
+          return true; // Keep the first occurrence
+        }
+        return false; // Skip elements that have their id in seenIds
+      });
+
+      return {
+        tvShows: orderBy(tvCast, ['sortDate'], 'asc'),
+        movies: orderBy(movieResp.data.cast, ['sortDate'], 'asc'),
+        personDetails: personDetailsResp.data,
+      } as PersonCredit;
+
+      // const resp = await tvGetPersonCredits(parseInt(personId));
+      // const resp2 = await movieGetPersonCredits(parseInt(personId));
+      // return [...resp.data.cast, ...resp2.data.cast];
     },
     staleTime: 600000,
   });
