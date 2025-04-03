@@ -8,20 +8,10 @@ import PersonContainer from '~/components/shows/details/personDetails/PersonCont
 
 const PersonIdRoute = () => {
   const { personid, showid } = useLocalSearchParams();
-  console.log('SHOWID', showid);
-  // const router = useRouter();
-  // const navigation = useNavigation();
-  // const show = savedShows$.shows[showid as string].get();
 
   return (
     <View className="flex-1">
-      <Text>PersonIdRoute - {personid}</Text>
       <PersonContainer personId={personid as string} currentShowId={showid as string} />
-      {/* <Link\'
-        href={`/(authed)/82782`}
-        className="absolute right-10 top-10 rounded-lg bg-blue-500 p-2">
-        <Text>Next Show</Text>
-      </Link> */}
     </View>
   );
 };

@@ -375,8 +375,8 @@ export const usePersonDetails = (personId: string | undefined) => {
       });
 
       return {
-        tvShows: orderBy(tvCast, ['sortDate'], 'asc'),
-        movies: orderBy(movieResp.data.cast, ['sortDate'], 'asc'),
+        tvShows: orderBy(tvCast, ['sortDate'], 'desc'),
+        movies: orderBy(movieResp.data.cast, ['sortDate'], 'desc'),
         personDetails: personDetailsResp.data,
       } as PersonCredit;
 
