@@ -29,13 +29,14 @@ const ShowItemTop = ({ showId }: Props) => {
   const dlStatus = savedAttributesSummary?.nextDownloadEpisode?.status;
   const allWatched = savedAttributesSummary?.allSeasonsWatched;
 
-  if (dlStatus === 'n') return null;
+  // if (dlStatus === 'n') return null;
   return (
     <View className="relative z-10 w-full flex-row justify-between">
       <Animated.View
         className="mx-3 my-[-15] h-[25] flex-row items-center justify-start rounded-lg border-hairline px-1"
         style={{
           backgroundColor: dlStatus === 'a' ? '#ffffffcc' : '#ffffffcc',
+          opacity: dlStatus === 'n' ? 0 : 1, //If nothing downloaded keep view as placeholder, but make invisible
         }}>
         <View>
           {dlStatus === 'a' ? (
@@ -46,10 +47,6 @@ const ShowItemTop = ({ showId }: Props) => {
             </Text>
           )}
         </View>
-
-        {/* <Animated.View style={[{ position: 'absolute', right: 0, top: -5 }]}>
-          <DeleteShowButton showId={showId} />
-          </Animated.View> */}
       </Animated.View>
       {allWatched && (
         <View

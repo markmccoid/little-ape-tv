@@ -162,6 +162,8 @@ const filterCriteriaFunctions: FilterCriteriaFunctions = {
   actionClearAllCriteria: () => {
     filterCriteria$.actionClearGenres();
     filterCriteria$.actionClearTags();
+    filterCriteria$.baseFilters.filterIsFavorited.set('off');
+    filterCriteria$.baseFilters.filterIsAllWatched.set('off');
   },
   updateSortSettings: (newSortFieldValues) => {
     const sortSettings = filterCriteria$.sortSettings.peek();

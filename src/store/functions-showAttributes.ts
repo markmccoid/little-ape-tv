@@ -401,6 +401,7 @@ const calculateSeasonSummary = (
   // First, find the last downloaded episode
   let lastDownloadedSeason = 0;
   let lastDownloadedEpisode = 0;
+  let lastSeasonAllDownloaded = false;
 
   // Loop through seasons in order
   seasons.forEach((season) => {
@@ -422,41 +423,43 @@ const calculateSeasonSummary = (
 
     // Checking if NO episodes are downloaded for the season
     // If not we set nextDownloadEpisode
-
-    if (Object.keys(seasonAttribData.episodes).length === 0) {
+    if (Object.keys(seasonAttribData.episodes).length === 0 && !nextDownloadEpisode) {
       allDownloaded = false;
 
-      if (!nextDownloadEpisode) {
-        //! COuld be a problem.  Test more ---------
-        // Sometimes a season has no episodes. If that is the case
-        // we ASSUME that it is a new season that has no episodes yet and
-        // thus the LAST season.
-        if (season.episodes.length === 0) {
-          allDownloaded = true;
-          return;
-        }
-        //! --------- END Problem
-
-        //~ If you wanted to show that nothing or at least the first has not yet been downloaded
-        //~ uncomment.  Otherwise we want it to be null
-        nextDownloadEpisode = {
-          season: season.seasonNumber,
-          episode: 1,
-          airDate: season?.episodes[0]?.airDate.formatted,
-          status: 'n',
-        };
+      // Sometimes a season has no episodes. If that is the case
+      // we ASSUME that it is a new season that has no episodes yet and
+      // thus the LAST season which is why mark as allDownloaded to true
+      // because there is nothing to download yet.
+      if (season.episodes.length === 0) {
+        allDownloaded = true;
+        return;
       }
+
+      // the lastSeasonAllDownloaded check, makes sure we set the status to "s" if
+      // there are previous seasons with all the episodes downloaded.
+      nextDownloadEpisode = {
+        season: season.seasonNumber,
+        episode: 1,
+        airDate: season?.episodes[0]?.airDate.formatted,
+        status: lastSeasonAllDownloaded ? 's' : 'n',
+      };
+
       return;
     }
 
     // Loop through the actual seasons/episodes and
     // Check each episode against our seasonAttribute episodes to see if it was downloaded.
+    const seasonEpisodeCount = season.episodes.length;
     season.episodes.forEach((ep, idx) => {
       const isDownloaded = seasonAttribData.episodes[ep.episodeNumber]?.d;
 
       if (isDownloaded) {
         lastDownloadedSeason = season.seasonNumber;
         lastDownloadedEpisode = ep.episodeNumber;
+        // if ALL episodes are downloaded, set the lastSeasonAllDownloaded to true
+        if (seasonEpisodeCount === idx + 1) {
+          lastSeasonAllDownloaded = true;
+        }
       } else {
         allDownloaded = false;
         if (
@@ -493,6 +496,7 @@ const calculateSeasonSummary = (
       status: 'a',
     };
   }
+
   //! --------- END DOWNLOAD STATUS CALC ---------
 
   //~ Calculate the summary data for each season as well as the lastWatchedSeasons(lws), grandTotalWatched(gtw), and nextDownloadEpisode (nde)
