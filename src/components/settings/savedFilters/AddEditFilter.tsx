@@ -18,6 +18,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import Checkbox from 'expo-checkbox';
 import * as Burnt from 'burnt';
 import { priorityMergeArrays } from '~/utils/utils';
+import AddEditWatched from './AddEditWatched';
 
 type Props = {
   filterId?: string;
@@ -50,6 +51,13 @@ const AddEditFilter = ({ filterId }: Props) => {
   const setFavorite = (inclusionState: InclusionState) => {
     setIsFav(inclusionState);
   };
+  //~ allWatched
+  const [isWatched, setIsWatched] = useState<InclusionState>(
+    savedFilter?.filter?.filterIsFavorited || 'off'
+  );
+  const setWatched = (inclusionState: InclusionState) => {
+    setIsWatched(inclusionState);
+  };
 
   //~ Load on Startup
   const [loadOnStartup, setLoadonStartup] = useState(savedFilter?.loadOnStartup || false);
@@ -75,6 +83,7 @@ const AddEditFilter = ({ filterId }: Props) => {
         excludeGenres: genreStateArrays.excludedTags,
         includeGenres: genreStateArrays.includedTags,
         filterIsFavorited: isFav,
+        filterIsAllWatched: isWatched,
       },
       sort: workingSortFields,
       favorite: savedFilter?.favorite || false,
@@ -131,6 +140,9 @@ const AddEditFilter = ({ filterId }: Props) => {
       </View>
       <View className="m-1">
         <AddEditFavorites isFavorited={isFav} setFavorite={setFavorite} />
+      </View>
+      <View className="mx-1">
+        <AddEditWatched isWatched={isWatched} setWatched={setWatched} />
       </View>
 
       <View className="m-1 p-1">

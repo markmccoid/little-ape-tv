@@ -10,6 +10,7 @@ import Animated, {
   useAnimatedStyle,
 } from 'react-native-reanimated';
 import { getNoImageFound } from '~/utils/utils';
+import { useCustomTheme } from '~/utils/customColorTheme';
 
 type Props = {
   personInfo: getPersonDetails_typedef['data'];
@@ -19,6 +20,8 @@ type Props = {
 const AnimatedImage = Animated.createAnimatedComponent(Image);
 const PersonProfile = ({ personInfo, scrollY, headerHeight }: Props) => {
   const profileURL = personInfo?.profileImage ?? getNoImageFound();
+  const { colors } = useCustomTheme();
+
   const animatedProfileStyle = useAnimatedStyle(() => {
     // Simple approach: Scale down immediately if scrolled even 1 pixel
     // const scale = scrollY.value > 0 ? 0.5 : 1;
@@ -34,7 +37,7 @@ const PersonProfile = ({ personInfo, scrollY, headerHeight }: Props) => {
     const height = interpolate(
       scrollY.value,
       [0, headerHeight + 5],
-      [125 * 1.7, 0],
+      [125 * 1.5, 0],
       Extrapolation.CLAMP
     );
     return {
@@ -46,7 +49,9 @@ const PersonProfile = ({ personInfo, scrollY, headerHeight }: Props) => {
     };
   });
   return (
-    <View className="mx-1 flex-row" style={{}}>
+    <View
+      className="flex-row bg-white px-1 pt-[8]"
+      style={{ backgroundColor: `${colors.button}77` }}>
       <Animated.View
         style={[
           animatedProfileStyle,
@@ -63,7 +68,7 @@ const PersonProfile = ({ personInfo, scrollY, headerHeight }: Props) => {
         />
       </Animated.View>
 
-      <ScrollView>
+      <ScrollView className="" contentContainerClassName="pb-5">
         <Text className="flex-1 px-1">{personInfo.biography}</Text>
       </ScrollView>
     </View>

@@ -2,7 +2,7 @@
   "expo": {
     "name": "Little Ape TV",
     "slug": "little-ape-tv",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "scheme": "little-ape-tv",
     "newArchEnabled": true,
     "web": {

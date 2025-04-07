@@ -45,7 +45,6 @@ const ShowDetailContainer = ({ showId }: Props) => {
   const { bottom } = useSafeAreaInsets();
   // const headerHeight = useHeaderHeight();
   const { data, isLoading, status, isPlaceholderData, isError } = useShowDetails(parseInt(showId));
-  // console.log('DetailContainer Show Id', showId);
 
   //~ Save Function, make sure to update if data changes.
   const handleSaveShow = useCallback(() => {
@@ -209,9 +208,6 @@ const ShowDetailContainer = ({ showId }: Props) => {
         </HiddenContainerAnimated>
         <View className="h-2" />
         {/* Cast */}
-        {/* <HiddenContainer title="Cast" leftIconFunction={() => console.log('LEFT')} startOpen>
-          <CastContainer showId={data?.tmdbId} cast={data?.credits} />
-        </HiddenContainer> */}
         <HiddenContainerAnimated title="Cast" startOpen>
           <CastContainer showId={data?.tmdbId} cast={data?.credits} />
         </HiddenContainerAnimated>

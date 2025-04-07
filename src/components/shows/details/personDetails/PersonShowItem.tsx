@@ -52,11 +52,11 @@ const PersonShowItem = ({ showItem, numColumns, currentShowId }: Props) => {
             width: imageWidth,
           }}
           className="overflow-hidden rounded-lg border-hairline bg-white">
-          <View className="flex-col items-center p-1">
-            <Text className="flex-1" numberOfLines={1}>
+          <View className="flex-row items-center justify-start border-b-hairline bg-card p-1">
+            <Text className="flex-1 font-semibold" numberOfLines={1}>
               {showItem?.characterName}
             </Text>
-            <Text>{showItem?.firstAirDate?.formatted}</Text>
+            <Text className="text-xs"> {showItem?.firstAirDate?.formatted}</Text>
           </View>
           <View>
             <ShowImage

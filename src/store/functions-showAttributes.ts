@@ -32,6 +32,8 @@ interface SeasonSummary {
   ad: boolean; // allDownloaded
 }
 export type SeasonsSummary = {
+  tec: number; // totalEpisodeCount
+  asw: boolean; // allSeasonsWatched
   lws: number; // lastWatchedSeason
   gtw: number; // grandTotalWatched
   nde: NextDownloadEpisode;
@@ -296,6 +298,8 @@ type NextDownloadEpisode =
     }
   | undefined;
 type SeasonsSummaryVerbose = {
+  totalEpisodeCount: number;
+  allSeasonsWatched: boolean;
   lastWatchedSeason: number;
   grandTotalWatched: number;
   nextDownloadEpisode: NextDownloadEpisode;
@@ -355,11 +359,11 @@ export const updateSeasonSummary = (showId: string, seasons: TVShowSeasonDetails
   const avgRunTime = savedShows$.shows[showId].avgEpisodeRunTime.peek();
   //! REMOVE START
   //! forcing this everytime until we populate the avgRunTime
-  eventDispatcher.emit(
-    EventName.UpdateAvgEpisodeRuntime,
-    showId,
-    seasons.map((el) => el.seasonNumber)
-  );
+  // eventDispatcher.emit(
+  //   EventName.UpdateAvgEpisodeRuntime,
+  //   showId,
+  //   seasons.map((el) => el.seasonNumber)
+  // );
   //! REMOVE END
   if (avgRunTime === 0 || isNaN(Number(avgRunTime))) {
     eventDispatcher.emit(
@@ -378,8 +382,12 @@ const calculateSeasonSummary = (
   seasons: TVShowSeasonDetails[]
 ) => {
   const seasonEpisodeCounts: Record<number, number> = {};
+  let totalEpisodesCount: number = 0;
   seasons.forEach((season) => {
     seasonEpisodeCounts[season.seasonNumber] = season.episodes.length;
+    if (season.seasonNumber !== 0) {
+      totalEpisodesCount = totalEpisodesCount + season.episodes.length;
+    }
   });
 
   let lastWatchedSeason = 0;
@@ -497,8 +505,21 @@ const calculateSeasonSummary = (
         lastWatchedSeason = parseInt(season);
       }
       grandTotalWatched = grandTotalWatched + numWatched;
+
+      // Calculate asw for this season (skip season 0, force true on season 0)
+      // Need to do this so that our final.asw && seasonAsw works properly.
+      const seasonAsw = seasonNum === 0 ? true : numWatched === seasonEpisodeCounts[seasonNum];
+
+      // console.log(
+      //   'seasonSummary',
+      //   numWatched,
+      //   seasonEpisodeCounts[seasonNum],
+      //   final.asw && seasonAsw
+      // );
       return {
         ...final,
+        asw: final.asw && seasonAsw,
+        tec: totalEpisodesCount,
         lws: lastWatchedSeason,
         gtw: grandTotalWatched,
         nde: nextDownloadEpisode || { status: 'n' },
@@ -512,7 +533,7 @@ const calculateSeasonSummary = (
         },
       };
     },
-    { lws: 0, gtw: 0, nde: { status: 'n' } } as SeasonsSummary
+    { tec: 0, asw: true, lws: 0, gtw: 0, nde: { status: 'n' } } as SeasonsSummary
   );
 
   // Store the seasonSummary data on savedShow$.showAttributes observable
@@ -556,6 +577,8 @@ function expandSummaryNames(summaryData: SeasonsSummary): SeasonsSummaryVerbose 
   if (!summaryData)
     return { lastWatchedSeason: 0, grandTotalWatched: 0, nextDownloadEpisode: { status: 'n' } };
   let newData: SeasonsSummaryVerbose = {
+    totalEpisodeCount: summaryData.tec || 0,
+    allSeasonsWatched: summaryData.asw || false,
     lastWatchedSeason: summaryData.lws || 0,
     grandTotalWatched: summaryData.gtw || 0,
     nextDownloadEpisode: summaryData.nde || { status: 'n' },
@@ -564,7 +587,7 @@ function expandSummaryNames(summaryData: SeasonsSummary): SeasonsSummaryVerbose 
   for (let season in summaryData) {
     // along with season data we have the three other keys that summarize
     // the all the shows seasons
-    if (['lws', 'gtw', 'nde'].includes(season)) continue;
+    if (['lws', 'gtw', 'nde', 'asw', 'tec'].includes(season)) continue;
     newData = {
       ...newData,
       [season]: {

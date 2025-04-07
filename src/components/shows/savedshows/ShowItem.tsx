@@ -3,7 +3,7 @@ import React, { useCallback, useState } from 'react';
 import { Image } from 'expo-image';
 import { SavedShow } from '~/store/functions-shows';
 import { Link, router } from 'expo-router';
-import { savedShows$ } from '~/store/store-shows';
+import { savedShows$, useSavedShow } from '~/store/store-shows';
 import Animated, {
   Extrapolation,
   FadeIn,
@@ -35,6 +35,7 @@ type Props = {
 
 const ShowItem = ({ show, showId }: Props) => {
   const scrollX = useSharedValue(0);
+  const showInfo = useSavedShow(showId);
 
   const [currIndex, setCurrIndex] = useState(0);
   // const onScroll = useAnimatedScrollHandler((e) => {
@@ -102,6 +103,8 @@ const ShowItem = ({ show, showId }: Props) => {
 
   const renderItem = useCallback(({ item, index }: { item: CardDataItem; index: number }) => {
     const Comp = item.component;
+
+    if (!show) return null;
     return (
       <View
         style={{
@@ -119,6 +122,8 @@ const ShowItem = ({ show, showId }: Props) => {
       </View>
     );
   }, []);
+
+  // if (!showInfo.isStoredLocally) return null;
 
   return (
     <Animated.View className="relative" exiting={FadeOutLeft} entering={FadeIn}>

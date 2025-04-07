@@ -26,6 +26,7 @@ import { queryClient } from '~/utils/queryClient';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { settings$ } from '~/store/store-settings';
+import { eventDispatcher, EventName } from '~/utils/EventDispatcher';
 dayjs.extend(customParseFormat);
 
 //~ ------------------------------------------------------
@@ -40,6 +41,7 @@ export const useFilteredShows = () => {
     excludeTags = [],
   } = use$(filterCriteria$.baseFilters);
   const filterIsFavorited = use$(filterCriteria$.baseFilters.filterIsFavorited);
+  const filterIsAllWatched = use$(filterCriteria$.baseFilters.filterIsAllWatched);
   const { showName, ignoreOtherFilters } = use$(filterCriteria$.nameFilter);
   const sortSettings = use$(filterCriteria$.sortSettings);
   const savedShows = Object.values(savedShowsObj);
@@ -50,9 +52,7 @@ export const useFilteredShows = () => {
   const nextDLDateSortDir = sortSettings.find(
     (el) => el.sortField === 'sortNextDLDate'
   )?.sortDirection;
-  // Set a value for the value to use when the nextDLEpisodeDate is undefined.  This keeps undefined at the end of the list
-  // whether acsending or descending.
-  const nextDLDateUndefinedValue = nextDLDateSortDir === 'asc' ? Infinity : -Infinity;
+
   const normalizedShowName = showName?.toLowerCase() || '';
 
   // Filter predicates
@@ -83,6 +83,13 @@ export const useFilteredShows = () => {
         ? !isFavorite
         : true;
   };
+  const matchesAllWatched = (allWatched: boolean) => {
+    return filterIsAllWatched === 'include'
+      ? allWatched
+      : filterIsAllWatched === 'exclude'
+        ? !allWatched
+        : true;
+  };
 
   //! Converted to forEach from filter so I could inject the showAttributes summary into the filteredShows
   const filteredShows: (SavedShow & { nextDLEpisodeDate?: string; sortNextDLDate?: number })[] = [];
@@ -93,24 +100,36 @@ export const useFilteredShows = () => {
     if (ignoreOtherFilters && normalizedShowName) {
       if (matchesName(show)) {
         //~ get show Attributes summary and add to filteredShows Also set the sortNextDLDate
-        const showSummaryAttributes = getShowAttributes(
+        const { sortDate, workingDate } = handleNullDates(
           show,
-          nextDLDateUndefinedValue,
+          nextDLDateSortDir || 'asc',
           summaryData[show.tmdbId]?.summary?.nde?.airDate
         );
-        filteredShows.push({ ...show, ...showSummaryAttributes });
+        filteredShows.push({
+          ...show,
+          ...{ sortNextDLDate: sortDate, nextDLEpisodeDate: workingDate },
+        });
       }
       return;
     }
     // Full filter
-    if (matchesName(show) && matchesTags(show) && matchesGenres(show) && matchesFavorite(show)) {
+    if (
+      matchesName(show) &&
+      matchesTags(show) &&
+      matchesGenres(show) &&
+      matchesFavorite(show) &&
+      matchesAllWatched(!!summaryData?.[show.tmdbId]?.summary?.asw)
+    ) {
       //~ get show Attributes summary and add to filteredShows Also set the sortNextDLDate
-      const showSummaryAttributes = getShowAttributes(
+      const { sortDate, workingDate } = handleNullDates(
         show,
-        nextDLDateUndefinedValue,
+        nextDLDateSortDir || 'asc',
         summaryData[show.tmdbId]?.summary?.nde?.airDate
       );
-      filteredShows.push({ ...show, ...showSummaryAttributes });
+      filteredShows.push({
+        ...show,
+        ...{ sortNextDLDate: sortDate, nextDLEpisodeDate: workingDate },
+      });
     }
   });
 
@@ -118,20 +137,27 @@ export const useFilteredShows = () => {
   return orderBy(filteredShows, sortFields, sortDirections);
 };
 //# useShows Attributes helper
-const getShowAttributes = (
+//~ ------------------------------------------------------
+//~ handleNullDates - Handle null dates for sorting
+//~ based on sortDirection passed.
+//~ We always want the undefined dates to show up at the end of the list
+//~ regardless of the sort direction.
+//~ ------------------------------------------------------
+const handleNullDates = (
   show: SavedShow,
-  dateUndefinedValue: number,
-  nextDLEpisodeDate: string | undefined
+  sortDirection: 'asc' | 'desc',
+  workingDate: string | undefined
 ) => {
   // const nextDLEpisodeDate = savedShows$.showAttributes[show.tmdbId]?.summary?.nde?.airDate.peek();
   // const summaryData = savedShows$.showAttributes[show.tmdbId]?.summary.get();
   // const nextDLEpisodeDate = summaryData?.nde?.airDate;
-  const sortNextDLDate = !nextDLEpisodeDate
-    ? dateUndefinedValue
-    : dayjs(nextDLEpisodeDate, 'MM-DD-YYYY').unix();
+  // Set a value for the value to use when the nextDLEpisodeDate is undefined.  This keeps undefined at the end of the list
+  // whether acsending or descending.
+  const dateUndefinedValue = sortDirection === 'asc' ? Infinity : -Infinity;
+  const sortDate = !workingDate ? dateUndefinedValue : dayjs(workingDate, 'MM-DD-YYYY').unix();
   //! Potentially remove nextDLEpisodeDate from here and just use sortNextDLDate
   //! will inject summary data in useShows
-  return { sortNextDLDate, nextDLEpisodeDate };
+  return { sortDate, workingDate };
 };
 
 //!! FILTER useShows
@@ -230,8 +256,11 @@ export const useShowDetails = (showId: number) => {
       // merge with placeholder data. This type must match the placehodlerData type
       const data = showDetails.data;
       // console.log('data url', showDetails.apiCall);
+      // emit event to update the saved show details if it is stored locally
+      if (localShow?.isStoredLocally) {
+        eventDispatcher.emit(EventName.UpdateSavedShowDetail, showId.toString(), data);
+      }
       return { ...data };
-      // return { ...data, ...localShow };
     },
     // if locally saved show
     placeholderData: localShow,
@@ -373,6 +402,8 @@ export const usePersonDetails = (personId: string | undefined) => {
         }
         return false; // Skip elements that have their id in seenIds
       });
+
+      // console.log('usePersonDetails', movieResp.data.cast[0].posterURL, tvCast.length);
 
       return {
         tvShows: orderBy(tvCast, ['sortDate'], 'desc'),

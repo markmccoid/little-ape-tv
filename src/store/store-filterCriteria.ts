@@ -26,7 +26,7 @@ const inclusionStates = ['off', 'include', 'exclude'] as const;
 // Derive the type from the array
 export type InclusionState = (typeof inclusionStates)[number];
 type BaseFilters = {
-  filterIsWatched?: InclusionState;
+  filterIsAllWatched?: InclusionState;
   filterIsFavorited?: InclusionState;
   // List of tags to include in filter
   includeTags?: string[];

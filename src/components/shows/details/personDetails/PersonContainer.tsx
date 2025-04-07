@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, Pressable } from 'react-native';
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { usePersonDetails } from '~/data/query.shows';
 // import ShowImage from '~/components/common/ShowImage'; // Assuming not needed directly here
 // import SearchItem from '~/components/search/SearchItem'; // Assuming not needed directly here
@@ -17,9 +17,13 @@ import Animated, {
   interpolate,
   Extrapolation, // Use Extrapolation consistently
 } from 'react-native-reanimated';
-import { MotiView } from 'moti';
+import { AnimatePresence, MotiView } from 'moti';
 import { SymbolView } from 'expo-symbols';
 import { useCustomTheme } from '~/utils/customColorTheme';
+import SegmentedControl from '@react-native-segmented-control/segmented-control';
+import { delay, set } from 'lodash';
+import PersonMovieItem from './PersonMovieItem';
+import useImageSize from '~/utils/useImageSize';
 
 type Props = {
   personId: string;
@@ -27,7 +31,7 @@ type Props = {
 };
 
 // Define constants for header height animation
-const HEADER_MAX_HEIGHT = 210; // Initial height of the profile section
+const HEADER_MAX_HEIGHT = 195; // Initial height of the profile section
 const HEADER_MIN_HEIGHT = 0; // Height it shrinks down to (can be > 0 if you want a minimal header)
 const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT; // The scroll distance over which the header collapses
 
@@ -36,14 +40,25 @@ const PersonContainer = ({ personId, currentShowId }: Props) => {
   const { data, isLoading } = usePersonDetails(personId);
   const navigation = useNavigation();
   const scrollY = useSharedValue(0);
-  const [resultCols, setResultCols] = useState(2);
+  // show 2 or 3 columns
+  const [resultCols, setResultCols] = useState<3 | 2>(2);
+  const [viewState, setViewState] = useState('tv');
+  const [animDelay, setAnimDelay] = useState(0);
+  const { imageHeight, imageWidth } = useImageSize(resultCols);
+  const scrollViewRef = useRef<Animated.ScrollView>(null); // Create a ref for the ScrollView
 
+  const handleSegmentChange = (event: any) => {
+    const state = event.nativeEvent.selectedSegmentIndex;
+    setViewState(state === 0 ? 'tv' : 'movie');
+
+    // Scroll to the top of the ScrollView
+    scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+  };
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
       scrollY.value = event.contentOffset.y;
     },
   });
-
   // Animated style for the Header (PersonProfile container) *inside* the ScrollView
   const animatedHeaderStyle = useAnimatedStyle(() => {
     const height = interpolate(
@@ -115,16 +130,24 @@ const PersonContainer = ({ personId, currentShowId }: Props) => {
   }, [data?.personDetails, resultCols]);
 
   if (isLoading || !data) return null;
-
   const taggedTV = reTagPersonShows(savedShows$.shows.peek(), data.tvShows);
 
   return (
     <View className="flex-1">
       {/* ScrollView now contains everything */}
+      <View>
+        <SegmentedControl
+          className="w-[100]"
+          values={['TV Shows', 'Movies']}
+          selectedIndex={viewState === 'tv' ? 0 : 1}
+          onChange={handleSegmentChange}
+        />
+      </View>
       <Animated.ScrollView
+        ref={scrollViewRef}
         onScroll={scrollHandler}
         scrollEventThrottle={16}
-        className="flex-1 bg-white pt-2"
+        className="flex-1 bg-white"
         // Add bottom padding to content container if needed (e.g., for tab bar)
         contentContainerStyle={styles.scrollContentContainer}>
         {/* 1. The Animated Header */}
@@ -140,21 +163,133 @@ const PersonContainer = ({ personId, currentShowId }: Props) => {
 
         {/* 2. The List Content - Renders naturally below the header */}
         <View
-          className="flex-row flex-wrap justify-between px-[8]"
-          style={{ paddingTop: HEADER_MAX_HEIGHT + 20 }}>
-          {taggedTV.map((show, index) => {
-            return (
+          style={{
+            position: 'relative',
+            minHeight:
+              // Set minimum height to the tallest content to prevent jumping
+              viewState === 'tv'
+                ? Math.floor((data?.tvShows?.length || 0) / (resultCols || 2)) * (imageHeight + 100)
+                : Math.floor((data?.movies?.length || 0) / (resultCols || 2)) * (imageHeight + 100),
+          }}>
+          <MotiView
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              paddingTop: HEADER_MAX_HEIGHT + 20,
+            }}
+            animate={{
+              opacity: viewState === 'tv' ? 1 : 0,
+              translateX: viewState === 'tv' ? 0 : -400,
+            }}
+            transition={{
+              type: 'timing',
+              duration: 500,
+              delay: animDelay,
+              opacity: { type: 'timing', duration: 200 },
+            }}
+            pointerEvents={viewState === 'tv' ? 'auto' : 'none'}
+            className="flex-row flex-wrap justify-between px-[8]">
+            {taggedTV.map((show, index) => (
               <PersonShowItem
                 key={show.tvShowId.toString() + index}
                 showItem={show}
                 numColumns={resultCols as 2 | 3}
                 currentShowId={currentShowId}
-                // Adjust className if needed based on new parent (View vs ScrollView contentContainer)
-                // className="justify-between" // May not be needed here if listContainer handles layout
               />
-            );
-          })}
+            ))}
+          </MotiView>
+
+          <MotiView
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              paddingTop: HEADER_MAX_HEIGHT + 20,
+            }}
+            animate={{
+              opacity: viewState === 'movie' ? 1 : 0,
+              translateX: viewState === 'movie' ? 0 : 400,
+            }}
+            transition={{
+              type: 'timing',
+              duration: 500,
+              delay: animDelay,
+              opacity: { type: 'timing', duration: 200 },
+            }}
+            pointerEvents={viewState === 'movie' ? 'auto' : 'none'}
+            className="flex-row flex-wrap justify-between px-[8]">
+            {data?.movies?.length > 0 ? (
+              data.movies.map((movie, index) => (
+                <PersonMovieItem
+                  key={movie.movieId.toString() + index}
+                  movieItem={movie}
+                  numColumns={2}
+                />
+              ))
+            ) : (
+              <Text>No movies available</Text>
+            )}
+          </MotiView>
         </View>
+        {/* <AnimatePresence>
+          {viewState === 'tv' && (
+            <MotiView
+              key="tv"
+              from={{
+                opacity: 0.5,
+                translateX: -400,
+              }}
+              animate={{ opacity: 1, translateX: 0 }}
+              exit={{ opacity: 0.3, translateX: -400 }}
+              transition={{ type: 'timing', duration: 500, delay: animDelay }}
+              exitTransition={{ type: 'timing', duration: 200 }}
+              className="flex-row flex-wrap justify-between px-[8]"
+              style={{ paddingTop: HEADER_MAX_HEIGHT + 20 }}>
+              {taggedTV.map((show, index) => {
+                return (
+                  <PersonShowItem
+                    key={show.tvShowId.toString() + index}
+                    showItem={show}
+                    numColumns={resultCols as 2 | 3}
+                    currentShowId={currentShowId}
+                    // Adjust className if needed based on new parent (View vs ScrollView contentContainer)
+                    // className="justify-between" // May not be needed here if listContainer handles layout
+                  />
+                );
+              })}
+            </MotiView>
+          )}
+          {viewState === 'movie' && (
+            <MotiView
+              key="movie"
+              from={{
+                opacity: 0.5,
+                translateX: 400,
+              }}
+              animate={{ opacity: 1, translateX: 0 }}
+              exit={{ opacity: 0.3, translateX: 400 }}
+              transition={{ type: 'timing', duration: 500, delay: animDelay }}
+              exitTransition={{ type: 'timing', duration: 200 }}
+              className="flex-row flex-wrap justify-between px-[8]"
+              style={{ paddingTop: HEADER_MAX_HEIGHT + 20 }}>
+              {data?.movies.map((movie, index) => {
+                return (
+                  <PersonMovieItem
+                    key={movie.movieId.toString() + index}
+                    movieItem={movie}
+                    // numColumns={resultCols as 2 | 3}
+                    // currentShowId={currentShowId}
+                    // Adjust className if needed based on new parent (View vs ScrollView contentContainer)
+                    // className="justify-between" // May not be needed here if listContainer handles layout
+                  />
+                );
+              })}
+            </MotiView>
+          )}
+        </AnimatePresence> */}
       </Animated.ScrollView>
     </View>
   );

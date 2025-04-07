@@ -19,6 +19,7 @@ import { SavedShowObservable } from './store-shows';
 import { eventDispatcher, EventName } from '~/utils/EventDispatcher';
 import { queryClient } from '~/utils/queryClient';
 import { useEffect, useState } from 'react';
+import { update } from 'lodash';
 
 //~ -----------------------------------------------
 export type SavedShow = {
@@ -28,6 +29,8 @@ export type SavedShow = {
   name: string;
   posterURL?: string;
   backdropURL?: string;
+  showStatus?: string;
+  allWatched?: boolean; // this will be set if all episodes are watched. (excluding season 0 (specials))
   avgEpisodeRunTime?: number;
   firstAirDateEpoch: number;
   imdbEpisodesURL?: string;
@@ -36,7 +39,7 @@ export type SavedShow = {
   userRating?: number;
   favorite?: number; // Epoch date number
   userTags?: string[];
-  dateAddedEpoch: number;
+  dateAddedEpoch?: number;
   dateLastUpdatedEpoch: number;
   // Stores the streaming data for a show (allows for search)
   streaming?: {
@@ -55,6 +58,7 @@ export type SavedShows = Record<ShowId, SavedShow>;
 //~ -----------------------------------------------
 export type ShowFunctions = {
   addShow: (showId: string) => Promise<void>;
+  updateSavedShowDetail: (showId: string, data: TVShowDetails) => void;
   removeShow: (showId: string) => void;
   toggleFavoriteShow: (showId: string, action: 'toggle' | 'off' | 'on') => void;
   updateShowTags: (showId: string, tagId: string, action: 'add' | 'remove') => void;
@@ -69,10 +73,30 @@ export const createShowFunctions = (
   savedShows$: Observable<SavedShowObservable>
 ): ShowFunctions => {
   return {
+    updateSavedShowDetail: (showId: string, data: TVShowDetails) => {
+      const existingData = savedShows$.shows[showId].peek();
+
+      const updatedShow: SavedShow = {
+        ...existingData,
+        allWatched: savedShows$.showAttributes[showId]?.summary.asw.peek() ?? false,
+        isStoredLocally: true,
+        tmdbId: data.id.toString(),
+        imdbId: data.imdbId,
+        tvdbId: data.tvdbId,
+        name: data.name,
+        showStatus: data.status,
+        imdbEpisodesURL: data.imdbEpisodesURL,
+        firstAirDateEpoch: data.firstAirDate.epoch,
+        genres: data.genres,
+        dateLastUpdatedEpoch: formatEpoch(Date.now()),
+      };
+
+      savedShows$.shows[showId].set(updatedShow);
+    },
     addShow: async (showId) => {
       //! Need to deal with undefined posterURL and backdropURL
       const data = await getShowDetails(parseInt(showId));
-
+      // savedShows$.updateSavedShowDetail(showId, data as TVShowDetails, true);
       savedShows$.shows[showId].set({
         isStoredLocally: true,
         tmdbId: data.id.toString(),
@@ -82,9 +106,12 @@ export const createShowFunctions = (
         posterURL: data.posterURL,
         backdropURL: data.backdropURL,
         avgEpisodeRunTime: data.avgEpisodeRunTime,
+        showStatus: data.status,
         imdbEpisodesURL: data.imdbEpisodesURL,
         firstAirDateEpoch: data.firstAirDate.epoch,
         genres: data.genres,
+        //system generated
+        allWatched: false,
         // User specific
         userRating: 0,
         dateAddedEpoch: formatEpoch(Date.now()),

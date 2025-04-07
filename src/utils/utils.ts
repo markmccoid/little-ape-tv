@@ -88,6 +88,27 @@ export const nativeShareItem = async ({ message, url }: { message: string; url: 
 };
 
 //~  --------------------------------------
+//~  Set the BG color based on the length of the shows runtime
+//~  --------------------------------------
+const rtColors = {
+  15: ['red', 'white'],
+  30: ['green', 'white'],
+  45: ['yellow', 'black'],
+  60: ['orange', 'black'],
+};
+const rtColorArray = [15, 30, 45, 60];
+export const getBGColor = (runTime: number | undefined) => {
+  // Find the next greater key
+  if (!runTime) return undefined;
+
+  for (const key of rtColorArray) {
+    if (key >= runTime) {
+      return rtColors[key];
+    }
+  }
+  return ['white', 'black']; // Default color if no match found
+};
+//~  --------------------------------------
 //~  Merge two arrays of objects with a priority
 //~  The second array will overwrite the first array
 //~  if the id is the same in both arrays

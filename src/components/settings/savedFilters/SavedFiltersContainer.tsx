@@ -5,9 +5,12 @@ import { filterCriteria$, SavedFilter } from '~/store/store-filterCriteria';
 import { useRouter } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
 import { useCustomTheme } from '~/utils/customColorTheme';
-import { filter } from 'lodash';
 import Sortable, { SortableGridRenderItem } from 'react-native-sortables';
 
+// NOTE: This is the list of created filters.
+// The "Favorite" this is referring to is the indentifier that says to
+// show a filter on the main page.
+// If you need to edit the actual filters start with "AddEditFilter.tsx"
 const SavedFiltersContainer = () => {
   const { colors } = useCustomTheme();
   const savedFilters = use$(filterCriteria$.savedFilters);
