@@ -73,7 +73,6 @@ const HiddenContainerAnimated: React.FC<Props> = ({
 
   // For images inside the component, you could add image loading tracking
   // This would be particularly useful if you're rendering 6-7 images that are slow to load
-
   return (
     <View
       style={[
@@ -125,16 +124,16 @@ const HiddenContainerAnimated: React.FC<Props> = ({
           transition={{ type: 'timing', duration: animationDuration }}
           style={{ overflow: 'hidden', backgroundColor: 'rgba(255, 255, 255, .1)' }}>
           <AnimatePresence>
-            {isOpen && (
-              <MotiView
-                from={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                key="content"
-                transition={{ type: 'timing', duration: animationDuration }}>
-                {children}
-              </MotiView>
-            )}
+            (
+            <MotiView
+              from={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              key="content"
+              transition={{ type: 'timing', duration: animationDuration }}>
+              {children}
+            </MotiView>
+            )
           </AnimatePresence>
         </MotiView>
       )}

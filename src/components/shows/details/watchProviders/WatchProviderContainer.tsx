@@ -1,5 +1,5 @@
 import { View, Text, Image, ScrollView, FlatList, TouchableOpacity } from 'react-native';
-import React, { useState } from 'react';
+import React, { useDeferredValue, useState } from 'react';
 import { useWatchProviders, WatchProviderOnly } from '~/data/query.shows';
 import WatchProviderSection from './WatchProviderSection';
 import { ProviderInfo } from '@markmccoid/tmdb_api';
@@ -25,7 +25,8 @@ interface WatchProviderSection {
 const MDWatchProviders = ({ showId }: Props) => {
   if (!showId) return null;
 
-  const { data, isLoading } = useWatchProviders(showId);
+  const { data: initData, isLoading } = useWatchProviders(showId);
+  const data = useDeferredValue(initData);
   const watchProviders = data?.watchProviders;
   const justWatchLink = data?.justWatchLink;
 
@@ -117,4 +118,4 @@ const MDWatchProviders = ({ showId }: Props) => {
   );
 };
 
-export default MDWatchProviders;
+export default React.memo(MDWatchProviders);
