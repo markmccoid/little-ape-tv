@@ -149,11 +149,11 @@ const PersonContainer = ({ personId, currentShowId }: Props) => {
         scrollEventThrottle={16}
         className="flex-1 bg-white"
         // Add bottom padding to content container if needed (e.g., for tab bar)
-        contentContainerStyle={styles.scrollContentContainer}>
+        contentContainerStyle={{ marginBottom: 55 }}>
         {/* 1. The Animated Header */}
         <Animated.View
-          style={[animatedHeaderStyle]}
-          className="absolute bottom-0 left-0 right-0 top-0 z-10 border-b-hairline border-b-primary">
+          style={[animatedHeaderStyle, { backgroundColor: `${colors.button}77` }]}
+          className="absolute bottom-0 left-0 right-0 top-0 z-10 border-b-hairline border-b-primary ">
           <PersonProfile
             personInfo={data.personDetails}
             scrollY={scrollY}
@@ -168,8 +168,10 @@ const PersonContainer = ({ personId, currentShowId }: Props) => {
             minHeight:
               // Set minimum height to the tallest content to prevent jumping
               viewState === 'tv'
-                ? Math.floor((data?.tvShows?.length || 0) / (resultCols || 2)) * (imageHeight + 100)
-                : Math.floor((data?.movies?.length || 0) / (resultCols || 2)) * (imageHeight + 100),
+                ? Math.ceil((data?.tvShows?.length || 0) / (resultCols || 2)) * (imageHeight + 50) +
+                  401
+                : Math.ceil((data?.movies?.length || 0) / (resultCols || 2)) * (imageHeight + 50) +
+                  401,
           }}>
           <MotiView
             style={{
@@ -226,7 +228,7 @@ const PersonContainer = ({ personId, currentShowId }: Props) => {
                 <PersonMovieItem
                   key={movie.movieId.toString() + index}
                   movieItem={movie}
-                  numColumns={2}
+                  numColumns={resultCols as 2 | 3}
                 />
               ))
             ) : (

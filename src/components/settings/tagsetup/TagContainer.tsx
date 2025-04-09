@@ -60,7 +60,7 @@ const TagContainer = () => {
         columns={1}
         data={tags}
         renderItem={renderItem}
-        rowGap={10}
+        rowGap={4}
         columnGap={10}
         onDragEnd={(parms) => tags$.updateTagPositions(parms.indexToKey)}
         enableActiveItemSnap={false}

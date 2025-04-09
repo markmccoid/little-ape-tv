@@ -49,9 +49,7 @@ const PersonProfile = ({ personInfo, scrollY, headerHeight }: Props) => {
     };
   });
   return (
-    <View
-      className="flex-row bg-white px-1 pt-[8]"
-      style={{ backgroundColor: `${colors.button}77` }}>
+    <View className="flex-row px-1 pt-[8]">
       <Animated.View
         style={[
           animatedProfileStyle,

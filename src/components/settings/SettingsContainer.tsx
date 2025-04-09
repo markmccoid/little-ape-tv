@@ -1,4 +1,4 @@
-import { View, Text, Pressable, ScrollView, Switch } from 'react-native';
+import { View, Text, Pressable, ScrollView, Switch, SafeAreaView } from 'react-native';
 import React from 'react';
 import { useRouter } from 'expo-router';
 // import { List, FormItem, Section, Link } from '~/components/expo-router-forms/ui/Form';
@@ -9,6 +9,9 @@ import { SymbolView } from 'expo-symbols';
 import { useCustomTheme } from '~/utils/customColorTheme';
 import { settings$ } from '~/store/store-settings';
 import { use$ } from '@legendapp/state/react';
+import SettingsItem from './SettingsItem';
+import SettingsGroup from './SettingsGroup';
+import { FilterIcon } from '../common/Icons';
 
 const SettingsContainer = () => {
   const router = useRouter();
@@ -18,73 +21,56 @@ const SettingsContainer = () => {
   const excludeGenresFromPerson = use$(settings$.excludeGenresFromPerson);
 
   return (
-    <ScrollView className="flex-1">
-      <Text className="mx-3 text-2xl text-text" style={{ color: AC.secondaryLabel }}>
-        Settings
-      </Text>
-      {/* Tag Maintenance */}
-      <Pressable
-        onPress={() => router.push('/(authed)/settings/tagsetup')}
-        className="mx-2 flex-row items-center justify-between rounded-lg border-hairline p-1 px-2 active:bg-card"
-        style={{ backgroundColor: `${colors.card}99` }}>
-        <Text className="p-1 text-lg text-text">Tag Maintenance</Text>
-        <SymbolView name="chevron.right" tintColor={colors.text} size={20} />
-      </Pressable>
-      {/* SAVED Filters */}
-      <Pressable
-        onPress={() => router.push('/(authed)/settings/savedfiltersmaint')}
-        className="mx-2 mt-2 flex-row items-center justify-between rounded-lg border-hairline p-1 px-2 active:bg-card"
-        style={{ backgroundColor: `${colors.card}99` }}>
-        <Text className="p-1 text-lg text-text">Saved Filters</Text>
-        <SymbolView name="chevron.right" tintColor={colors.text} size={20} />
-      </Pressable>
+    <SafeAreaView className="flex-1">
+      <ScrollView className="pt-2">
+        <SettingsGroup title="Manage Tags and Filters">
+          {/* SAVED Filters */}
+          <SettingsItem
+            title="Saved Filters"
+            settingType="route"
+            route="/(authed)/settings/savedfiltersmaint"
+            // childStyle={{ borderTopLeftRadius: 0, borderTopRightRadius: 0 }}
+            isFirst={true}
+            LeftSymbol={() => <FilterIcon color={colors.buttonDarker} size={23} />}
+          />
+          {/* Tag Maintenance */}
+          <SettingsItem
+            title="Tag Maintenance"
+            settingType="route"
+            route="/(authed)/settings/tagsetup"
+            isLast={true}
+            // childStyle={{ borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}
+            LeftSymbol={() => <SymbolView name="tag" tintColor={colors.buttonDarker} size={28} />}
+          />
+        </SettingsGroup>
 
-      {/* Show Images on Episode List */}
-      <View
-        className="mx-2 mt-2 flex-row items-center justify-between rounded-lg border-hairline p-1 pl-2 active:bg-card"
-        style={{ backgroundColor: `${colors.card}99` }}>
-        <Text className="p-1 text-lg text-text">Show Images on Episode List</Text>
-        <Switch
-          style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
-          trackColor={{ false: '#767577', true: '#34C759' }}
-          thumbColor={showImages ? '#FFFFFF' : '#F2F2F2'}
-          ios_backgroundColor="#767577"
-          onValueChange={() => settings$.showImageInEpisode.set((prev) => !prev)}
-          value={showImages}
+        {/* Show Images on Episode List */}
+        <SettingsItem
+          title="Show Images on Episode List"
+          settingType="switch"
+          switchCallback={() => settings$.showImageInEpisode.set((prev) => !prev)}
+          switchValue={showImages}
         />
-      </View>
-      {/* Show Next Download Episode */}
-      <View
-        className="mx-2 mt-2 flex-row items-center justify-between rounded-lg border-hairline p-1 pl-2 active:bg-card"
-        style={{ backgroundColor: `${colors.card}99` }}>
-        <Text className="p-1 text-lg text-text">Show Next Download Episode</Text>
-        <Switch
-          style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
-          trackColor={{ false: '#767577', true: '#34C759' }}
-          thumbColor={showNextDownloadEpisode ? '#FFFFFF' : '#F2F2F2'}
-          ios_backgroundColor="#767577"
-          onValueChange={() => settings$.downloadOptions.showNextDownloadInfo.set((prev) => !prev)}
-          value={showNextDownloadEpisode}
+        {/* Show Next Download Episode */}
+        <SettingsItem
+          title="Show Next Download Episode"
+          settingType="switch"
+          switchCallback={() => settings$.downloadOptions.showNextDownloadInfo.set((prev) => !prev)}
+          switchValue={showNextDownloadEpisode}
         />
-      </View>
-      {/* Exclude Talk shows from Person Show List */}
-      <View
-        className="mx-2 mt-2 flex-row items-center justify-between rounded-lg border-hairline p-1 pl-2 active:bg-card"
-        style={{ backgroundColor: `${colors.card}99` }}>
-        <Text className="p-1 text-lg text-text">Exclude Talk Shows/Person List</Text>
-        <Switch
-          style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
-          trackColor={{ false: '#767577', true: '#34C759' }}
-          thumbColor={excludeGenresFromPerson?.length > 0 ? '#FFFFFF' : '#F2F2F2'}
-          ios_backgroundColor="#767577"
-          onValueChange={(val) => {
+
+        {/* Exclude Talk shows from Person Show List */}
+        <SettingsItem
+          title="Exclude Talk Shows/Person List"
+          settingType="switch"
+          switchCallback={(val) => {
             const newVal = val ? ['talk'] : [];
             settings$.excludeGenresFromPerson.set(newVal);
           }}
-          value={excludeGenresFromPerson?.length > 0}
+          switchValue={excludeGenresFromPerson?.length > 0}
         />
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 

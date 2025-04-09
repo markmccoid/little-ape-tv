@@ -58,7 +58,7 @@ const TagItem = ({ tagItem }: { tagItem: Tag }) => {
   const { colors } = useCustomTheme();
 
   return (
-    <View className="flex-row items-center rounded-xl border border-card bg-white p-2">
+    <View className="flex-row items-center rounded-xl border-hairline border-gray-400 bg-white p-2">
       <View className="mr-2 flex-grow ">
         <Text className="text-lg">{tagItem.name}</Text>
       </View>

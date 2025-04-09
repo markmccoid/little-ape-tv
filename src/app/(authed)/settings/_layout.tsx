@@ -12,8 +12,11 @@ export default function SettingsLayout() {
       <Stack.Screen
         name="index"
         options={{
-          headerShown: true,
-          headerLeft: () => (
+          headerLargeTitle: true,
+          headerLargeTitleShadowVisible: true,
+          // headerTransparent: true,
+          // headerShown: true,
+          headerRight: () => (
             <Pressable onPress={() => router.back()}>
               <SymbolView name="house.fill" size={30} tintColor={colors.text} />
             </Pressable>
