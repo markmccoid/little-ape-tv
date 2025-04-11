@@ -50,15 +50,15 @@ const ShowDetailContainer = ({ showId }: Props) => {
   // const headerHeight = useHeaderHeight();
   const { data, isLoading, status, isPlaceholderData, isError } = useShowDetails(parseInt(showId));
 
-  const [renderPhase, setRenderPhase] = useState('initial');
+  const [shouldRender, setShouldRender] = useState(false);
 
   useEffect(() => {
     // we are not checking this anywhere, but by doing this the data that is passed will load without
     // waiting for the timeout and API calls from other children components
-    requestAnimationFrame(() => setRenderPhase('chill'));
+    requestAnimationFrame(() => setShouldRender(true));
     // Optionally delay secondary components
-    const timeout = setTimeout(() => setRenderPhase('full'), 75);
-    return () => clearTimeout(timeout);
+    // const timeout = setTimeout(() => setRenderPhase('full'), 75);
+    // return () => clearTimeout(timeout);
   }, []);
 
   //~ Save Function, make sure to update if data changes.
@@ -112,9 +112,9 @@ const ShowDetailContainer = ({ showId }: Props) => {
     navigation.setOptions(options);
   }, [data?.id, data?.isStoredLocally]);
 
-  if (renderPhase === 'initial') {
-    return <ActivityIndicator size="large" className="mt-10" />;
-  }
+  // if (renderPhase === 'initial') {
+  //   return <ActivityIndicator size="large" className="mt-10" />;
+  // }
   return (
     <View className={`relative w-full flex-1`}>
       <MotiView
@@ -214,28 +214,28 @@ const ShowDetailContainer = ({ showId }: Props) => {
         <View className="my-2 ">{data?.tmdbId && <ShowTagContainer showId={data?.tmdbId} />}</View>
 
         {/* Show Information */}
-        {renderPhase === 'full' && (
+        {shouldRender && (
           <HiddenContainerAnimated title="Where To Watch" extraHeight={10}>
             <WatchProviderContainer showId={showId} />
           </HiddenContainerAnimated>
         )}
         <View className="h-2" />
         {/* Recommendations */}
-        {renderPhase === 'full' && (
+        {shouldRender && (
           <HiddenContainerAnimated title="Recommendations">
             <DetailRecommendations recommendations={data?.recommendations} />
           </HiddenContainerAnimated>
         )}
         <View className="h-2" />
         {/* Videos */}
-        {renderPhase === 'full' && (
+        {shouldRender && (
           <HiddenContainerAnimated title="Videos" extraHeight={10}>
             <DetailVideos videoData={data?.videos} />
           </HiddenContainerAnimated>
         )}
         <View className="h-2" />
         {/* Cast */}
-        {renderPhase === 'full' && (
+        {shouldRender && (
           <HiddenContainerAnimated title="Cast" startOpen>
             <CastContainer showId={data?.tmdbId} cast={data?.credits} />
           </HiddenContainerAnimated>
