@@ -23,52 +23,71 @@ const SettingsContainer = () => {
   return (
     <SafeAreaView className="flex-1">
       <ScrollView className="pt-2">
-        <SettingsGroup title="Manage Tags and Filters">
-          {/* SAVED Filters */}
-          <SettingsItem
+        <SettingsGroup title="Manage Tags & Filters">
+          <SettingsGroup.RouteItem
             title="Saved Filters"
-            settingType="route"
             route="/(authed)/settings/savedfiltersmaint"
-            // childStyle={{ borderTopLeftRadius: 0, borderTopRightRadius: 0 }}
-            isFirst={true}
             LeftSymbol={() => <FilterIcon color={colors.buttonDarker} size={23} />}
           />
-          {/* Tag Maintenance */}
-          <SettingsItem
+          <SettingsGroup.RouteItem
             title="Tag Maintenance"
-            settingType="route"
             route="/(authed)/settings/tagsetup"
-            isLast={true}
-            // childStyle={{ borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}
             LeftSymbol={() => <SymbolView name="tag" tintColor={colors.buttonDarker} size={28} />}
           />
+          {/* <SettingsGroup.SwitchItem /> */}
         </SettingsGroup>
 
         {/* Show Images on Episode List */}
-        <SettingsItem
-          title="Show Images on Episode List"
-          settingType="switch"
-          switchCallback={() => settings$.showImageInEpisode.set((prev) => !prev)}
-          switchValue={showImages}
-        />
+        <SettingsGroup style={{ marginTop: 8 }}>
+          <SettingsGroup.SwitchItem
+            title="Show Images on Episode List"
+            switchCallback={() => settings$.showImageInEpisode.set((prev) => !prev)}
+            switchValue={showImages}
+            LeftSymbol={() =>
+              showImages ? (
+                <SymbolView
+                  name="photo.badge.checkmark"
+                  tintColor={colors.buttonDarker}
+                  size={28}
+                />
+              ) : (
+                <SymbolView name="photo" tintColor={colors.buttonDarker} size={28} />
+              )
+            }
+          />
+        </SettingsGroup>
         {/* Show Next Download Episode */}
-        <SettingsItem
-          title="Show Next Download Episode"
-          settingType="switch"
-          switchCallback={() => settings$.downloadOptions.showNextDownloadInfo.set((prev) => !prev)}
-          switchValue={showNextDownloadEpisode}
-        />
+        <SettingsGroup style={{ marginTop: 8 }}>
+          <SettingsGroup.SwitchItem
+            title="Show Next Download Episode"
+            switchCallback={() =>
+              settings$.downloadOptions.showNextDownloadInfo.set((prev) => !prev)
+            }
+            switchValue={showNextDownloadEpisode}
+            LeftSymbol={() => (
+              <SymbolView name="arrow.down.square" tintColor={colors.buttonDarker} size={28} />
+            )}
+          />
+        </SettingsGroup>
 
         {/* Exclude Talk shows from Person Show List */}
-        <SettingsItem
-          title="Exclude Talk Shows/Person List"
-          settingType="switch"
-          switchCallback={(val) => {
-            const newVal = val ? ['talk'] : [];
-            settings$.excludeGenresFromPerson.set(newVal);
-          }}
-          switchValue={excludeGenresFromPerson?.length > 0}
-        />
+        <SettingsGroup style={{ marginTop: 8 }}>
+          <SettingsGroup.SwitchItem
+            title="Exclude Talk Shows/Person List"
+            switchCallback={(val) => {
+              const newVal = val ? ['talk'] : [];
+              settings$.excludeGenresFromPerson.set(newVal);
+            }}
+            switchValue={excludeGenresFromPerson?.length > 0}
+            LeftSymbol={() =>
+              excludeGenresFromPerson?.length > 0 ? (
+                <SymbolView name="person.slash" tintColor={colors.buttonDarker} size={28} />
+              ) : (
+                <SymbolView name="person" tintColor={colors.buttonDarker} size={28} />
+              )
+            }
+          />
+        </SettingsGroup>
       </ScrollView>
     </SafeAreaView>
   );

@@ -53,7 +53,9 @@ const ShowDetailContainer = ({ showId }: Props) => {
   const [renderPhase, setRenderPhase] = useState('initial');
 
   useEffect(() => {
-    requestAnimationFrame(() => setRenderPhase('primary'));
+    // we are not checking this anywhere, but by doing this the data that is passed will load without
+    // waiting for the timeout and API calls from other children components
+    requestAnimationFrame(() => setRenderPhase('chill'));
     // Optionally delay secondary components
     const timeout = setTimeout(() => setRenderPhase('full'), 75);
     return () => clearTimeout(timeout);
