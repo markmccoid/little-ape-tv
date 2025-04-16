@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, Pressable } from 'react-native';
+import { View, Text, Pressable, ScrollView } from 'react-native';
 import { Image } from 'expo-image';
 import Animated, {
   Extrapolation,
@@ -14,10 +14,8 @@ import { useSavedShow } from '~/store/store-shows';
 import dayjs from 'dayjs';
 import { useSavedSeasonSummary } from '~/store/functions-showAttributes';
 import { useRouter } from 'expo-router';
-import ShowItemBottom from './ShowItemBottom';
-import { use$ } from '@legendapp/state/react';
-import { savedShows$ } from '~/store/store-shows';
-const missingPosterURI = require('../../../../assets/missingPoster.png');
+import ScreenTwoSeasonData from './ScreenTwoSeasonData';
+const missingPosterURI = require('../../../../../assets/missingPoster.png');
 
 type Props = {
   showId: string;
@@ -27,7 +25,6 @@ type Props = {
   scrollX: SharedValue<number>;
 };
 const ShowItemScreenTwo = ({ showId, imageWidth, imageHeight, index, scrollX }: Props) => {
-  const seasonsSummary = useSavedSeasonSummary(showId);
   const { favorite, posterURL, name, dateAddedEpoch } = useSavedShow(showId);
   // console.log('secondScreen NextDLEpisodeDate', nextDLEpisodeDate);
   const router = useRouter();
@@ -47,13 +44,13 @@ const ShowItemScreenTwo = ({ showId, imageWidth, imageHeight, index, scrollX }: 
   });
 
   return (
-    <View style={{ width: imageWidth, height: imageHeight }}>
-      {/* <View className="absolute top-[-10] z-10">
-          <SetFavoriteButton showId={show.tmdbId} isFavorited={!!show.favorite} />
-        </View> */}
-      <Animated.View
-        style={[animStyle, { width: imageWidth, height: imageHeight, position: 'relative' }]}
-        className="overflow-hidden rounded-lg border-hairline border-primary bg-white">
+    // <View style={{ width: imageWidth, height: imageHeight + 26, borderWidth: 1 }}>
+    <Animated.View
+      style={[animStyle, { width: imageWidth, height: imageHeight + 26 }]}
+      className="flex-row items-center overflow-hidden">
+      <View
+        className="relative z-30 overflow-hidden rounded-lg border-hairline border-primary"
+        style={{ height: imageHeight, width: imageWidth }}>
         <Image
           className="absolute"
           source={posterURL || missingPosterURI}
@@ -68,31 +65,36 @@ const ShowItemScreenTwo = ({ showId, imageWidth, imageHeight, index, scrollX }: 
             zIndex: -1,
           }}
         />
-        <View className="relative z-30 mx-[9] my-[5]">
+        {/* Inner View */}
+        <View className="mx-1">
           <Text
             className="text-center text-lg font-semibold"
             lineBreakMode="tail"
             numberOfLines={2}>
             {name}
           </Text>
-          <Text className="text-center text-lg font-semibold">
-            {dayjs.unix(dateAddedEpoch).format('MM/DD/YYYY')}
-          </Text>
-          <Text>Season {seasonsSummary?.['1']?.watched}</Text>
-          <Text>Show Favorited?: {favorite}</Text>
-          <Pressable
-            onPress={() =>
-              router.push({
-                pathname: `/seasonslistmodal`,
-                params: { showid: parseInt(showId) },
-              })
-            }>
-            <Text>See Seasons</Text>
-          </Pressable>
+          <ScrollView>
+            <View className="flex-row gap-1">
+              <Text>Date Added:</Text>
+              <Text className="">{dayjs.unix(dateAddedEpoch).format('MM/DD/YYYY')}</Text>
+            </View>
+            <ScreenTwoSeasonData showId={showId} />
+            <View className="flex-row">
+              <Pressable
+                onPress={() =>
+                  router.push({
+                    pathname: `/seasonslistmodal`,
+                    params: { showid: parseInt(showId) },
+                  })
+                }
+                className="rounded-md border-hairline bg-primary px-2 py-1">
+                <Text className="color-primarytext">See Seasons</Text>
+              </Pressable>
+            </View>
+          </ScrollView>
         </View>
-      </Animated.View>
-      <ShowItemBottom showId={showId} />
-    </View>
+      </View>
+    </Animated.View>
   );
 };
 

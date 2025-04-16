@@ -8,6 +8,7 @@ import useImageSize from '~/utils/useImageSize';
 import { search$ } from '~/store/store-search';
 import { use$ } from '@legendapp/state/react';
 import { settings$ } from '~/store/store-settings';
+import { savedShows$ } from '~/store/store-shows';
 
 const { width, height } = Dimensions.get('window');
 const IMG_WIDTH = (width - 30) / 2;
@@ -26,6 +27,7 @@ type Props = {
 };
 const SearchItem = ({ searchItem, numColumns }: Props) => {
   const router = useRouter();
+  const posterURL = use$(savedShows$.shows[searchItem.id].posterURL);
 
   const { imageHeight, imageWidth } = useImageSize(numColumns);
   return (
@@ -49,7 +51,7 @@ const SearchItem = ({ searchItem, numColumns }: Props) => {
             </View>
           )}
           <Image
-            source={searchItem.posterURL || missingPosterURI}
+            source={posterURL || searchItem.posterURL || missingPosterURI}
             contentFit="cover"
             style={{ width: imageWidth, height: imageHeight }}
           />

@@ -134,6 +134,11 @@ export const createShowFunctions = (
         showId,
         data.seasons.map((el) => el.seasonNumber) || []
       );
+      eventDispatcher.emit(
+        EventName.UpdateSeasonSummary,
+        showId,
+        data.seasons.map((el) => el.seasonNumber) || []
+      );
     },
     removeShow: (showId) => {
       savedShows$.shows[showId].delete();

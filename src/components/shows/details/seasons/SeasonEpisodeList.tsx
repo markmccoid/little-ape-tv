@@ -7,11 +7,7 @@ import { getEpisodeIMDBURL, ShowDetailsData, UseShowDetailsReturn } from '~/data
 import { useLocalSearchParams } from 'expo-router';
 import EpisodeRow from './EpisodeRow';
 import { CheckIcon, TelevisionIcon, TelevisionOffIcon } from '~/components/common/Icons';
-import {
-  updateSeasonSummary,
-  useSavedSeasonSummary,
-  useSeasonSummary,
-} from '~/store/functions-showAttributes';
+import { updateSeasonSummary, useSavedSeasonSummary } from '~/store/functions-showAttributes';
 import SeasonHeader from './SeasonHeader';
 import { useObservable, useObserveEffect } from '@legendapp/state/react';
 import { savedShows$ } from '~/store/store-shows';
@@ -41,7 +37,7 @@ const SeasonEpisodeList: React.FC<Props> = ({ seasons, showData }) => {
   const sectionListRef = useRef<SectionList>(null);
   const seasonScrollRef = useRef<ScrollView>(null);
   const seasonSummary = useSavedSeasonSummary(showid as string);
-  // console.log('SEASON SUMMARY', seasonSummary);
+  console.log('SEASON SUMMARY', seasonSummary);
 
   //# this legend state hook will fire when a change is made to the showAttributes
   //# which will in turn update the seasonSummary data on the showAttributes[showId] observable

@@ -20,6 +20,7 @@ import { SymbolView } from 'expo-symbols';
 import { FilterIcon } from '~/components/common/Icons';
 import { useCustomTheme } from '~/utils/customColorTheme';
 import { search$ } from '~/store/store-search';
+import ShowItemBottom from './ShowItemBottom';
 
 //!! MOVE TO A FUNCTION SO ONE source of TRUTH
 const { width, height } = Dimensions.get('window');
@@ -76,13 +77,20 @@ const ShowsContainer = () => {
   const listStyle = useAnimatedStyle(() => {
     // console.log("Flatlist PAdding", searchY.value);
     return {
-      paddingTop: searchY.value + 55,
+      paddingTop: searchY.value + 40,
     };
   });
 
   //!!
   const renderShow = useCallback(({ item }: { item: SavedShow }) => {
-    return <ShowItem show={item} showId={item.tmdbId} />;
+    return (
+      <View>
+        <ShowItem show={item} showId={item.tmdbId} />
+        <View className="absolute bottom-[15] left-0 w-full">
+          <ShowItemBottom showId={item.tmdbId} />
+        </View>
+      </View>
+    );
   }, []);
 
   const getItemLayout = (_: any, index: number) => {

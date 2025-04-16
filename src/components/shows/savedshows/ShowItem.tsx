@@ -18,7 +18,7 @@ import Animated, {
 import SearchItemButtonAnim from '~/components/search/SearchItemButtonAnim';
 import ShowItemBottom from './ShowItemBottom';
 import ShowItemMain from './ShowItemMain';
-import ShowItemScreenTwo from './ShowItemScreenTwo';
+import ShowItemScreenTwo from './ScreenTwo/ShowItemScreenTwo';
 import { MotiView } from 'moti';
 import SetFavoriteButton from '../details/tags/SetFavoriteButton';
 import DeleteShowButton from './DeleteShowButton';

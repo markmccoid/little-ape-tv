@@ -1,3 +1,4 @@
+import { ShowAttributes, updateSeasonSummary } from './../store/functions-showAttributes';
 import { QueryClient } from '@tanstack/react-query';
 import { eventDispatcher, EventName } from './EventDispatcher';
 import { fetchSeasonsData, useShowSeasonData } from '~/data/query.shows';
@@ -46,14 +47,36 @@ export const setupEvents = (queryClient: QueryClient) => {
     }
   });
 };
+//# --------------------------------------
+//# UpdateSavedShowDetail -> Is called from when we view a show.
+//# makes ure the show details are up to date.
+//# --------------------------------------
+eventDispatcher.on(EventName.UpdateSeasonSummary, async (showId, seasonsArray) => {
+  const seasonData = await fetchSeasonsData(parseInt(showId), seasonsArray);
+  updateSeasonSummary(showId, seasonData);
+});
 
 //# --------------------------------------
 //# Trimmed Mean helper function
 //# --------------------------------------
 export const trimmedMean = (arr: number[], trimPercent: number) => {
-  if (!arr || arr.length === 0) return 0;
-  const sortedArr = arr.sort((a, b) => a - b);
-  const trimCount = Math.floor(arr.length * trimPercent);
+  // Return 0 for invalid inputs
+  if (!arr || arr.length === 0 || trimPercent < 0 || trimPercent >= 0.5) return 0;
+
+  // Filter out undefined and non-numeric values
+  const validArr = arr.filter((val) => val !== undefined && !isNaN(val) && val !== 0);
+
+  // Return 0 if no valid numbers remain
+  if (validArr.length === 0) return 0;
+
+  // Sort the array
+  const sortedArr = validArr.sort((a, b) => a - b);
+
+  // Calculate trim count, ensuring at least one element remains
+  const trimCount = Math.floor(sortedArr.length * trimPercent);
+  if (trimCount * 2 >= sortedArr.length) return sortedArr[Math.floor(sortedArr.length / 2)];
+
+  // Slice the array and calculate mean
   const trimmedArr = sortedArr.slice(trimCount, sortedArr.length - trimCount);
   return Math.round(trimmedArr.reduce((acc, val) => acc + val, 0) / trimmedArr.length);
 };

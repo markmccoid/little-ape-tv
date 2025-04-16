@@ -93,9 +93,9 @@ const ScrollerMain = ({ showId, imageWidth, imageHeight, index, scrollX }: Props
           <Text className="text-white">{nextDownloadEpisode?.airDate}</Text>
         )}
       </View> */}
-      <View className="absolute bottom-[15] left-0 w-full">
+      {/* <View className="absolute bottom-[15] left-0 w-full">
         <ShowItemBottom showId={showId} />
-      </View>
+      </View> */}
     </Animated.View>
   );
 };

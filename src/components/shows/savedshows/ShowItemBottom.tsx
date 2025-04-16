@@ -15,6 +15,7 @@ import { useSavedSeasonSummary } from '~/store/functions-showAttributes';
 import { settings$ } from '~/store/store-settings';
 import { useSavedShow } from '~/store/store-shows';
 import { getBGColor } from '~/utils/utils';
+import { useRouter } from 'expo-router';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 type Props = {
@@ -23,6 +24,7 @@ type Props = {
 
 const ShowItemBottom = ({ showId }: Props) => {
   const { colors } = useCustomTheme();
+  const router = useRouter();
   const { isStoredLocally, favorite } = useSavedShow(showId);
   const showInfo = useSavedShow(showId);
   const [runTimeBGColor, runTimeTextColor] = getBGColor(showInfo.avgEpisodeRunTime) || ['', ''];
@@ -39,9 +41,17 @@ const ShowItemBottom = ({ showId }: Props) => {
         <View
           className="absolute rounded-full border-hairline p-2"
           style={{ backgroundColor: runTimeBGColor }}>
-          <Text className="font-semibold" style={{ color: runTimeTextColor }}>
-            {showInfo.avgEpisodeRunTime} Min
-          </Text>
+          <Pressable
+            onPress={() =>
+              router.push({
+                pathname: `/seasonslistmodal`,
+                params: { showid: parseInt(showId) },
+              })
+            }>
+            <Text className="font-semibold" style={{ color: runTimeTextColor }}>
+              {showInfo.avgEpisodeRunTime} Min
+            </Text>
+          </Pressable>
         </View>
       )}
 
