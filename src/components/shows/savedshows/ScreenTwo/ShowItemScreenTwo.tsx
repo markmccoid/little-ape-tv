@@ -10,11 +10,13 @@ import Animated, {
   useAnimatedStyle,
 } from 'react-native-reanimated';
 // import { SavedShow, useSavedShow } from '~/store/functions-shows';
-import { useSavedShow } from '~/store/store-shows';
+import { savedShows$, useSavedShow } from '~/store/store-shows';
 import dayjs from 'dayjs';
 import { useSavedSeasonSummary } from '~/store/functions-showAttributes';
 import { useRouter } from 'expo-router';
 import ScreenTwoSeasonData from './ScreenTwoSeasonData';
+import ScreenTwoTagCloud from './ScreenTwoTagCloud';
+import { use$ } from '@legendapp/state/react';
 const missingPosterURI = require('../../../../../assets/missingPoster.png');
 
 type Props = {
@@ -28,6 +30,7 @@ const ShowItemScreenTwo = ({ showId, imageWidth, imageHeight, index, scrollX }: 
   const { favorite, posterURL, name, dateAddedEpoch } = useSavedShow(showId);
   // console.log('secondScreen NextDLEpisodeDate', nextDLEpisodeDate);
   const router = useRouter();
+
   const animStyle = useAnimatedStyle(() => {
     return {
       transform: [
@@ -73,11 +76,14 @@ const ShowItemScreenTwo = ({ showId, imageWidth, imageHeight, index, scrollX }: 
             numberOfLines={2}>
             {name}
           </Text>
-          <ScrollView>
+          <ScrollView className="mb-[50]">
             <View className="flex-row gap-1">
               <Text>Date Added:</Text>
               <Text className="">{dayjs.unix(dateAddedEpoch).format('MM/DD/YYYY')}</Text>
             </View>
+
+            <ScreenTwoTagCloud showId={showId} />
+
             <ScreenTwoSeasonData showId={showId} />
             <View className="flex-row">
               <Pressable

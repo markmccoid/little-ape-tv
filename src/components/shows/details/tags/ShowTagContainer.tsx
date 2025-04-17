@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useReducer, useRef, useState } from 'react';
-import { savedShows$, tags$ } from '~/store/store-shows';
+import { savedShows$, tags$, useShowTags } from '~/store/store-shows';
 import { use$ } from '@legendapp/state/react';
 import TagCloudEnhanced, { TagItem } from '~/components/common/TagCloud/TagCloudEnhanced';
 import Animated, {
@@ -26,22 +26,11 @@ const ShowTagContainer = ({ showId }: Props) => {
   if (!showId) return;
   const isFavorited = use$(savedShows$.shows[showId].favorite);
   const { colors } = useCustomTheme();
-  const matchedTags = use$(tags$.matchTagIds(savedShows$.shows[showId].userTags.get()));
+  const { matchedTags, toggleTagState } = useShowTags(showId);
   const [showTags, toggleShowTags] = useReducer((el) => !el, false);
   const [containerHeight, setContainerHeight] = useState(0);
   const [isMeasured, setIsMeasured] = useState(false);
   const toHeight = useSharedValue(0);
-
-  //~ Toggle state (add/remove tags)
-  const toggleTagState = (tagId: string) => {
-    const foundTag = matchedTags.find((el) => el.id === tagId);
-    if (!foundTag) return;
-    if (foundTag.state === 'include') {
-      savedShows$.updateShowTags(showId, tagId, 'remove');
-    } else {
-      savedShows$.updateShowTags(showId, tagId, 'add');
-    }
-  };
 
   const onLayout = (event: LayoutChangeEvent) => {
     if (isMeasured) return;

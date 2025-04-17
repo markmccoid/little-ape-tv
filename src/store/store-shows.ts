@@ -1,15 +1,12 @@
 import { authManager } from '~/authentication/AuthProvider';
-import { observable, Observable, syncState } from '@legendapp/state';
+import { observable } from '@legendapp/state';
 import { createShowFunctions } from './functions-shows';
-import type { ShowFunctions, SavedShow, SavedShows } from './functions-shows';
+import type { ShowFunctions, SavedShows } from './functions-shows';
 import type { ShowAttributes } from './functions-showAttributes';
 import { type TagFunctions, type Tag, createTagFunctions } from './functions-tags';
 import { synced } from '@legendapp/state/sync';
 import { ObservablePersistMMKV } from '@legendapp/state/persist-plugins/mmkv';
-import { useEffect, useState } from 'react';
 import { use$ } from '@legendapp/state/react';
-import { Alert } from 'react-native';
-import dayjs from 'dayjs';
 
 //~ -----------------------------------------------
 //~ Observer Creation
@@ -87,6 +84,22 @@ export const useSavedShow = (showId: string) => {
   return use$(savedShows$.shows?.[showId]) ?? {};
 };
 
+export const useShowTags = (showId: string) => {
+  const matchedTags = use$(tags$.matchTagIds(savedShows$.shows[showId].userTags.get()));
+
+  //~ Toggle state (add/remove tags)
+  const toggleTagState = (tagId: string) => {
+    const foundTag = matchedTags.find((el) => el.id === tagId);
+    if (!foundTag) return;
+    if (foundTag.state === 'include') {
+      savedShows$.updateShowTags(showId, tagId, 'remove');
+    } else {
+      savedShows$.updateShowTags(showId, tagId, 'add');
+    }
+  };
+
+  return { matchedTags, toggleTagState };
+};
 //-- ===================
 //-- Handle Auth Change
 //-- ===================
