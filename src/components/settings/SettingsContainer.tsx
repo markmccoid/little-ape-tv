@@ -12,6 +12,7 @@ import { use$ } from '@legendapp/state/react';
 import SettingsItem from './SettingsItem';
 import SettingsGroup from './SettingsGroup';
 import { FilterIcon } from '../common/Icons';
+import { ThemeOption } from './ThemeSelector';
 
 const SettingsContainer = () => {
   const router = useRouter();
@@ -19,6 +20,7 @@ const SettingsContainer = () => {
   const showImages = use$(settings$.showImageInEpisode);
   const showNextDownloadEpisode = use$(settings$.downloadOptions.showNextDownloadInfo);
   const excludeGenresFromPerson = use$(settings$.excludeGenresFromPerson);
+  const defaultTheme = use$(settings$.defaultTheme);
 
   return (
     <SafeAreaView className="flex-1">
@@ -37,6 +39,23 @@ const SettingsContainer = () => {
           {/* <SettingsGroup.SwitchItem /> */}
         </SettingsGroup>
 
+        {/* Set Default Appearance */}
+        <SettingsGroup style={{ marginTop: 8 }}>
+          <SettingsGroup.ThemeSelect
+            title="Default Appearance"
+            selectCallback={(theme?: ThemeOption) => settings$.defaultTheme.set(theme || 'auto')}
+            selectValue={defaultTheme}
+            LeftSymbol={() =>
+              defaultTheme === 'auto' ? (
+                <SymbolView name="light.recessed" tintColor={colors.buttonDarker} size={28} />
+              ) : defaultTheme === 'light' ? (
+                <SymbolView name="light.max" tintColor={colors.buttonDarker} size={28} />
+              ) : (
+                <SymbolView name="light.min" tintColor={colors.buttonDarker} size={28} />
+              )
+            }
+          />
+        </SettingsGroup>
         {/* Show Images on Episode List */}
         <SettingsGroup style={{ marginTop: 8 }}>
           <SettingsGroup.SwitchItem

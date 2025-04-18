@@ -3,6 +3,7 @@ import React from 'react';
 import { useRouter } from 'expo-router';
 import { useCustomTheme } from '~/utils/customColorTheme';
 import { SymbolView } from 'expo-symbols';
+import ThemeSelector, { ThemeOption } from './ThemeSelector';
 
 type RouteProps = {
   title: string;
@@ -54,6 +55,7 @@ export const SettingsItemRoute = ({
     </Pressable>
   );
 };
+
 export const SettingsItemSwitch = ({
   title,
   switchCallback,
@@ -88,6 +90,45 @@ export const SettingsItemSwitch = ({
         onValueChange={(val) => switchCallback(val)}
         value={switchValue}
       />
+    </View>
+  );
+};
+
+// Multi Select
+type CustomProps = {
+  title: string;
+  selectCallback: (val?: ThemeOption) => void;
+  selectValue: ThemeOption;
+  LeftSymbol?: () => JSX.Element;
+  childStyle?: ViewStyle;
+};
+export const SettingsItemThemeSelect = ({
+  title,
+  selectCallback,
+  selectValue,
+  LeftSymbol,
+  childStyle = {},
+}: CustomProps) => {
+  const { colors } = useCustomTheme();
+
+  return (
+    <View
+      className="flex-row items-center justify-between rounded-lg border-gray-300 p-1 pl-2 active:bg-card"
+      style={{
+        backgroundColor: `${colors.card}`,
+        borderWidth: StyleSheet.hairlineWidth,
+        borderRadius: 10,
+        // borderTopLeftRadius: isLast ? 0 : 10,
+        // borderTopRightRadius: isLast ? 0 : 10,
+        // borderBottomLeftRadius: isFirst ? 0 : 10,
+        // borderBottomRightRadius: isFirst ? 0 : 10,
+        ...childStyle,
+      }}>
+      <View className="flex-row items-center">
+        {LeftSymbol ? <LeftSymbol /> : null}
+        <Text className="p-1 text-lg text-text">{title}</Text>
+      </View>
+      <ThemeSelector selectedValue={selectValue} onValueChange={selectCallback} />
     </View>
   );
 };

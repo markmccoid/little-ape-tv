@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, Pressable, ScrollView } from 'react-native';
+import { View, Text, Pressable, StyleSheet, ScrollView } from 'react-native';
 import { Image } from 'expo-image';
 import Animated, {
   Extrapolation,
@@ -16,7 +16,7 @@ import { useSavedSeasonSummary } from '~/store/functions-showAttributes';
 import { useRouter } from 'expo-router';
 import ScreenTwoSeasonData from './ScreenTwoSeasonData';
 import ScreenTwoTagCloud from './ScreenTwoTagCloud';
-import { use$ } from '@legendapp/state/react';
+
 const missingPosterURI = require('../../../../../assets/missingPoster.png');
 
 type Props = {
@@ -28,6 +28,7 @@ type Props = {
 };
 const ShowItemScreenTwo = ({ showId, imageWidth, imageHeight, index, scrollX }: Props) => {
   const { favorite, posterURL, name, dateAddedEpoch } = useSavedShow(showId);
+
   // console.log('secondScreen NextDLEpisodeDate', nextDLEpisodeDate);
   const router = useRouter();
 
@@ -61,7 +62,7 @@ const ShowItemScreenTwo = ({ showId, imageWidth, imageHeight, index, scrollX }: 
           style={{
             width: imageWidth,
             height: imageHeight,
-            opacity: 0.1,
+            opacity: 0.3,
             position: 'absolute',
             top: 0,
             left: 0,
@@ -71,15 +72,15 @@ const ShowItemScreenTwo = ({ showId, imageWidth, imageHeight, index, scrollX }: 
         {/* Inner View */}
         <View className="mx-1">
           <Text
-            className="text-center text-lg font-semibold"
+            className="text-center text-lg font-semibold text-text"
             lineBreakMode="tail"
             numberOfLines={2}>
             {name}
           </Text>
           <ScrollView className="mb-[50]">
             <View className="flex-row gap-1">
-              <Text>Date Added:</Text>
-              <Text className="">{dayjs.unix(dateAddedEpoch).format('MM/DD/YYYY')}</Text>
+              <Text className="text-text">Date Added:</Text>
+              <Text className="text-text">{dayjs.unix(dateAddedEpoch).format('MM/DD/YYYY')}</Text>
             </View>
 
             <ScreenTwoTagCloud showId={showId} />

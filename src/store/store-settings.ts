@@ -3,6 +3,7 @@ import { observable } from '@legendapp/state';
 import { ObservablePersistMMKV } from '@legendapp/state/persist-plugins/mmkv';
 import { authManager } from '~/authentication/AuthProvider';
 import { synced } from '@legendapp/state/sync';
+import { ThemeOption } from '~/components/settings/ThemeSelector';
 //**
 
 type DownloadOptions = {
@@ -14,6 +15,7 @@ type Settings = {
   downloadOptions: DownloadOptions;
   // List of genres to exclude from a persons list of shows the were cast members in
   excludeGenresFromPerson: string[];
+  defaultTheme: ThemeOption;
 };
 //~ - - - - - - - - - - - - - - - - - -
 //~ settings$ Observable
@@ -25,6 +27,7 @@ const initialState = {
   // When on, these genres will be excluded when showing a persons shows they were in
   // PersonContainer.tsx
   excludeGenresFromPerson: [],
+  defaultTheme: 'auto',
 };
 export const settings$ = observable<Settings>(
   synced({

@@ -16,6 +16,9 @@ import { useFonts } from '@expo-google-fonts/asul';
 import { setupEvents } from '~/utils/events';
 import { queryClient } from '~/utils/queryClient';
 import { useSyncQueries } from 'tanstack-query-dev-tools-expo-plugin';
+import { PortalProvider } from '@gorhom/portal';
+import { use$ } from '@legendapp/state/react';
+import { settings$ } from '~/store/store-settings';
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
@@ -85,6 +88,13 @@ const InitialLayout = () => {
 export default function RootLayout() {
   // const { colorScheme } = useColorScheme();
   const colorScheme = useColorScheme();
+  const defaultTheme = use$(settings$.defaultTheme);
+
+  const finalTheme = defaultTheme === 'auto' ? colorScheme : defaultTheme;
+
+  useEffect(() => {
+    Appearance.setColorScheme(finalTheme);
+  }, [finalTheme]);
   //! Uncomment to use the react query dev tools
   // useReactQueryDevTools(queryClient);
   // Appearance.setColorScheme('light');
@@ -92,11 +102,13 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView>
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <ThemeProvider value={colorScheme === 'dark' ? CustomDarkTheme : CustomLightTheme}>
-            <InitialLayout />
-          </ThemeProvider>
-        </AuthProvider>
+        <PortalProvider>
+          <AuthProvider>
+            <ThemeProvider value={finalTheme === 'dark' ? CustomDarkTheme : CustomLightTheme}>
+              <InitialLayout />
+            </ThemeProvider>
+          </AuthProvider>
+        </PortalProvider>
       </QueryClientProvider>
     </GestureHandlerRootView>
   );

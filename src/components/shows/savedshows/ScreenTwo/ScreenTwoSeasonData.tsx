@@ -19,12 +19,16 @@ const ScreenTwoSeasonData = ({ showId }: Props) => {
         .map((key: string) => {
           return (
             <View key={key}>
-              <Text className="text-lg font-semibold">Season {key}</Text>
-              <Text className="ml-2">Episodes - {seasonsSummary[parseInt(key)].totalEpisodes}</Text>
+              <Text className="text-lg font-semibold text-text">Season {key}</Text>
+              <Text className="ml-2 text-text">
+                Episodes - {seasonsSummary[parseInt(key)].totalEpisodes}
+              </Text>
 
-              <Text className="ml-2">Watched - {seasonsSummary[parseInt(key)].watched}</Text>
+              <Text className="ml-2 text-text">
+                Watched - {seasonsSummary[parseInt(key)].watched}
+              </Text>
               {showDownloaded && (
-                <Text className="ml-2">
+                <Text className="ml-2 text-text">
                   Downloaded - {seasonsSummary[parseInt(key)].downloaded}
                 </Text>
               )}
