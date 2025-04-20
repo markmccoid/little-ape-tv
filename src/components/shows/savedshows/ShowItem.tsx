@@ -70,16 +70,17 @@ const ShowItem = ({ show, showId }: Props) => {
     onScroll: (e) => {
       // scrollX.value = e.contentOffset.x;
       scrollX.value = e.contentOffset.x / IMG_WIDTH;
+      // console.log('Active Index', Math.round(e.contentOffset.x / IMG_WIDTH));
     },
     onEndDrag: (e) => {
       const currentOffset = e.contentOffset.x;
-      const index = Math.round(currentOffset / IMG_WIDTH);
+      const index = Math.abs(Math.round(currentOffset / IMG_WIDTH));
       runOnJS(setCurrIndex)(index);
     },
     onMomentumEnd: (e) => {
       // Calculate index after scroll has completely stopped
       const currentOffset = e.contentOffset.x;
-      const index = Math.round(currentOffset / IMG_WIDTH);
+      const index = Math.abs(Math.round(currentOffset / IMG_WIDTH));
       runOnJS(setCurrIndex)(index);
     },
   });
@@ -103,7 +104,7 @@ const ShowItem = ({ show, showId }: Props) => {
 
   const renderItem = useCallback(({ item, index }: { item: CardDataItem; index: number }) => {
     const Comp = item.component;
-
+    // console.log('INRender', currIndex);
     if (!show) return null;
     return (
       <View
@@ -135,6 +136,7 @@ const ShowItem = ({ show, showId }: Props) => {
         keyExtractor={(item) => item.id}
         horizontal={true}
         decelerationRate="fast"
+        scrollEventThrottle={16}
         snapToInterval={IMG_WIDTH + 1}
         snapToAlignment="start"
         showsHorizontalScrollIndicator={false}

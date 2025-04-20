@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, Pressable, StyleSheet, ScrollView } from 'react-native';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { View, Text, Pressable, StyleSheet, ScrollView, Modal } from 'react-native';
 import { Image } from 'expo-image';
 import Animated, {
   Extrapolation,
@@ -16,6 +16,10 @@ import { useSavedSeasonSummary } from '~/store/functions-showAttributes';
 import { useRouter } from 'expo-router';
 import ScreenTwoSeasonData from './ScreenTwoSeasonData';
 import ScreenTwoTagCloud from './ScreenTwoTagCloud';
+import TagModal from './TagRatingEditModal';
+import { Portal } from '@gorhom/portal';
+import SimpleModal from './TagRatingEditModal';
+import TagRatingEditModal from './TagRatingEditModal';
 
 const missingPosterURI = require('../../../../../assets/missingPoster.png');
 
@@ -28,7 +32,11 @@ type Props = {
 };
 const ShowItemScreenTwo = ({ showId, imageWidth, imageHeight, index, scrollX }: Props) => {
   const { favorite, posterURL, name, dateAddedEpoch } = useSavedShow(showId);
+  // const [showModal, setShowModal] = useState(false);
 
+  // const toggleModalVisible = useCallback(() => {
+  //   setShowModal((state) => !state);
+  // }, []);
   // console.log('secondScreen NextDLEpisodeDate', nextDLEpisodeDate);
   const router = useRouter();
 
@@ -80,24 +88,22 @@ const ShowItemScreenTwo = ({ showId, imageWidth, imageHeight, index, scrollX }: 
           <ScrollView className="mb-[50]">
             <View className="flex-row gap-1">
               <Text className="text-text">Date Added:</Text>
-              <Text className="text-text">{dayjs.unix(dateAddedEpoch).format('MM/DD/YYYY')}</Text>
+              <Text className="font-semibold text-text">
+                {dayjs.unix(dateAddedEpoch).format('MM/DD/YYYY')}
+              </Text>
             </View>
 
-            <ScreenTwoTagCloud showId={showId} />
+            {/* <ScreenTwoTagCloud showId={showId} /> */}
 
+            {/* -------------------------------------- */}
+            {/* MODAL For TAG and USER RATING Editing */}
+            {/* -------------------------------------- */}
+            <TagRatingEditModal showId={showId} />
+            {/* <Portal>
+            {/* -------------------------------------- */}
+            {/* SEASONS/EPISODES Data                  */}
+            {/* -------------------------------------- */}
             <ScreenTwoSeasonData showId={showId} />
-            <View className="flex-row">
-              <Pressable
-                onPress={() =>
-                  router.push({
-                    pathname: `/seasonslistmodal`,
-                    params: { showid: parseInt(showId) },
-                  })
-                }
-                className="rounded-md border-hairline bg-primary px-2 py-1">
-                <Text className="color-primarytext">See Seasons</Text>
-              </Pressable>
-            </View>
           </ScrollView>
         </View>
       </View>

@@ -1,12 +1,12 @@
 import { View, StyleSheet } from 'react-native';
 import React from 'react';
 
-const MDBackground = () => {
+const MDBackground = ({ opacity = 0.5 }: { opacity?: number }) => {
   return (
     <View
       style={{
         backgroundColor: 'white',
-        opacity: 0.5,
+        opacity: opacity,
         borderRadius: 10,
         shadowColor: '#000000',
         shadowOffset: {

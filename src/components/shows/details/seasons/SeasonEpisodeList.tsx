@@ -37,7 +37,6 @@ const SeasonEpisodeList: React.FC<Props> = ({ seasons, showData }) => {
   const sectionListRef = useRef<SectionList>(null);
   const seasonScrollRef = useRef<ScrollView>(null);
   const seasonSummary = useSavedSeasonSummary(showid as string);
-  console.log('SEASON SUMMARY', seasonSummary);
 
   //# this legend state hook will fire when a change is made to the showAttributes
   //# which will in turn update the seasonSummary data on the showAttributes[showId] observable

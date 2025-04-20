@@ -16,7 +16,7 @@ import { useFonts } from '@expo-google-fonts/asul';
 import { setupEvents } from '~/utils/events';
 import { queryClient } from '~/utils/queryClient';
 import { useSyncQueries } from 'tanstack-query-dev-tools-expo-plugin';
-import { PortalProvider } from '@gorhom/portal';
+
 import { use$ } from '@legendapp/state/react';
 import { settings$ } from '~/store/store-settings';
 
@@ -102,13 +102,11 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView>
       <QueryClientProvider client={queryClient}>
-        <PortalProvider>
-          <AuthProvider>
-            <ThemeProvider value={finalTheme === 'dark' ? CustomDarkTheme : CustomLightTheme}>
-              <InitialLayout />
-            </ThemeProvider>
-          </AuthProvider>
-        </PortalProvider>
+        <AuthProvider>
+          <ThemeProvider value={finalTheme === 'dark' ? CustomDarkTheme : CustomLightTheme}>
+            <InitialLayout />
+          </ThemeProvider>
+        </AuthProvider>
       </QueryClientProvider>
     </GestureHandlerRootView>
   );

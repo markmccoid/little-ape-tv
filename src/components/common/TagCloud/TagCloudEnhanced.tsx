@@ -38,6 +38,7 @@ export const TagItem = ({
   type = 'threestate',
 }: Props) => {
   const { colors } = useCustomTheme();
+
   const [localState, setLocalState] = useState(state);
   const [isProcessing, setIsProcessing] = useState(false);
   const bgColor =
