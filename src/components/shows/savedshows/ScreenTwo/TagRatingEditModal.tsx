@@ -6,6 +6,8 @@ import { savedShows$, tags$ } from '~/store/store-shows';
 import { SymbolView } from 'expo-symbols';
 import ShadowBackground from '~/components/common/ShadowBackground';
 import { use$ } from '@legendapp/state/react';
+import { MenuItem, UserRatingDetailScreen } from '../../details/userRating/UserRatingDetailScreen';
+import { Ruler } from '../../details/userRating/UserRatingRuler';
 
 interface TagRatingEditModalProps {
   showId: string;
@@ -30,8 +32,9 @@ const TagRatingEditModal = ({ showId }: TagRatingEditModalProps) => {
     // Save Tags and User Rating before hiding modal.
     console.log('Saving Tags and User Rating', pendingTags);
     savedShows$.shows[showId].userTags.set(pendingTags);
+    savedShows$.shows[showId].userRating.set(pendingUserRating);
     toggleVisible();
-  }, [pendingTags]);
+  }, [pendingTags, pendingUserRating]);
 
   return (
     <View className="my-2">
@@ -39,12 +42,13 @@ const TagRatingEditModal = ({ showId }: TagRatingEditModalProps) => {
         <ShadowBackground opacity={0.7} />
         {pendingTags.length > 0 ? (
           <View>
+            {/* View of Selected Tags */}
             <View className="flex-row flex-wrap gap-[3]">
               {tags$
                 .matchTagIds(pendingTags)
                 .filter((tag) => tag.state === 'include')
                 .map((tag) => (
-                  <View className="rounded-sm border-hairline bg-green-300 p-[2]">
+                  <View className="rounded-sm border-hairline bg-green-300 p-[2]" key={tag.id}>
                     <Text key={tag.id} className="text-xs text-black">
                       {tag.name}
                     </Text>
@@ -72,8 +76,41 @@ const TagRatingEditModal = ({ showId }: TagRatingEditModalProps) => {
               backgroundColor: 'rgba(0, 0, 0, 0.5)',
             }}
           />
-          <View className="h-1/2 w-3/4 rounded-lg border-hairline border-primary bg-white p-2">
-            <ScreenTwoTagCloud showId={showId} handlePendingTags={handlePendingTags} />
+          <View className="h-1/2 w-[300] rounded-lg border-hairline border-primary bg-white p-2">
+            <View className="border">
+              <ScreenTwoTagCloud showId={showId} handlePendingTags={handlePendingTags} />
+            </View>
+            <View className="border">
+              <Ruler
+                fadeColor="#eeeeee"
+                onChange={(value) => {
+                  console.log(value);
+                  setPendingUserRating(value);
+                }}
+                startingTick={pendingUserRating}
+              />
+            </View>
+            {/* <UserRatingDetailScreen
+              menu={[
+                { displayText: '1' },
+                { displayText: '2' },
+                { displayText: '3' },
+                { displayText: '4' },
+                { displayText: '5' },
+                { displayText: '6' },
+                { displayText: '7' },
+                { displayText: '8' },
+                { displayText: '9' },
+                { displayText: '10' },
+              ]} // Explicitly pass the 10-item menu
+              onPress={(selectedItem: MenuItem) =>
+                savedShows$.updateShowUserRating(showId, parseInt(selectedItem.displayText))
+              }
+              size={32} // Optional: Customize the size
+              closedOffset={4} // Optional: Customize the closed offset
+              itemSpacing={5}
+              currentRating={userRating || 0}
+            /> */}
             <View className="flex-row justify-end">
               <Pressable
                 onPress={() => {
