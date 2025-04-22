@@ -5,6 +5,7 @@ import Animated, {
   clamp,
   Extrapolation,
   interpolate,
+  interpolateColor,
   runOnJS,
   SharedValue,
   useAnimatedProps,
@@ -12,10 +13,10 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from 'react-native-reanimated';
-import UserRatingRulerText from './UserRatingRulerText';
+import * as Haptics from 'expo-haptics';
 import { FlatList } from 'react-native-gesture-handler';
 
-const _spacing = 30;
+const _spacing = 22;
 const _rulerHeight = 24;
 const _rulerWidth = 2;
 const _itemSize = _spacing;
@@ -27,10 +28,10 @@ type RulerLineProps = {
   scrollX: SharedValue<number>;
   onItemPress: (index: number) => void;
 };
-// This is just each line of the ruler.  Making it larger as it gets closer to the center
+// This is the rule value.  Here I'm using numbers
 function RulerLine({ index, scrollX, onItemPress }: RulerLineProps) {
   const handlePress = () => {
-    console.log('INDEX', index, scrollX.value);
+    // console.log('INDEX', index, scrollX.value);
     // Call the callback passed from the parent, providing the index
     if (onItemPress) {
       onItemPress(index);
@@ -44,6 +45,12 @@ function RulerLine({ index, scrollX, onItemPress }: RulerLineProps) {
       //   [index - 1, index, index + 1],
       //   [_rulerHeight - 1, _rulerHeight, _rulerHeight - 1]
       // ),
+      opacity: interpolate(
+        scrollX.value,
+        [index - 1, index, index + 1],
+        [1, 0, 1],
+        Extrapolation.CLAMP
+      ),
       transform: [
         {
           scale: interpolate(
@@ -53,7 +60,25 @@ function RulerLine({ index, scrollX, onItemPress }: RulerLineProps) {
             Extrapolation.CLAMP
           ),
         },
+        {
+          translateY: interpolate(
+            scrollX.value,
+            [index - 2, index - 1, index, index + 1, index + 2],
+            [1, -1.5, -15, -1.5, 1],
+            Extrapolation.CLAMP
+          ),
+        },
       ],
+    };
+  });
+  const styleColor = useAnimatedStyle(() => {
+    return {
+      backgroundColor: interpolateColor(
+        scrollX.value,
+        [index - 1, index, index + 1],
+        ['green', '#ffffff00', 'orange'],
+        'RGB'
+      ),
     };
   });
   return (
@@ -67,7 +92,6 @@ function RulerLine({ index, scrollX, onItemPress }: RulerLineProps) {
             width: _itemSize,
             justifyContent: 'center',
             alignItems: 'center',
-            paddingRight: 14,
           },
           stylez,
         ]}>
@@ -79,9 +103,9 @@ function RulerLine({ index, scrollX, onItemPress }: RulerLineProps) {
           opacity: 0.3,
         }}
       /> */}
-        <View style={stylez}>
-          <Text>{index}</Text>
-        </View>
+        <Animated.View style={{}}>
+          <Text style={{ fontSize: 20 }}>{index}</Text>
+        </Animated.View>
       </Animated.View>
     </Pressable>
   );
@@ -101,23 +125,27 @@ function AnimatedText({ value, style = undefined }: AnimatedTextProps) {
     };
   });
   return (
-    <AnimatedTextInput
-      underlineColorAndroid={'transparent'}
-      editable={false}
-      defaultValue={String(value.value)}
-      animatedProps={animatedPropz}
-      style={[
-        {
-          fontSize: 28,
-          fontWeight: '700',
-          textAlign: 'center',
-          letterSpacing: -2,
-          fontVariant: ['tabular-nums'],
-          width: 40,
-        },
-        style,
-      ]}
-    />
+    <View
+      className="py-1/2 border-hairline bg-yellow-200 px-2"
+      style={{ borderTopRightRadius: 10, borderTopLeftRadius: 10 }}>
+      <AnimatedTextInput
+        underlineColorAndroid={'transparent'}
+        editable={false}
+        defaultValue={String(value.value)}
+        animatedProps={animatedPropz}
+        style={[
+          {
+            fontSize: 28,
+            fontWeight: '700',
+            textAlign: 'center',
+            letterSpacing: -2,
+            fontVariant: ['tabular-nums'],
+            width: 40,
+          },
+          style,
+        ]}
+      />
+    </View>
   );
 }
 
@@ -136,7 +164,7 @@ export function Ruler({
   const data = useMemo(() => [...Array(ticks).keys()], [ticks]);
   const scrollX = useSharedValue(startingTick);
   const flatListRef = useRef<FlatList>(null);
-  const handleItemPress = useCallback((index) => {
+  const handleItemPress = useCallback((index: number) => {
     if (flatListRef.current) {
       flatListRef.current.scrollToIndex({
         index,
@@ -144,11 +172,26 @@ export function Ruler({
       });
     }
   }, []);
-
+  const lastHapticIndex = useRef(-1);
+  const checkHapticFeedback = useCallback(
+    (currentIndex: number) => {
+      // Only trigger haptic if we've moved to a new index
+      if (
+        currentIndex !== lastHapticIndex.current &&
+        currentIndex >= 0 &&
+        currentIndex < data.length
+      ) {
+        lastHapticIndex.current = currentIndex;
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      }
+    },
+    [data.length]
+  );
   const onScroll = useAnimatedScrollHandler({
     onScroll: (e) => {
       scrollX.value = clamp(e.contentOffset.x / _itemSize, 0, data.length - 1);
-      console.log(scrollX.value, e.contentOffset.x);
+      runOnJS(checkHapticFeedback)(Math.floor(scrollX.value));
+      // console.log(scrollX.value, e.contentOffset.x);
     },
     onMomentumEnd: (e) => {
       // set some state here, maybe call a callback
@@ -157,23 +200,19 @@ export function Ruler({
       }
     },
   });
-  const animatedPropz = useAnimatedProps(() => {
-    return {
-      text: String(Math.round(scrollX.value)),
-    };
-  });
+
   return (
     <View style={{ justifyContent: 'center' }}>
       <View
         style={{
           justifyContent: 'center',
           alignItems: 'center',
-          marginBottom: _spacing,
+          // marginBottom: _spacing,
           // width: 40,
-          borderWidth: 1,
+          // borderWidth: 1,
         }}>
+        <Text className="text-xl font-semibold">User Rating</Text>
         <AnimatedText value={scrollX} />
-        {/* <UserRatingRulerText scrollX={scrollX} /> */}
       </View>
       <View>
         <Animated.FlatList
@@ -185,12 +224,12 @@ export function Ruler({
           showsHorizontalScrollIndicator={false}
           snapToInterval={_itemSize}
           contentContainerStyle={{
-            borderWidth: 1,
+            borderWidth: StyleSheet.hairlineWidth,
             // width: _itemSize * data.length,
             flexDirection: 'row',
             justifyContent: 'center',
             //marginLeft: 50,
-            paddingHorizontal: width / 2 - _itemSize / 2,
+            paddingHorizontal: width / 2 - (_itemSize + 14) / 2,
             // alignItems: "flex-end",
           }}
           renderItem={({ index }) => {
@@ -206,7 +245,7 @@ export function Ruler({
             index,
           })}
         />
-        <View
+        {/* <View
           style={{
             alignSelf: 'center',
             position: 'absolute',
@@ -219,7 +258,7 @@ export function Ruler({
             // opacity: 0.5,
             // backgroundColor: '',
           }}
-        />
+        /> */}
         <LinearGradient
           style={[StyleSheet.absoluteFillObject]}
           colors={[fadeColor, `${fadeColor}00`, `${fadeColor}00`, fadeColor]}

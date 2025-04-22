@@ -30,7 +30,7 @@ const TagRatingEditModal = ({ showId }: TagRatingEditModalProps) => {
 
   const handleModalClose = useCallback(() => {
     // Save Tags and User Rating before hiding modal.
-    console.log('Saving Tags and User Rating', pendingTags);
+    // console.log('Saving Tags and User Rating', pendingTags);
     savedShows$.shows[showId].userTags.set(pendingTags);
     savedShows$.shows[showId].userRating.set(pendingUserRating);
     toggleVisible();
@@ -77,14 +77,13 @@ const TagRatingEditModal = ({ showId }: TagRatingEditModalProps) => {
             }}
           />
           <View className="h-1/2 w-[300] rounded-lg border-hairline border-primary bg-white p-2">
-            <View className="border">
+            <View className="mb-5 border-hairline py-2">
               <ScreenTwoTagCloud showId={showId} handlePendingTags={handlePendingTags} />
             </View>
-            <View className="border">
+            <View className="">
               <Ruler
                 fadeColor="#eeeeee"
                 onChange={(value) => {
-                  console.log(value);
                   setPendingUserRating(value);
                 }}
                 startingTick={pendingUserRating}
@@ -111,7 +110,7 @@ const TagRatingEditModal = ({ showId }: TagRatingEditModalProps) => {
               itemSpacing={5}
               currentRating={userRating || 0}
             /> */}
-            <View className="flex-row justify-end">
+            <View className="mt-5 flex-row justify-end">
               <Pressable
                 onPress={() => {
                   handleModalClose();
