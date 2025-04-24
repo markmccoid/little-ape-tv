@@ -85,6 +85,9 @@ const SeasonEpisodeList: React.FC<Props> = ({ seasons, showData }) => {
     });
   }, []);
 
+  //==============================================
+  // Scroll to the last watched season and episode
+  //==============================================
   useEffect(() => {
     if (!seasonSummary?.lastWatchedSeason) return;
 
@@ -103,14 +106,18 @@ const SeasonEpisodeList: React.FC<Props> = ({ seasons, showData }) => {
     setTimeout(() => scrollToLocation(seasonIndexToScroll, episodeIndex), 100);
   }, [seasonSummary?.lastWatchedSeason, seasons.length, scrollToLocation]);
 
-  useEffect(() => {
-    if (seasonScrollRef.current && seasonSummary?.lastWatchedSeason) {
-      const xOffset = (seasonSummary.lastWatchedSeason - 1) * 105;
-      if (xOffset >= 0) {
-        setTimeout(() => seasonScrollRef.current?.scrollTo({ x: xOffset, animated: false }), 0);
-      }
-    }
-  }, [seasonSummary?.lastWatchedSeason]);
+  //! SHOULD BE ABLE TO DELETE after testing - 04/22/2025
+  // useEffect(() => {
+  //   console.log('Scroll 2');
+  //   if (seasonScrollRef.current && seasonSummary?.lastWatchedSeason) {
+  //     const xOffset = (seasonSummary.lastWatchedSeason - 1) * 105;
+  //     if (xOffset >= 0) {
+  //       setTimeout(() => seasonScrollRef.current?.scrollTo({ x: xOffset, animated: false }), 0);
+  //     }
+  //   }
+  // }, [seasonSummary?.lastWatchedSeason]);
+  //!
+
   //==============================================
   // Render section header (season name)
   //==============================================

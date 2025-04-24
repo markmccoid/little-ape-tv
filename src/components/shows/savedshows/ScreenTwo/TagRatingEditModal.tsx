@@ -77,17 +77,20 @@ const TagRatingEditModal = ({ showId }: TagRatingEditModalProps) => {
             }}
           />
           <View className="h-1/2 w-[300] rounded-lg border-hairline border-primary bg-white p-2">
-            <View className="mb-5 border-hairline py-2">
+            <View className="mb-5 rounded-lg border-hairline py-2">
               <ScreenTwoTagCloud showId={showId} handlePendingTags={handlePendingTags} />
             </View>
-            <View className="">
-              <Ruler
-                fadeColor="#eeeeee"
-                onChange={(value) => {
-                  setPendingUserRating(value);
-                }}
-                startingTick={pendingUserRating}
-              />
+            <View className="flex-col items-center justify-center rounded-lg border-hairline border-primary py-2">
+              <Text className="text-xl font-semibold">User Rating</Text>
+              <View className="flex-row ">
+                <Ruler
+                  fadeColor="#eeeeee"
+                  onChange={(value) => {
+                    setPendingUserRating(value);
+                  }}
+                  startingTick={pendingUserRating}
+                />
+              </View>
             </View>
             {/* <UserRatingDetailScreen
               menu={[

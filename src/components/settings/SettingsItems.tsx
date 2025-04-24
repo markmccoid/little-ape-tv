@@ -1,4 +1,4 @@
-import { View, Text, ViewStyle, Pressable, StyleSheet, Switch } from 'react-native';
+import { View, Text, ViewStyle, Pressable, StyleSheet, Switch, TextInput } from 'react-native';
 import React from 'react';
 import { useRouter } from 'expo-router';
 import { useCustomTheme } from '~/utils/customColorTheme';
@@ -18,6 +18,14 @@ type SwitchProps = {
   title: string;
   switchCallback: (val?: boolean) => void;
   switchValue: boolean;
+  LeftSymbol?: () => JSX.Element;
+  childStyle?: ViewStyle;
+};
+
+type SelectProps = {
+  title: string;
+  selectCallback: (val: number) => void;
+  selectValue: number;
   LeftSymbol?: () => JSX.Element;
   childStyle?: ViewStyle;
 };
@@ -89,6 +97,53 @@ export const SettingsItemSwitch = ({
         ios_backgroundColor="#767577"
         onValueChange={(val) => switchCallback(val)}
         value={switchValue}
+      />
+    </View>
+  );
+};
+
+export const SettingsNumberSelect = ({
+  title,
+  selectCallback,
+  selectValue,
+  LeftSymbol,
+  childStyle = {},
+}: SelectProps) => {
+  const { colors } = useCustomTheme();
+  const [localValue, setLocalValue] = React.useState(selectValue.toString());
+  React.useEffect(() => {
+    setLocalValue(selectValue.toString());
+  }, [selectValue]);
+  const handleChange = (val: string) => {
+    const parsedValue = parseInt(val);
+    if (!isNaN(parsedValue)) {
+      setLocalValue(val);
+      selectCallback(parsedValue);
+    }
+  };
+  return (
+    <View
+      className="flex-row items-center justify-between rounded-lg border-gray-300 p-1 pl-2 active:bg-card"
+      style={{
+        backgroundColor: `${colors.card}`,
+        borderWidth: StyleSheet.hairlineWidth,
+        borderRadius: 10,
+        // borderTopLeftRadius: isLast ? 0 : 10,
+        // borderTopRightRadius: isLast ? 0 : 10,
+        // borderBottomLeftRadius: isFirst ? 0 : 10,
+        // borderBottomRightRadius: isFirst ? 0 : 10,
+        ...childStyle,
+      }}>
+      <View className="flex-row items-center">
+        {LeftSymbol ? <LeftSymbol /> : null}
+        <Text className="p-1 text-lg text-text">{title}</Text>
+      </View>
+      <TextInput
+        className="flex-row justify-end border-b-hairline text-right"
+        style={{ fontSize: 20, width: 50 }}
+        value={localValue}
+        onChangeText={handleChange}
+        keyboardType="numeric"
       />
     </View>
   );

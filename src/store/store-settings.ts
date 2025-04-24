@@ -16,6 +16,7 @@ type Settings = {
   // List of genres to exclude from a persons list of shows the were cast members in
   excludeGenresFromPerson: string[];
   defaultTheme: ThemeOption;
+  userRatingMax: number;
 };
 //~ - - - - - - - - - - - - - - - - - -
 //~ settings$ Observable
@@ -28,6 +29,7 @@ const initialState = {
   // PersonContainer.tsx
   excludeGenresFromPerson: [],
   defaultTheme: 'auto',
+  userRatingMax: 10,
 };
 export const settings$ = observable<Settings>(
   synced({

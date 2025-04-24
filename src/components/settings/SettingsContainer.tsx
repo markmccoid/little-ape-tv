@@ -107,6 +107,19 @@ const SettingsContainer = () => {
             }
           />
         </SettingsGroup>
+        {/* Max User Rating Number */}
+        <SettingsGroup style={{ marginTop: 8 }}>
+          <SettingsGroup.NumberItem
+            title="Max User Ratings"
+            selectCallback={(val: number) => {
+              settings$.userRatingMax.set(val);
+            }}
+            selectValue={settings$.userRatingMax.peek()}
+            LeftSymbol={() => (
+              <SymbolView name="number" tintColor={colors.buttonDarker} size={28} />
+            )}
+          />
+        </SettingsGroup>
       </ScrollView>
     </SafeAreaView>
   );

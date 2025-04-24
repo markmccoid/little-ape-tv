@@ -32,6 +32,8 @@ import CastContainer from './cast/CastContainer';
 import WatchProviderContainer from './watchProviders/WatchProviderContainer';
 import DetailRecommendations from './DetailRecommendations';
 import DetailVideos from './watchProviders/DetailVideos';
+import { Ruler } from './userRating/UserRatingRuler';
+import UserRatingDetailScreenRuler from './userRating/UserRatingDetailScreenRuler';
 // const WatchProviderContainer = lazy(() => import('./watchProviders/WatchProviderContainer'));
 // const DetailRecommendations = lazy(() => import('./DetailRecommendations'));
 // const DetailVideos = lazy(() => import('./watchProviders/DetailVideos'));
@@ -47,6 +49,7 @@ const ShowDetailContainer = ({ showId }: Props) => {
   const router = useRouter();
   const navigation = useNavigation();
   const { bottom } = useSafeAreaInsets();
+  const [showSetRating, setShowSetRating] = useState(false);
   // const headerHeight = useHeaderHeight();
   const { data, isLoading, status, isPlaceholderData, isError } = useShowDetails(parseInt(showId));
 
@@ -143,44 +146,9 @@ const ShowDetailContainer = ({ showId }: Props) => {
           </View>
         </View>
         {/* RATING/Button BAR */}
-        <View className="mx-2 mt-2 flex-1 flex-row items-center rounded-lg border-hairline p-2">
+        <View className="mx-2 mt-2 flex-1 flex-row items-center rounded-lg border-hairline px-2">
           <TransparentBackground />
-          <View
-            className="flex-row"
-            style={[
-              {
-                justifyContent: 'flex-start',
-                paddingBottom: 0,
-                flex: 1,
-                alignItems: 'center',
-              },
-            ]}>
-            {data?.isStoredLocally && (
-              <UserRatingDetailScreen
-                menu={[
-                  { displayText: '1' },
-                  { displayText: '2' },
-                  { displayText: '3' },
-                  { displayText: '4' },
-                  { displayText: '5' },
-                  { displayText: '6' },
-                  { displayText: '7' },
-                  { displayText: '8' },
-                  { displayText: '9' },
-                  { displayText: '10' },
-                ]} // Explicitly pass the 10-item menu
-                onPress={(selectedItem: MenuItem) =>
-                  savedShows$.updateShowUserRating(data.tmdbId, parseInt(selectedItem.displayText))
-                }
-                size={32} // Optional: Customize the size
-                closedOffset={4} // Optional: Customize the closed offset
-                itemSpacing={5}
-                currentRating={data.userRating || 0}
-              />
-            )}
-          </View>
-          {/* Buttons */}
-          <View className="flex-row justify-end gap-2">
+          <View className="py-2">
             <Pressable
               onPress={
                 () => router.push({ pathname: `/seasonslistmodal`, params: { showid: showId } })
@@ -189,6 +157,57 @@ const ShowDetailContainer = ({ showId }: Props) => {
               className="rounded-lg border-hairline bg-buttondarker px-3 py-1">
               <Text className="font-semibold text-buttondarkertext">Seasons</Text>
             </Pressable>
+          </View>
+          <View className="justify-center] h-full flex-1 items-center">
+            {data?.isStoredLocally && (
+              <View className="absolute top-1 z-20 w-[220] flex-row items-center justify-center">
+                {/* <Pressable
+                  onPress={() => setShowSetRating(true)}
+                  // className="rounded-2xl border-hairline bg-yellow-200 px-3.5 py-1"
+                  className="py-1/2 z-10 mt-1 h-full border-hairline bg-yellow-200 px-2"
+                  style={{
+                    borderTopRightRadius: 10,
+                    borderTopLeftRadius: 10,
+                    opacity: showSetRating ? 0 : 1,
+                  }}>
+                  <Text
+                    style={[
+                      {
+                        fontSize: 28,
+                        fontWeight: '700',
+                        textAlign: 'center',
+                        letterSpacing: -2,
+                        fontVariant: ['tabular-nums'],
+                        width: 40,
+                      },
+                    ]}>
+                    {data.userRating || 0}
+                  </Text>
+                </Pressable> */}
+                {/* <Ruler
+                  fadeColor="#eeeeee"
+                  startingTick={data.userRating || 0}
+                  ticks={12}
+                  onChange={(val) => savedShows$.shows[showId].userRating.set(val)}
+                /> */}
+                <UserRatingDetailScreenRuler
+                  fadeColor="#6D975377"
+                  startingTick={data.userRating || 0}
+                  onChange={(val) => savedShows$.shows[showId].userRating.set(val)}
+                />
+              </View>
+            )}
+          </View>
+          {/* Buttons */}
+          <View className="flex-row justify-end py-2">
+            {/* <Pressable
+              onPress={
+                () => router.push({ pathname: `/seasonslistmodal`, params: { showid: showId } })
+                // router.push({ pathname: `/[showid]/seasonslist`, params: { showid: showId } })
+              }
+              className="rounded-lg border-hairline bg-buttondarker px-3 py-1">
+              <Text className="font-semibold text-buttondarkertext">Seasons</Text>
+            </Pressable> */}
             <Pressable
               onPress={() => {
                 try {

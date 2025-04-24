@@ -25,7 +25,7 @@ type Props = {
 const ShowItemBottom = ({ showId }: Props) => {
   const { colors } = useCustomTheme();
   const router = useRouter();
-  const { isStoredLocally, favorite } = useSavedShow(showId);
+  const { favorite } = useSavedShow(showId);
   const showInfo = useSavedShow(showId);
   const [runTimeBGColor, runTimeTextColor] = getBGColor(showInfo.avgEpisodeRunTime) || ['', ''];
 

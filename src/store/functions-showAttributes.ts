@@ -506,9 +506,14 @@ const calculateSeasonSummary = (
     .reduce<SeasonsSummary>(
       (final, seasonNum: number) => {
         // const seasonNum = parseInt(season);
+        // If there are NO episodes in season, do NOT include it in the Season Summary.
+
+        if (seasonEpisodeCounts[seasonNum] === 0 || !seasonEpisodeCounts[seasonNum]) return final;
+
         const numDownloaded = getSeasonTotalsByType(seasonsAttributeData[seasonNum]?.episodes, 'd');
         const numWatched = getSeasonTotalsByType(seasonsAttributeData[seasonNum]?.episodes, 'w');
-        if (numWatched === seasonEpisodeCounts[seasonNum]) {
+        // checking also for episodes > 0, should never happen because of first 'if' check in reduce.
+        if (numWatched === seasonEpisodeCounts[seasonNum] && seasonEpisodeCounts[seasonNum] > 0) {
           lastWatchedSeason = seasonNum;
         }
         grandTotalWatched = grandTotalWatched + numWatched;

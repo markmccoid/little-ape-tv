@@ -1,5 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { Dimensions, Pressable, StyleSheet, Text, TextInput, TextStyle, View } from 'react-native';
 import Animated, {
   clamp,
@@ -15,13 +15,14 @@ import Animated, {
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { FlatList } from 'react-native-gesture-handler';
+import { MotiView } from 'moti';
 import { settings$ } from '~/store/store-settings';
 
 const _spacing = 24;
 const _rulerHeight = 35;
 const _rulerWidth = 2;
 const _itemSize = _spacing;
-const width = 300;
+const width = 220;
 // const { width } = Dimensions.get('window');
 
 type RulerLineProps = {
@@ -77,9 +78,7 @@ function RulerRenderValue({ index, scrollX, onItemPress }: RulerLineProps) {
   });
 
   return (
-    <Pressable
-      onPress={handlePress}
-      style={{ width: _itemSize, alignItems: 'center' /* or other layout */ }}>
+    <Pressable onPress={handlePress} style={{ width: _itemSize, alignItems: 'center', zIndex: 10 }}>
       <Animated.View
         style={[
           {
@@ -99,7 +98,7 @@ function RulerRenderValue({ index, scrollX, onItemPress }: RulerLineProps) {
         }}
       /> */}
         <Animated.View style={{}}>
-          <Text style={{ fontSize: 20 }}>{index}</Text>
+          <Text style={{ fontSize: 20, fontWeight: 600 }}>{index}</Text>
         </Animated.View>
       </Animated.View>
     </Pressable>
@@ -162,14 +161,12 @@ function AnimatedText({
 type RulerProps = {
   onChange?: (value: number) => void;
   fadeColor?: string;
-  ticks?: number;
   startingTick?: number;
   onRatingPress?: () => void;
 };
-export function Ruler({
+export default function UserRatingDetailScreenRuler({
   onChange,
   fadeColor = '#ffffff',
-
   startingTick = 0,
   onRatingPress = () => {},
 }: RulerProps) {
@@ -177,6 +174,11 @@ export function Ruler({
   const data = useMemo(() => [...Array(ticks).keys()], [ticks]);
   const scrollX = useSharedValue(startingTick);
   const flatListRef = useRef<FlatList>(null);
+  const [displayRatingWheel, toggleDisplayRatingWheel] = useReducer(
+    (state: boolean) => !state,
+    false
+  );
+
   const handleItemPress = useCallback((index: number) => {
     if (flatListRef.current) {
       flatListRef.current.scrollToIndex({
@@ -185,6 +187,7 @@ export function Ruler({
       });
     }
   }, []);
+
   const lastHapticIndex = useRef(-1);
   const checkHapticFeedback = useCallback(
     (currentIndex: number) => {
@@ -215,18 +218,36 @@ export function Ruler({
   });
 
   return (
-    <View style={{ justifyContent: 'center' }}>
+    <View style={{}}>
       <View
         style={{
           justifyContent: 'center',
           alignItems: 'center',
+
           // marginBottom: _spacing,
           // width: 40,
         }}>
         {/* <Text className="text-xl font-semibold">User Rating</Text> */}
-        <AnimatedText value={scrollX} initialValue={startingTick} onRatingPress={onRatingPress} />
+        <AnimatedText
+          value={scrollX}
+          initialValue={startingTick}
+          onRatingPress={toggleDisplayRatingWheel}
+        />
       </View>
-      <View className="overflow-hidden rounded-xl border-hairline">
+
+      <MotiView
+        className="overflow-hidden rounded-xl border-hairline"
+        from={{
+          height: displayRatingWheel ? 10 : 1,
+          opacity: displayRatingWheel ? 0 : 1,
+        }}
+        animate={{
+          height: displayRatingWheel ? _rulerHeight : 0,
+          opacity: displayRatingWheel ? 1 : 0,
+        }}
+        // animate={{ height: _rulerHeight, opacity: 1 }}
+        exit={{ height: 0, opacity: 0 }}
+        transition={{ type: 'timing', duration: 500 }}>
         <Animated.FlatList
           data={data}
           ref={flatListRef}
@@ -236,16 +257,11 @@ export function Ruler({
           showsHorizontalScrollIndicator={false}
           snapToInterval={_itemSize}
           contentContainerStyle={{
-            // borderWidth: StyleSheet.hairlineWidth,
-            // borderRadius: 10,
-            // width: _itemSize * data.length,
             flexDirection: 'row',
             justifyContent: 'center',
-            //marginLeft: 50,
+            zIndex: 10,
             paddingHorizontal: width / 2 - _itemSize / 2,
             backgroundColor: '#6D975377',
-            // paddingHorizontal: width / 2 - (_itemSize + 14) / 2,
-            // alignItems: "flex-end",
           }}
           renderItem={({ index }) => {
             return (
@@ -270,7 +286,7 @@ export function Ruler({
           locations={[0, 0.3, 0.7, 1]}
           pointerEvents="none"
         />
-      </View>
+      </MotiView>
     </View>
   );
 }

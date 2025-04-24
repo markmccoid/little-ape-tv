@@ -1,6 +1,11 @@
 import { View, Text, ViewStyle } from 'react-native';
 import React from 'react';
-import { SettingsItemRoute, SettingsItemSwitch, SettingsItemThemeSelect } from './SettingsItems';
+import {
+  SettingsItemRoute,
+  SettingsItemSwitch,
+  SettingsItemThemeSelect,
+  SettingsNumberSelect,
+} from './SettingsItems';
 
 type SettingsGroupProps = {
   title?: string;
@@ -19,5 +24,6 @@ const SettingsGroup = ({ title, children, style }: SettingsGroupProps) => {
 
 SettingsGroup.RouteItem = SettingsItemRoute;
 SettingsGroup.SwitchItem = SettingsItemSwitch;
+SettingsGroup.NumberItem = SettingsNumberSelect;
 SettingsGroup.ThemeSelect = SettingsItemThemeSelect;
 export default SettingsGroup;

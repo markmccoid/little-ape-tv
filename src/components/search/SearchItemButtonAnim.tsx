@@ -11,17 +11,6 @@ import { SymbolView } from 'expo-symbols';
 import { savedShows$ } from '~/store/store-shows';
 import { TVSearchResultItem } from '@markmccoid/tmdb_api';
 
-const prepareAddShow = (searchitem) => ({
-  tmdbId: searchitem.id.toString(),
-  name: searchitem.name,
-  posterURL: searchitem.posterURL,
-  avgEpisodeRunTime: searchitem.avgEpisodeRunTime,
-  backdropURL: searchitem.backdropURL,
-  genres: searchitem.genres,
-  imdbId: searchitem.imdbId,
-  tvdbId: searchitem.tvdbId,
-});
-
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 type Props = {
   searchItem: TVSearchResultItem & { isStoredLocally: boolean };
@@ -31,6 +20,7 @@ const SearchItemButtonAnim = ({ searchItem }: Props) => {
   const { colors } = useCustomTheme();
   const [isStoredLocally, setIsStoredLocally] = useState(searchItem.isStoredLocally);
   const transition = useSharedValue(searchItem.isStoredLocally ? 1 : 0); // 1 for true, 0 for false
+
   useEffect(() => {
     transition.value = withTiming(isStoredLocally ? 1 : 0, { duration: 500 });
   }, [isStoredLocally]);
