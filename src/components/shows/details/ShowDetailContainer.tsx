@@ -160,7 +160,8 @@ const ShowDetailContainer = ({ showId }: Props) => {
           </View>
           <View className="justify-center] h-full flex-1 items-center">
             {data?.isStoredLocally && (
-              <View className="absolute top-1 z-20 w-[220] flex-row items-center justify-center">
+              //! CHANGE width HERE for change in rulerWidth
+              <View className="absolute top-1 z-20 w-[250] flex-row items-center justify-center">
                 {/* <Pressable
                   onPress={() => setShowSetRating(true)}
                   // className="rounded-2xl border-hairline bg-yellow-200 px-3.5 py-1"
@@ -191,8 +192,9 @@ const ShowDetailContainer = ({ showId }: Props) => {
                   onChange={(val) => savedShows$.shows[showId].userRating.set(val)}
                 /> */}
                 <UserRatingDetailScreenRuler
-                  fadeColor="#6D975377"
+                  fadeColor="#E2BE3E" // "#EEF5E9"
                   startingTick={data.userRating || 0}
+                  rulerWidth={250}
                   onChange={(val) => savedShows$.shows[showId].userRating.set(val)}
                 />
               </View>

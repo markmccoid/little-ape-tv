@@ -33,12 +33,15 @@ export type SavedShow = {
   allWatched?: boolean; // this will be set if all episodes are watched. (excluding season 0 (specials))
   avgEpisodeRunTime?: number;
   firstAirDateEpoch: number;
+  nextAirDateEpoch: number | undefined;
   imdbEpisodesURL?: string;
   genres?: string[];
   // User specific
   userRating?: number;
   favorite?: number; // Epoch date number
   userTags?: string[];
+  // If set to true, we will track this show (backgroundTasks.ts) and notify the user when new episodes are available
+  trackAndNotify?: boolean; //! 04/25 - Not yet settable by user, but is being checked in background tasks
   dateAddedEpoch?: number;
   dateLastUpdatedEpoch: number;
   // Stores the streaming data for a show (allows for search)
@@ -75,7 +78,6 @@ export const createShowFunctions = (
   return {
     updateSavedShowDetail: (showId: string, data: TVShowDetails) => {
       const existingData = savedShows$.shows[showId].peek();
-
       const updatedShow: SavedShow = {
         ...existingData,
         allWatched: savedShows$.showAttributes[showId]?.summary.asw.peek() ?? false,
@@ -85,8 +87,9 @@ export const createShowFunctions = (
         tvdbId: data.tvdbId,
         name: data.name,
         showStatus: data.status,
+        nextAirDateEpoch: data?.nextAirDate?.epoch,
         imdbEpisodesURL: data.imdbEpisodesURL,
-        firstAirDateEpoch: data.firstAirDate.epoch,
+        firstAirDateEpoch: data?.firstAirDate?.epoch,
         genres: data.genres,
         dateLastUpdatedEpoch: formatEpoch(Date.now()),
       };
@@ -108,10 +111,12 @@ export const createShowFunctions = (
         avgEpisodeRunTime: data.avgEpisodeRunTime,
         showStatus: data.status,
         imdbEpisodesURL: data.imdbEpisodesURL,
-        firstAirDateEpoch: data.firstAirDate.epoch,
+        firstAirDateEpoch: data?.firstAirDate?.epoch,
+        nextAirDateEpoch: data?.nextAirDate?.epoch,
         genres: data.genres,
         //system generated
         allWatched: false,
+        trackAndNotify: true,
         // User specific
         userRating: 0,
         dateAddedEpoch: formatEpoch(Date.now()),

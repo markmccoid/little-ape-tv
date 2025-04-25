@@ -16,7 +16,7 @@ import { useFonts } from '@expo-google-fonts/asul';
 import { setupEvents } from '~/utils/events';
 import { queryClient } from '~/utils/queryClient';
 import { useSyncQueries } from 'tanstack-query-dev-tools-expo-plugin';
-
+import { getWatchedShows, registerBackgroundFetch } from '~/utils/backgroundTasks';
 import { use$ } from '@legendapp/state/react';
 import { settings$ } from '~/store/store-settings';
 
@@ -37,10 +37,12 @@ const InitialLayout = () => {
   //~~ ------------------------------------------------------
   useEffect(() => {
     const mainInit = async () => {
+      getWatchedShows();
       const tmdbKey = process.env.EXPO_PUBLIC_TMDB_API_KEY;
       if (!tmdbKey) throw new Error('TMDB API Key not defined');
       await initTMDB(tmdbKey);
       setupEvents(queryClient);
+      await registerBackgroundFetch();
     };
 
     mainInit();

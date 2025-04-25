@@ -17,8 +17,9 @@ import * as Haptics from 'expo-haptics';
 import { FlatList } from 'react-native-gesture-handler';
 import { MotiView } from 'moti';
 import { settings$ } from '~/store/store-settings';
+import { last } from 'lodash';
 
-const _spacing = 24;
+const _spacing = 30;
 const _rulerHeight = 35;
 const _rulerWidth = 2;
 const _itemSize = _spacing;
@@ -50,6 +51,7 @@ function RulerRenderValue({ index, scrollX, onItemPress }: RulerLineProps) {
       //   [index - 1, index, index + 1],
       //   [_rulerHeight - 1, _rulerHeight, _rulerHeight - 1]
       // ),
+
       opacity: interpolate(
         scrollX.value,
         [index - 1, index, index + 1],
@@ -78,7 +80,13 @@ function RulerRenderValue({ index, scrollX, onItemPress }: RulerLineProps) {
   });
 
   return (
-    <Pressable onPress={handlePress} style={{ width: _itemSize, alignItems: 'center', zIndex: 10 }}>
+    <Pressable
+      onPress={handlePress}
+      style={{
+        width: _itemSize,
+        alignItems: 'center',
+        zIndex: 10,
+      }}>
       <Animated.View
         style={[
           {
@@ -97,9 +105,9 @@ function RulerRenderValue({ index, scrollX, onItemPress }: RulerLineProps) {
           opacity: 0.3,
         }}
       /> */}
-        <Animated.View style={{}}>
-          <Text style={{ fontSize: 20, fontWeight: 600 }}>{index}</Text>
-        </Animated.View>
+        {/* <Animated.View style={{ borderWidth: 1, width: '100%', height: '100%' }}> */}
+        <Text style={{ fontSize: 20, fontWeight: 600 }}>{index}</Text>
+        {/* </Animated.View> */}
       </Animated.View>
     </Pressable>
   );
@@ -162,12 +170,20 @@ type RulerProps = {
   onChange?: (value: number) => void;
   fadeColor?: string;
   startingTick?: number;
+  rulerWidth: number;
+  ratingWheelInitialState?: 'open' | 'closed';
+  // If true, then whatever the rating wheel will start open and stay open
+  // if true, the ratingWheelInitialState will be ignored
+  ratingWheelLocked?: boolean;
   onRatingPress?: () => void;
 };
 export default function UserRatingDetailScreenRuler({
   onChange,
   fadeColor = '#ffffff',
   startingTick = 0,
+  rulerWidth = 300,
+  ratingWheelLocked = false,
+  ratingWheelInitialState = 'closed',
   onRatingPress = () => {},
 }: RulerProps) {
   const ticks = settings$.userRatingMax.peek() + 1;
@@ -176,7 +192,7 @@ export default function UserRatingDetailScreenRuler({
   const flatListRef = useRef<FlatList>(null);
   const [displayRatingWheel, toggleDisplayRatingWheel] = useReducer(
     (state: boolean) => !state,
-    false
+    ratingWheelLocked || ratingWheelInitialState === 'open' ? true : false
   );
 
   const handleItemPress = useCallback((index: number) => {
@@ -193,6 +209,7 @@ export default function UserRatingDetailScreenRuler({
     (currentIndex: number) => {
       // Only trigger haptic if we've moved to a new index
       if (
+        lastHapticIndex.current !== -1 && // Prevent haptic feedback on the first render
         currentIndex !== lastHapticIndex.current &&
         currentIndex >= 0 &&
         currentIndex < data.length
@@ -223,20 +240,17 @@ export default function UserRatingDetailScreenRuler({
         style={{
           justifyContent: 'center',
           alignItems: 'center',
-
-          // marginBottom: _spacing,
-          // width: 40,
         }}>
-        {/* <Text className="text-xl font-semibold">User Rating</Text> */}
         <AnimatedText
           value={scrollX}
           initialValue={startingTick}
-          onRatingPress={toggleDisplayRatingWheel}
+          onRatingPress={ratingWheelLocked ? () => {} : toggleDisplayRatingWheel}
         />
       </View>
 
       <MotiView
         className="overflow-hidden rounded-xl border-hairline"
+        style={{ backgroundColor: '#FBF087' }}
         from={{
           height: displayRatingWheel ? 10 : 1,
           opacity: displayRatingWheel ? 0 : 1,
@@ -260,8 +274,8 @@ export default function UserRatingDetailScreenRuler({
             flexDirection: 'row',
             justifyContent: 'center',
             zIndex: 10,
-            paddingHorizontal: width / 2 - _itemSize / 2,
-            backgroundColor: '#6D975377',
+            paddingHorizontal: rulerWidth / 2 - _itemSize / 2,
+            backgroundColor: '#FBF087', //'#c1d4b4',
           }}
           renderItem={({ index }) => {
             return (

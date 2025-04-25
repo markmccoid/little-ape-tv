@@ -1,4 +1,12 @@
-import { View, Text, Pressable, StyleSheet, GestureResponderEvent, Modal } from 'react-native';
+import {
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  GestureResponderEvent,
+  Modal,
+  ScrollView,
+} from 'react-native';
 import React, { useCallback, useEffect, useReducer, useState } from 'react';
 import ScreenTwoTagCloud from './ScreenTwoTagCloud';
 import { observable } from '@legendapp/state';
@@ -8,6 +16,7 @@ import ShadowBackground from '~/components/common/ShadowBackground';
 import { use$ } from '@legendapp/state/react';
 import { MenuItem, UserRatingDetailScreen } from '../../details/userRating/UserRatingDetailScreen';
 import { Ruler } from '../../details/userRating/UserRatingRuler';
+import UserRatingDetailScreenRuler from '../../details/userRating/UserRatingDetailScreenRuler';
 
 interface TagRatingEditModalProps {
   showId: string;
@@ -65,6 +74,7 @@ const TagRatingEditModal = ({ showId }: TagRatingEditModalProps) => {
           </View>
         )}
       </Pressable>
+      {/* MODAL START */}
       <Modal animationType="fade" transparent={true} visible={isVisible}>
         <View className="h-full items-center justify-center ">
           <Pressable
@@ -77,51 +87,36 @@ const TagRatingEditModal = ({ showId }: TagRatingEditModalProps) => {
             }}
           />
           <View className="h-1/2 w-[300] rounded-lg border-hairline border-primary bg-white p-2">
-            <View className="mb-5 rounded-lg border-hairline py-2">
-              <ScreenTwoTagCloud showId={showId} handlePendingTags={handlePendingTags} />
-            </View>
-            <View className="flex-col items-center justify-center rounded-lg border-hairline border-primary py-2">
-              <Text className="text-xl font-semibold">User Rating</Text>
-              <View className="flex-row ">
-                <Ruler
-                  fadeColor="#eeeeee"
-                  onChange={(value) => {
-                    setPendingUserRating(value);
-                  }}
-                  startingTick={pendingUserRating}
-                />
+            <ScrollView>
+              {/* USER RATING UPDATE */}
+              <View className="flex-col items-center justify-center rounded-lg border-hairline border-primary py-2">
+                <Text className="text-xl font-semibold">User Rating</Text>
+                <View className="flex-row ">
+                  <UserRatingDetailScreenRuler
+                    fadeColor="#E2BE3E"
+                    rulerWidth={300}
+                    ratingWheelLocked={true}
+                    onChange={(value) => {
+                      setPendingUserRating(value);
+                    }}
+                    startingTick={pendingUserRating}
+                  />
+                </View>
               </View>
-            </View>
-            {/* <UserRatingDetailScreen
-              menu={[
-                { displayText: '1' },
-                { displayText: '2' },
-                { displayText: '3' },
-                { displayText: '4' },
-                { displayText: '5' },
-                { displayText: '6' },
-                { displayText: '7' },
-                { displayText: '8' },
-                { displayText: '9' },
-                { displayText: '10' },
-              ]} // Explicitly pass the 10-item menu
-              onPress={(selectedItem: MenuItem) =>
-                savedShows$.updateShowUserRating(showId, parseInt(selectedItem.displayText))
-              }
-              size={32} // Optional: Customize the size
-              closedOffset={4} // Optional: Customize the closed offset
-              itemSpacing={5}
-              currentRating={userRating || 0}
-            /> */}
-            <View className="mt-5 flex-row justify-end">
-              <Pressable
-                onPress={() => {
-                  handleModalClose();
-                }}
-                className="rounded-lg border-hairline bg-button px-2 py-1">
-                <Text className="font-semibold text-buttontext">Done</Text>
-              </Pressable>
-            </View>
+              {/* TAGS UPDATE */}
+              <View className="mb-5 rounded-lg border-hairline py-2">
+                <ScreenTwoTagCloud showId={showId} handlePendingTags={handlePendingTags} />
+              </View>
+              <View className="mt-5 flex-row justify-end">
+                <Pressable
+                  onPress={() => {
+                    handleModalClose();
+                  }}
+                  className="rounded-lg border-hairline bg-button px-2 py-1">
+                  <Text className="font-semibold text-buttontext">Done</Text>
+                </Pressable>
+              </View>
+            </ScrollView>
           </View>
         </View>
       </Modal>

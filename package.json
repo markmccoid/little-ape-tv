@@ -71,7 +71,10 @@
     "react-native-web": "~0.19.10",
     "vaul": "^1.1.2",
     "zeego": "^3.0.5",
-    "expo-linear-gradient": "~14.0.2"
+    "expo-linear-gradient": "~14.0.2",
+    "expo-background-fetch": "~13.0.6",
+    "expo-task-manager": "~12.0.6",
+    "expo-notifications": "~0.29.14"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
