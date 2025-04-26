@@ -45,10 +45,26 @@ export const getNoImageFound = () => {
 };
 
 //~  --------------------------------------
+//~  Return the Unix timestamp in seconds
+//~  This is the number of seconds since January 1, 1970
+//~  --------------------------------------
+export const getEpochwithTime = () => {
+  return Math.floor(Date.now() / 1000);
+};
+
+//~  --------------------------------------
+//~  Add days to the passed Unix timestamp in seconds
+//~  --------------------------------------
+export const addDaysToEpoch = (epoch: number, days: number) => {
+  if (!epoch) return 0;
+  return epoch + days * 24 * 60 * 60;
+};
+//~  --------------------------------------
 //~  format Epoch number to not include any time information
 //~  You can send either milliseconds or seconds, but you
 //~  will always get back seconds
 //~  --------------------------------------
+
 export const formatEpoch = (epoch: number) => {
   if (!epoch) return 0;
   if (epoch < 1e12) {

@@ -4,6 +4,7 @@ import * as Notifications from 'expo-notifications';
 import { savedShows$ } from '~/store/store-shows';
 import { tvGetShowDetails } from '@markmccoid/tmdb_api';
 import * as Linking from 'expo-linking';
+import { addDaysToEpoch, getEpochwithTime } from './utils';
 
 const BACKGROUND_FETCH_TASK = 'check-new-episodes';
 
@@ -20,20 +21,24 @@ TaskManager.defineTask(BACKGROUND_FETCH_TASK, async () => {
 
 // Register the background task
 export async function registerBackgroundFetch() {
-  await BackgroundFetch.registerTaskAsync(BACKGROUND_FETCH_TASK, {
-    minimumInterval: 360 * 60, // 6 hours in seconds
-    stopOnTerminate: false, // Continue running after app is closed (iOS)
-    startOnBoot: true, // Restart task on device reboot (Android)
-  });
+  try {
+    await BackgroundFetch.registerTaskAsync(BACKGROUND_FETCH_TASK, {
+      minimumInterval: 60, //1 hour to test then ->  360 * 60, // 6 hours in seconds
+      stopOnTerminate: false, // Continue running after app is closed (iOS)
+      startOnBoot: true, // Restart task on device reboot (Android)
+    });
+  } catch (error) {
+    console.error('Failed to register background fetch task:', error);
+  }
 }
 
 //!! Need to implement a last checked date on the show object.
 //!! Don't need to check a show more than once a day.
 
-async function checkForNewEpisodes() {
+export async function checkForNewEpisodes() {
   // Returns shows that have not yet ended and are marked to be tracked
   const watchedShows = getWatchedShows();
-  const currentDate = Date.now();
+  const currentDate = getEpochwithTime();
 
   for (const show of watchedShows) {
     // Get stored next air date from AsyncStorage
@@ -61,8 +66,8 @@ async function checkForNewEpisodes() {
         await Notifications.scheduleNotificationAsync({
           content: {
             title: `New Episode: ${show.name}`,
-            body: `S${lastEpisodeToAir.seasonNumber}E${lastEpisodeToAir.episodeNumber} is now available!\n
-            ${Linking.createURL(`/${show.tmdbId}`)}`,
+            body: `S${lastEpisodeToAir.seasonNumber}E${lastEpisodeToAir.episodeNumber} is now available!
+${Linking.createURL(`/${show.tmdbId}`)}`,
           },
           trigger: null, // Send immediately
         });
@@ -75,6 +80,8 @@ async function checkForNewEpisodes() {
 
 export function getWatchedShows() {
   const shows = savedShows$.shows.peek();
+  const currentEpoch = getEpochwithTime();
+
   /*
    SHOW Status options from tdmb api
     Returning Series
@@ -95,11 +102,20 @@ export function getWatchedShows() {
       continue;
     }
 
-    showsToCheck.push(show);
+    const lastNotifiedEpoch = !show?.dateLastNotifiedEpoch
+      ? currentEpoch
+      : show.dateLastNotifiedEpoch;
+    console.log('lastNotifiedEpoch', lastNotifiedEpoch);
+    // const nextCheckEpoch = addDaysToEpoch(show.dateLastNotifiedEpoch || 0, 5)
+    console.log('lastepock', lastNotifiedEpoch, currentEpoch, addDaysToEpoch(lastNotifiedEpoch, 5));
+    if (lastNotifiedEpoch < currentEpoch || !lastNotifiedEpoch) {
+      showsToCheck.push(show);
+      savedShows$.shows[key].dateLastNotifiedEpoch.set(addDaysToEpoch(lastNotifiedEpoch, 5));
+    }
   }
-  // console.log(
-  //   'showsToCheck',
-  //   showsToCheck.map((el) => el.name)
-  // );
+  console.log(
+    'showsToCheck',
+    showsToCheck.map((el) => el.name)
+  );
   return showsToCheck;
 }

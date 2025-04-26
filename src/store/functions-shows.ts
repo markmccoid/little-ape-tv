@@ -32,8 +32,8 @@ export type SavedShow = {
   showStatus?: string;
   allWatched?: boolean; // this will be set if all episodes are watched. (excluding season 0 (specials))
   avgEpisodeRunTime?: number;
-  firstAirDateEpoch: number;
-  nextAirDateEpoch: number | undefined;
+  firstAirDateEpoch: number; // Unix timestamp in seconds
+  nextAirDateEpoch: number | undefined; // Unix timestamp in seconds
   imdbEpisodesURL?: string;
   genres?: string[];
   // User specific
@@ -42,8 +42,9 @@ export type SavedShow = {
   userTags?: string[];
   // If set to true, we will track this show (backgroundTasks.ts) and notify the user when new episodes are available
   trackAndNotify?: boolean; //! 04/25 - Not yet settable by user, but is being checked in background tasks
-  dateAddedEpoch?: number;
-  dateLastUpdatedEpoch: number;
+  dateAddedEpoch?: number; // Unix timestamp in seconds
+  dateLastUpdatedEpoch: number; // Unix timestamp in seconds
+  dateLastNotifiedEpoch?: number; // Date of last notification Unix timestamp in seconds
   // Stores the streaming data for a show (allows for search)
   streaming?: {
     dateAddedEpoch: number;

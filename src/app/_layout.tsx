@@ -19,6 +19,8 @@ import { useSyncQueries } from 'tanstack-query-dev-tools-expo-plugin';
 import { getWatchedShows, registerBackgroundFetch } from '~/utils/backgroundTasks';
 import { use$ } from '@legendapp/state/react';
 import { settings$ } from '~/store/store-settings';
+import * as Notifications from 'expo-notifications';
+import { askNotificationPermissions } from '~/utils/permissions';
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
@@ -37,11 +39,18 @@ const InitialLayout = () => {
   //~~ ------------------------------------------------------
   useEffect(() => {
     const mainInit = async () => {
-      getWatchedShows();
       const tmdbKey = process.env.EXPO_PUBLIC_TMDB_API_KEY;
       if (!tmdbKey) throw new Error('TMDB API Key not defined');
       await initTMDB(tmdbKey);
       setupEvents(queryClient);
+      await askNotificationPermissions();
+      Notifications.setNotificationHandler({
+        handleNotification: async () => ({
+          shouldShowAlert: true,
+          shouldPlaySound: false,
+          shouldSetBadge: false,
+        }),
+      });
       await registerBackgroundFetch();
     };
 

@@ -13,6 +13,7 @@ import SettingsItem from './SettingsItem';
 import SettingsGroup from './SettingsGroup';
 import { FilterIcon } from '../common/Icons';
 import { ThemeOption } from './ThemeSelector';
+import { checkForNewEpisodes } from '~/utils/backgroundTasks';
 
 const SettingsContainer = () => {
   const router = useRouter();
@@ -120,6 +121,9 @@ const SettingsContainer = () => {
             )}
           />
         </SettingsGroup>
+        <Pressable onPress={checkForNewEpisodes} className="border bg-white p-2">
+          <Text>Background Refresh Test</Text>
+        </Pressable>
       </ScrollView>
     </SafeAreaView>
   );

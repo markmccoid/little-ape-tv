@@ -2,7 +2,7 @@
   "expo": {
     "name": "Little Ape TV",
     "slug": "little-ape-tv",
-    "version": "0.2.6",
+    "version": "0.2.7",
     "scheme": "little-ape-tv",
     "newArchEnabled": true,
     "web": {
@@ -46,7 +46,10 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.markmccoid.littleapetv"
+      "bundleIdentifier": "com.markmccoid.littleapetv",
+      "infoPlist": {
+        "UIBackgroundModes": ["fetch"]
+      }
     },
     "android": {
       "adaptiveIcon": {
