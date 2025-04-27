@@ -44,7 +44,11 @@ export type SavedShow = {
   trackAndNotify?: boolean; //! 04/25 - Not yet settable by user, but is being checked in background tasks
   dateAddedEpoch?: number; // Unix timestamp in seconds
   dateLastUpdatedEpoch: number; // Unix timestamp in seconds
+  //! Not sure if we will use this or not
   dateLastNotifiedEpoch?: number; // Date of last notification Unix timestamp in seconds
+  // This is set in the background task and determines how often we let the show through
+  // to be processed for possible notification to be sent.
+  dateNextNotifyEpoch?: number; // Date of the next notification Unix timestamp in seconds
   // Stores the streaming data for a show (allows for search)
   streaming?: {
     dateAddedEpoch: number;

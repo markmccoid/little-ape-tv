@@ -16,7 +16,7 @@ import { useFonts } from '@expo-google-fonts/asul';
 import { setupEvents } from '~/utils/events';
 import { queryClient } from '~/utils/queryClient';
 import { useSyncQueries } from 'tanstack-query-dev-tools-expo-plugin';
-import { getWatchedShows, registerBackgroundFetch } from '~/utils/backgroundTasks';
+import { selectEligibleShows, registerBackgroundFetch } from '~/utils/backgroundTasks';
 import { use$ } from '@legendapp/state/react';
 import { settings$ } from '~/store/store-settings';
 import * as Notifications from 'expo-notifications';

@@ -32,6 +32,10 @@ export default function SettingsLayout() {
         name="addeditfiltermodal"
         options={{ headerShown: true, title: 'Change Me', presentation: 'fullScreenModal' }}
       />
+      <Stack.Screen
+        name="schedulednotifications"
+        options={{ headerShown: true, presentation: 'modal' }}
+      />
     </Stack>
   );
 }

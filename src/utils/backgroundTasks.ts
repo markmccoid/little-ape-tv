@@ -1,17 +1,20 @@
+import { ShowAttributes } from './../store/functions-showAttributes';
 import * as BackgroundFetch from 'expo-background-fetch';
 import * as TaskManager from 'expo-task-manager';
 import * as Notifications from 'expo-notifications';
 import { savedShows$ } from '~/store/store-shows';
 import { tvGetShowDetails } from '@markmccoid/tmdb_api';
 import * as Linking from 'expo-linking';
-import { addDaysToEpoch, getEpochwithTime } from './utils';
+import { addDaysToEpoch, formatEpoch, getEpochwithTime } from './utils';
+import { expandSummaryNames } from '~/store/functions-showAttributes';
+import { SeasonsSummaryVerbose } from '~/store/functions-showAttributes';
 
 const BACKGROUND_FETCH_TASK = 'check-new-episodes';
 
 // Define the background task
 TaskManager.defineTask(BACKGROUND_FETCH_TASK, async () => {
   try {
-    await checkForNewEpisodes();
+    await checkForShowUpdatesAndNotify();
     return BackgroundFetch.BackgroundFetchResult.NewData;
   } catch (error) {
     console.error('Background fetch failed:', error);
@@ -35,19 +38,41 @@ export async function registerBackgroundFetch() {
 //!! Need to implement a last checked date on the show object.
 //!! Don't need to check a show more than once a day.
 
-export async function checkForNewEpisodes() {
+export async function checkForShowUpdatesAndNotify() {
   // Returns shows that have not yet ended and are marked to be tracked
-  const watchedShows = getWatchedShows();
+  const eligibleShows = selectEligibleShows();
   const currentDate = getEpochwithTime();
-
-  for (const show of watchedShows) {
+  for (const show of eligibleShows) {
     // Get stored next air date from AsyncStorage
     const nextAirDate = show.nextAirDateEpoch || 0;
+    const seasonSummary = expandSummaryNames(
+      savedShows$.showAttributes[show.tmdbId].summary.peek()
+    );
+    //~ ------------------------------------------
+    //~  Season Info so that we can figure out if a show
+    //~  that is returning is done with episodes for the season.
+    //~ ------------------------------------------
 
-    // Skip API call if next episode hasn't aired yet
-    if (nextAirDate > currentDate) {
-      continue;
+    interface SeasonInfo {
+      seasonNumber: number;
+      totalEpisodes: number;
     }
+    const seasonStuff = Object.keys(seasonSummary)
+      .filter((key) => {
+        const num = parseInt(key);
+        return !isNaN(num) && num > 0; // Only include keys that are numeric and greater than 0
+      })
+      .reduce((acc: SeasonInfo[], key) => {
+        acc.push({
+          seasonNumber: parseInt(key), // Convert string key to number
+          totalEpisodes: seasonSummary[key].totalEpisodes,
+        });
+        return acc;
+      }, [] as SeasonInfo[]);
+    // Skip API call if next episode hasn't aired yet
+    // if (nextAirDate > currentDate) {
+    //   continue;
+    // }
 
     try {
       // Fetch show details from TMDB
@@ -60,27 +85,56 @@ export async function checkForNewEpisodes() {
       // Store the new next air date
       const newNextAirDate = nextAirDate?.epoch || undefined;
       savedShows$.shows[show.tmdbId].nextAirDateEpoch.set(newNextAirDate);
+      console.log('SHOW', show.name, seasonStuff);
+
+      console.log('Last Episode to Air', lastEpisodeToAir?.airDate?.formatted);
+      console.log('nextt Episode to Air', nextEpisodeToAir?.airDate?.formatted);
+      //! Check if lastEpisodeToAir's season is over and if so
+      //! set the nextNotifyEpoch to 10 days from now.
+      //! this means we will check to see if there are new episodes every 10 days.
+      const currentSeasons = seasonStuff.find(
+        (el) => el.seasonNumber === lastEpisodeToAir?.seasonNumber
+      );
+      if (currentSeasons?.totalEpisodes === lastEpisodeToAir?.episodeNumber) {
+        savedShows$.shows[show.tmdbId].dateNextNotifyEpoch.set(addDaysToEpoch(currentDate, 10));
+      }
 
       // Check if there's a new episode and notify (example logic)
-      if (lastEpisodeToAir /* your condition for new episode */) {
+      if (nextEpisodeToAir) {
         await Notifications.scheduleNotificationAsync({
           content: {
             title: `New Episode: ${show.name}`,
-            body: `S${lastEpisodeToAir.seasonNumber}E${lastEpisodeToAir.episodeNumber} is now available!
+            body: `${nextAirDate.formatted} - S${nextEpisodeToAir.seasonNumber}E${nextEpisodeToAir.episodeNumber} is now available!
 ${Linking.createURL(`/${show.tmdbId}`)}`,
           },
           trigger: null, // Send immediately
         });
+        // Update the next notify date to 3 days from the nextAirDate
+        savedShows$.shows[show.tmdbId].dateNextNotifyEpoch.set(
+          formatEpoch(addDaysToEpoch(nextAirDate?.epoch, 3))
+        );
       }
     } catch (error) {
       console.error(`Error checking show ${show.tmdbId}:`, error);
     }
+    console.log(
+      'show',
+      show.name,
+      'nextAirDate',
+      nextAirDate,
+      savedShows$.shows[show.tmdbId].dateNextNotifyEpoch.peek()
+    );
   }
 }
 
-export function getWatchedShows() {
+//~ ------------------------------------------
+//~ Filters saved shows to identify those that are still active and have not received a recent notification,
+//~ making them eligible for update checks and potential notifications.
+//~ ------------------------------------------
+export function selectEligibleShows() {
   const shows = savedShows$.shows.peek();
-  const currentEpoch = getEpochwithTime();
+  // no time information just date (unix seconds)
+  const currentEpoch = formatEpoch(Date.now());
 
   /*
    SHOW Status options from tdmb api
@@ -102,15 +156,15 @@ export function getWatchedShows() {
       continue;
     }
 
-    const lastNotifiedEpoch = !show?.dateLastNotifiedEpoch
-      ? currentEpoch
-      : show.dateLastNotifiedEpoch;
-    console.log('lastNotifiedEpoch', lastNotifiedEpoch);
-    // const nextCheckEpoch = addDaysToEpoch(show.dateLastNotifiedEpoch || 0, 5)
-    console.log('lastepock', lastNotifiedEpoch, currentEpoch, addDaysToEpoch(lastNotifiedEpoch, 5));
-    if (lastNotifiedEpoch < currentEpoch || !lastNotifiedEpoch) {
+    // If nextNotifyEpoch is not set, set it to currentEpoch
+    // it is null, then it will be added to showsToCheck
+    const nextNotifyEpoch = !show?.dateNextNotifyEpoch ? currentEpoch : show.dateNextNotifyEpoch;
+
+    console.log('nextepoch', nextNotifyEpoch, currentEpoch);
+    // if currentEpoch is greater than nextNotifyEpoch, then add to showsToCheck
+    if (nextNotifyEpoch <= currentEpoch || !nextNotifyEpoch) {
       showsToCheck.push(show);
-      savedShows$.shows[key].dateLastNotifiedEpoch.set(addDaysToEpoch(lastNotifiedEpoch, 5));
+      // savedShows$.shows[key].dateLastNotifiedEpoch.set(addDaysToEpoch(nextNotifyEpoch, 5));
     }
   }
   console.log(

@@ -1,4 +1,4 @@
-import { View, Text, Pressable, ScrollView, Switch, SafeAreaView } from 'react-native';
+import { View, Text, Pressable, ScrollView, Switch, SafeAreaView, Alert } from 'react-native';
 import React from 'react';
 import { useRouter } from 'expo-router';
 // import { List, FormItem, Section, Link } from '~/components/expo-router-forms/ui/Form';
@@ -13,7 +13,8 @@ import SettingsItem from './SettingsItem';
 import SettingsGroup from './SettingsGroup';
 import { FilterIcon } from '../common/Icons';
 import { ThemeOption } from './ThemeSelector';
-import { checkForNewEpisodes } from '~/utils/backgroundTasks';
+import { checkForShowUpdatesAndNotify } from '~/utils/backgroundTasks';
+import { savedShows$ } from '~/store/store-shows';
 
 const SettingsContainer = () => {
   const router = useRouter();
@@ -108,6 +109,7 @@ const SettingsContainer = () => {
             }
           />
         </SettingsGroup>
+
         {/* Max User Rating Number */}
         <SettingsGroup style={{ marginTop: 8 }}>
           <SettingsGroup.NumberItem
@@ -121,9 +123,32 @@ const SettingsContainer = () => {
             )}
           />
         </SettingsGroup>
-        <Pressable onPress={checkForNewEpisodes} className="border bg-white p-2">
-          <Text>Background Refresh Test</Text>
-        </Pressable>
+
+        {/* Scheduled Notifications */}
+        <View className="mt-2" />
+        <SettingsGroup title="View ">
+          <SettingsGroup.RouteItem
+            title="Scheduled Notifications"
+            route="/(authed)/settings/schedulednotifications"
+            LeftSymbol={() => <FilterIcon color={colors.buttonDarker} size={23} />}
+          />
+        </SettingsGroup>
+        <View className="flex-row items-center justify-between px-2 py-2">
+          <Pressable onPress={checkForShowUpdatesAndNotify} className="border bg-white p-2">
+            <Text>Background Refresh Test</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              const shows = savedShows$.shows.peek();
+              Object.keys(shows).forEach((key) => {
+                savedShows$.shows[key].dateNextNotifyEpoch.set(undefined);
+              });
+              Alert.alert('NextNotifyDates Reset DONE');
+            }}
+            className="border bg-white p-2">
+            <Text>Reset NextNotifyDates</Text>
+          </Pressable>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );

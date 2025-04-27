@@ -297,7 +297,7 @@ type NextDownloadEpisode =
       status: 's' | 'a' | 'n';
     }
   | undefined;
-type SeasonsSummaryVerbose = {
+export type SeasonsSummaryVerbose = {
   totalEpisodeCount: number;
   allSeasonsWatched: boolean;
   lastWatchedSeason: number;
@@ -634,7 +634,7 @@ function getSeasonTotalsByType(
 
 // Expand the seasons summary names from their shortened to full
 // We shorten to save space when storing
-function expandSummaryNames(summaryData: SeasonsSummary): SeasonsSummaryVerbose {
+export function expandSummaryNames(summaryData: SeasonsSummary): SeasonsSummaryVerbose {
   // if (!summaryData)
   //   return { lastWatchedSeason: 0, grandTotalWatched: 0, nextDownloadEpisode: { status: 'n' } };
   let newData: SeasonsSummaryVerbose = {

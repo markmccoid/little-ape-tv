@@ -64,7 +64,6 @@ export const addDaysToEpoch = (epoch: number, days: number) => {
 //~  You can send either milliseconds or seconds, but you
 //~  will always get back seconds
 //~  --------------------------------------
-
 export const formatEpoch = (epoch: number) => {
   if (!epoch) return 0;
   if (epoch < 1e12) {
