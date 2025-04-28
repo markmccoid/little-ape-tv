@@ -3,35 +3,16 @@ import React from 'react';
 import * as Notifications from 'expo-notifications';
 import DatePicker from 'react-native-date-picker';
 import dayjs from 'dayjs';
+import { settings$ } from '~/store/store-settings';
+import { ScrollView } from 'moti';
+import SetNotificationTime from '~/components/settings/notifications/SetNotificationTime';
+import NotificationList from '~/components/settings/notifications/NotificationList';
 
 const schedulednotifications = () => {
-  const [showTimePicker, setShowTimePicker] = React.useState(false);
-  const [time, setTime] = React.useState(new Date());
-
-  console.log('Scheduled Notifications', dayjs(time).format('HH:mm:ss'));
   return (
     <View>
-      <View>
-        <Pressable
-          onPress={() => setShowTimePicker(true)}
-          className="flex-row items-center justify-between p-2">
-          <Text>Time To Send Notifications</Text>
-          <Text>{dayjs(time).format('HH:mm:ss')}</Text>
-        </Pressable>
-        <DatePicker
-          modal
-          open={showTimePicker}
-          date={time}
-          mode="time"
-          onConfirm={(time) => {
-            setShowTimePicker(false);
-            setTime(time);
-          }}
-          onCancel={() => {
-            setShowTimePicker(false);
-          }}
-        />
-      </View>
+      <SetNotificationTime />
+      <NotificationList />
     </View>
   );
 };

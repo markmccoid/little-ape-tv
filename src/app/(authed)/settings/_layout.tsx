@@ -34,7 +34,7 @@ export default function SettingsLayout() {
       />
       <Stack.Screen
         name="schedulednotifications"
-        options={{ headerShown: true, presentation: 'modal' }}
+        options={{ headerShown: true, presentation: 'modal', title: 'Scheduled Notifications' }}
       />
     </Stack>
   );

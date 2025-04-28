@@ -8,6 +8,8 @@ import * as Linking from 'expo-linking';
 import { addDaysToEpoch, formatEpoch, getEpochwithTime } from './utils';
 import { expandSummaryNames } from '~/store/functions-showAttributes';
 import { SeasonsSummaryVerbose } from '~/store/functions-showAttributes';
+import { settings$ } from '~/store/store-settings';
+import dayjs from 'dayjs';
 
 const BACKGROUND_FETCH_TASK = 'check-new-episodes';
 
@@ -85,10 +87,7 @@ export async function checkForShowUpdatesAndNotify() {
       // Store the new next air date
       const newNextAirDate = nextAirDate?.epoch || undefined;
       savedShows$.shows[show.tmdbId].nextAirDateEpoch.set(newNextAirDate);
-      console.log('SHOW', show.name, seasonStuff);
 
-      console.log('Last Episode to Air', lastEpisodeToAir?.airDate?.formatted);
-      console.log('nextt Episode to Air', nextEpisodeToAir?.airDate?.formatted);
       //! Check if lastEpisodeToAir's season is over and if so
       //! set the nextNotifyEpoch to 10 days from now.
       //! this means we will check to see if there are new episodes every 10 days.
@@ -101,29 +100,51 @@ export async function checkForShowUpdatesAndNotify() {
 
       // Check if there's a new episode and notify (example logic)
       if (nextEpisodeToAir) {
+        const url = Linking.createURL(`/${show.tmdbId}`);
+        const body = `${nextAirDate.formatted} - S${nextEpisodeToAir.seasonNumber}E${nextEpisodeToAir.episodeNumber}`;
+        //~ Get the notification time from settings
+        const { hour, minute } = settings$.notificationTime.peek();
+        // Create a dayjs object for today at the desired time
+        let notifyDate = dayjs().hour(hour).minute(minute).second(0).millisecond(0);
+        // If that time has already passed, move to the next day
+        if (notifyDate.isBefore(dayjs())) {
+          notifyDate = notifyDate.add(1, 'day');
+        }
+        // If you need a JS Date object:
+        const notifyDateJS = notifyDate.toDate();
+
+        // Schedule notification
         await Notifications.scheduleNotificationAsync({
           content: {
             title: `New Episode: ${show.name}`,
-            body: `${nextAirDate.formatted} - S${nextEpisodeToAir.seasonNumber}E${nextEpisodeToAir.episodeNumber} is now available!
-${Linking.createURL(`/${show.tmdbId}`)}`,
+            body,
+            data: { url },
           },
-          trigger: null, // Send immediately
+          trigger: {
+            type: Notifications.SchedulableTriggerInputTypes.DATE,
+            date: notifyDateJS,
+          },
         });
         // Update the next notify date to 3 days from the nextAirDate
         savedShows$.shows[show.tmdbId].dateNextNotifyEpoch.set(
-          formatEpoch(addDaysToEpoch(nextAirDate?.epoch, 3))
+          formatEpoch(addDaysToEpoch(nextAirDate?.epoch, 1))
         );
+        // Store in the notification history
+        settings$.notificationHistory.set({
+          ...settings$.notificationHistory.peek(),
+          [show.tmdbId]: {
+            Id: show.tmdbId,
+            name: show.name,
+            dateSent: dayjs(notifyDateJS).unix(),
+            text: body,
+            // FOR TESTING
+            otherInfo: `LAST-${lastAirDate.formatted} | NEXT-${nextAirDate.formatted} | TOTAL EP-${currentSeasons?.totalEpisodes} | LAST S-${lastEpisodeToAir.seasonNumber} E-${lastEpisodeToAir.episodeNumber}`,
+          },
+        });
       }
     } catch (error) {
       console.error(`Error checking show ${show.tmdbId}:`, error);
     }
-    console.log(
-      'show',
-      show.name,
-      'nextAirDate',
-      nextAirDate,
-      savedShows$.shows[show.tmdbId].dateNextNotifyEpoch.peek()
-    );
   }
 }
 

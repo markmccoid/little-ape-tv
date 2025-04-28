@@ -21,17 +21,17 @@ import { use$ } from '@legendapp/state/react';
 import { settings$ } from '~/store/store-settings';
 import * as Notifications from 'expo-notifications';
 import { askNotificationPermissions } from '~/utils/permissions';
-
-export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: 'signin',
-};
+import useNotificationObserver from '~/utils/notificationObserver';
 
 const InitialLayout = () => {
   const router = useRouter();
   const { currentUser, initialized } = useAuth();
   const segments = useSegments();
   const [fontsLoaded, error] = useFonts({ Asul_700Bold });
+  //! Notification Observer.  Added because notification links were not
+  //! getting through via expo-router defaults.
+  useNotificationObserver();
+
   useSyncQueries({ queryClient });
   //~~ ------------------------------------------------------
   //~ Initialize TMDB API
@@ -61,24 +61,24 @@ const InitialLayout = () => {
   //~ Routing Effect -- This will run on every route change
   //~ making sure we only allow authorized users to get to authed routes
   //~~ ------------------------------------------------------
-  useEffect(() => {
-    if (!initialized || !fontsLoaded) return;
-    // Check to see if the route path is in Authed group
-    const inAuthedGroup = segments[0] === '(authed)';
-    // If not logged in (no currentUser) and trying to route to an Authed route
-    // send back to signin page
-    if (!currentUser && inAuthedGroup) {
-      router.replace('/signin');
-      return;
-    }
-    // If logged in, but not routing to an Authed page
-    // Send to root authed group "/"
-    if (currentUser && !inAuthedGroup) {
-      router.replace('/(authed)/(tabs)/(home)');
-      return;
-    }
-    // All other routes will fall through to the <Slot />
-  }, [currentUser, initialized, segments, fontsLoaded]);
+  // useEffect(() => {
+  //   if (!initialized || !fontsLoaded) return;
+  //   // Check to see if the route path is in Authed group
+  //   const inAuthedGroup = segments[0] === '(authed)';
+  //   // If not logged in (no currentUser) and trying to route to an Authed route
+  //   // send back to signin page
+  //   if (!currentUser && inAuthedGroup) {
+  //     router.replace('/signin');
+  //     return;
+  //   }
+  //   // If logged in, but not routing to an Authed page
+  //   // Send to root authed group "/"
+  //   if (currentUser && !inAuthedGroup) {
+  //     router.replace('/(authed)/(tabs)/(home)');
+  //     return;
+  //   }
+  //   // All other routes will fall through to the <Slot />
+  // }, [currentUser, initialized, segments, fontsLoaded]);
 
   //~~ ------------------------------------------------------
   //~~ Hide splashscreen when loaded

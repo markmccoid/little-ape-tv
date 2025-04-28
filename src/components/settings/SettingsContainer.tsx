@@ -1,6 +1,6 @@
 import { View, Text, Pressable, ScrollView, Switch, SafeAreaView, Alert } from 'react-native';
 import React from 'react';
-import { useRouter } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 // import { List, FormItem, Section, Link } from '~/components/expo-router-forms/ui/Form';
 import * as Form from '~/components/expo-router-forms/ui/Form';
 import { IconSymbol } from '../expo-router-forms/ui/IconSymbol.ios';

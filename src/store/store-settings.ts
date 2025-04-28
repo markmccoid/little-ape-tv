@@ -1,3 +1,4 @@
+import { Notification } from './../../node_modules/expo-notifications/build/Notifications.types.d';
 // import uuid from 'react-native-uuid';
 import { observable } from '@legendapp/state';
 import { ObservablePersistMMKV } from '@legendapp/state/persist-plugins/mmkv';
@@ -9,6 +10,14 @@ import { ThemeOption } from '~/components/settings/ThemeSelector';
 type DownloadOptions = {
   showNextDownloadInfo: boolean;
 };
+
+type NotificationRecord = {
+  Id: string;
+  name: string;
+  dateSent: number; // Unix epoch time
+  text: string;
+  otherInfo?: string;
+};
 type Settings = {
   searchNumColumns: 2 | 3;
   showImageInEpisode: boolean;
@@ -17,6 +26,9 @@ type Settings = {
   excludeGenresFromPerson: string[];
   defaultTheme: ThemeOption;
   userRatingMax: number;
+  notificationTime: { hour: number; minute: number };
+  // Each show will only store the LAST notification sent to the user
+  notificationHistory: Record<string, NotificationRecord>;
 };
 //~ - - - - - - - - - - - - - - - - - -
 //~ settings$ Observable
@@ -30,6 +42,8 @@ const initialState = {
   excludeGenresFromPerson: [],
   defaultTheme: 'auto',
   userRatingMax: 10,
+  notificationTime: { hour: 16, minute: 0 },
+  notificationHistory: {},
 };
 export const settings$ = observable<Settings>(
   synced({
