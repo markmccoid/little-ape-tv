@@ -49,7 +49,7 @@ const ShowDetailContainer = ({ showId }: Props) => {
   const router = useRouter();
   const navigation = useNavigation();
   const { bottom } = useSafeAreaInsets();
-  const [showSetRating, setShowSetRating] = useState(false);
+  // const [showSetRating, setShowSetRating] = useState(false);
   // const headerHeight = useHeaderHeight();
   const { data, isLoading, status, isPlaceholderData, isError } = useShowDetails(parseInt(showId));
 

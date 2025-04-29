@@ -44,6 +44,9 @@ const NotificationList = () => {
                     {item?.dateSent && dayjs.unix(item.dateSent).format('MM-DD-YY HH:mm:ss')}
                   </Text>
                 </View>
+                <View className="flex-row items-center justify-start">
+                  {item?.otherInfo && <Text className="text-lg">{item?.otherInfo}</Text>}
+                </View>
               </View>
             );
           }}

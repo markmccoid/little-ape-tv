@@ -72,7 +72,7 @@ export async function checkForShowUpdatesAndNotify() {
             dateChecked: getEpochwithTime(),
             text: 'INACTIVE CHECKING IN 7 DAYS',
             // FOR TESTING
-            otherInfo: '',
+            otherInfo: `Status: ${show.showStatus}`,
           },
         });
       } else if (nextAirDate.epoch > addDaysToEpoch(currentDate, NOTIFICATION_INTERVAL)) {
@@ -88,7 +88,7 @@ export async function checkForShowUpdatesAndNotify() {
             dateChecked: getEpochwithTime(),
             text: 'NOT IN NOTIFICATION_INTERVAL',
             // FOR TESTING
-            otherInfo: '',
+            otherInfo: `Next Air Date-${nextAirDate.formatted}`,
           },
         });
         continue;
@@ -176,7 +176,10 @@ export function selectEligibleShows() {
    */
   const showsToCheck = [];
   for (const [key, show] of Object.entries(shows)) {
-    const showOver = show.showStatus === 'Ended' || show.showStatus === 'Canceled';
+    const showOver =
+      !show?.showStatus ||
+      show?.showStatus?.toLowerCase() === 'ended' ||
+      show?.showStatus?.toLowerCase() === 'canceled';
     // console.log('show', show.name, show.showStatus, showOver);
     // Skip shows that are not tracked or if they have ended
     //! Implement after you figure out how to update all existing shows

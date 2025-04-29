@@ -1,6 +1,7 @@
-import { View, Text, ScrollView } from 'react-native';
+import { View, Text, ScrollView, Pressable } from 'react-native';
 import React from 'react';
 import { ShowDetailsData } from '~/data/query.shows';
+import { eventDispatcher, EventName } from '~/utils/EventDispatcher';
 
 type Props = {
   data: ShowDetailsData;
@@ -8,7 +9,15 @@ type Props = {
 const DetailInfo = ({ data }: Props) => {
   return (
     <View className="h-1/2 rounded-lg border-hairline bg-[#ffffff77] p-1">
-      <LabelTextDisplay label="Run Time:" text={data?.avgEpisodeRunTime} />
+      <Pressable
+        onLongPress={() => {
+          const seasons = data.seasons?.map((el) => el.seasonNumber).filter((el) => el !== 0);
+          if (seasons) {
+            eventDispatcher.emit(EventName.UpdateAvgEpisodeRuntime, data.tmdbId, seasons);
+          }
+        }}>
+        <LabelTextDisplay label="Run Time:" text={data?.avgEpisodeRunTime} />
+      </Pressable>
       <LabelTextDisplay label="Status:" text={data?.status} />
       {/* <LabelTextDisplay label="First Episode:" text={data?.firstAirDate?.formatted} />
       {data?.lastAirDate?.formatted && (
