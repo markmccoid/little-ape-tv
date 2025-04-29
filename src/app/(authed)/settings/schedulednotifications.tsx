@@ -10,7 +10,7 @@ import NotificationList from '~/components/settings/notifications/NotificationLi
 
 const schedulednotifications = () => {
   return (
-    <View>
+    <View className="flex-1">
       <SetNotificationTime />
       <NotificationList />
     </View>

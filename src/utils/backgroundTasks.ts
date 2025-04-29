@@ -44,64 +44,69 @@ export async function checkForShowUpdatesAndNotify() {
   // Returns shows that have not yet ended and are marked to be tracked
   const eligibleShows = selectEligibleShows();
   const currentDate = getEpochwithTime();
+  const NOTIFICATION_INTERVAL = 3;
   for (const show of eligibleShows) {
-    // Get stored next air date from AsyncStorage
-    const nextAirDate = show.nextAirDateEpoch || 0;
-    const seasonSummary = expandSummaryNames(
-      savedShows$.showAttributes[show.tmdbId].summary.peek()
-    );
-    //~ ------------------------------------------
-    //~  Season Info so that we can figure out if a show
-    //~  that is returning is done with episodes for the season.
-    //~ ------------------------------------------
-
-    interface SeasonInfo {
-      seasonNumber: number;
-      totalEpisodes: number;
-    }
-    const seasonStuff = Object.keys(seasonSummary)
-      .filter((key) => {
-        const num = parseInt(key);
-        return !isNaN(num) && num > 0; // Only include keys that are numeric and greater than 0
-      })
-      .reduce((acc: SeasonInfo[], key) => {
-        acc.push({
-          seasonNumber: parseInt(key), // Convert string key to number
-          totalEpisodes: seasonSummary[key].totalEpisodes,
-        });
-        return acc;
-      }, [] as SeasonInfo[]);
-    // Skip API call if next episode hasn't aired yet
-    // if (nextAirDate > currentDate) {
-    //   continue;
-    // }
-
     try {
+      // Default the offset days to 1...we will check everyday until
+      // show has eneded or is inactive.  When inactive check every 7 days
+      savedShows$.shows[show.tmdbId].nextNotifyOffset.set(1);
       // Fetch show details from TMDB
       const response = await tvGetShowDetails(parseInt(show.tmdbId));
       // const response = await axios.get(
       //   `https://api.themoviedb.org/3/tv/${show.id}?api_key=${TMDB_API_KEY}`
       // );
       const { lastAirDate, nextAirDate, lastEpisodeToAir, nextEpisodeToAir } = response.data;
+      // Skip API call if next episode is greater than NOTIFICATION_INTERVAL days in the future
+      // OR if there is no nextAirDate
+      if (!nextAirDate?.epoch) {
+        // NO Next Air Date -> Set check for 7 days in future
+        savedShows$.shows[show.tmdbId].nextNotifyOffset.set(7);
+        settings$.notificationHistory.set({
+          ...settings$.notificationHistory.peek(),
+          [show.tmdbId]: {
+            Id: show.tmdbId,
+            name: show.name,
+            season: 0,
+            episode: 0,
+            dateSent: undefined,
+            dateChecked: getEpochwithTime(),
+            text: 'INACTIVE CHECKING IN 7 DAYS',
+            // FOR TESTING
+            otherInfo: '',
+          },
+        });
+      } else if (nextAirDate.epoch > addDaysToEpoch(currentDate, NOTIFICATION_INTERVAL)) {
+        // Store in the notification history
+        settings$.notificationHistory.set({
+          ...settings$.notificationHistory.peek(),
+          [show.tmdbId]: {
+            Id: show.tmdbId,
+            name: show.name,
+            season: 0,
+            episode: 0,
+            dateSent: undefined,
+            dateChecked: getEpochwithTime(),
+            text: 'NOT IN NOTIFICATION_INTERVAL',
+            // FOR TESTING
+            otherInfo: '',
+          },
+        });
+        continue;
+      }
 
       // Store the new next air date
-      const newNextAirDate = nextAirDate?.epoch || undefined;
-      savedShows$.shows[show.tmdbId].nextAirDateEpoch.set(newNextAirDate);
-
-      //! Check if lastEpisodeToAir's season is over and if so
-      //! set the nextNotifyEpoch to 10 days from now.
-      //! this means we will check to see if there are new episodes every 10 days.
-      const currentSeasons = seasonStuff.find(
-        (el) => el.seasonNumber === lastEpisodeToAir?.seasonNumber
-      );
-      if (currentSeasons?.totalEpisodes === lastEpisodeToAir?.episodeNumber) {
-        savedShows$.shows[show.tmdbId].dateNextNotifyEpoch.set(addDaysToEpoch(currentDate, 10));
-      }
+      savedShows$.shows[show.tmdbId].nextAirDateEpoch.set(nextAirDate?.epoch || undefined);
 
       // Check if there's a new episode and notify (example logic)
       if (nextEpisodeToAir) {
+        // FIRST check to see if we have sent a notification about this S-E and if so skip
+        const seasonEpisode = `S${nextEpisodeToAir.seasonNumber}E${nextEpisodeToAir.episodeNumber}`;
+
+        if (savedShows$.shows[show.tmdbId].lastNotifySeasonEpisode.peek() === seasonEpisode) {
+          continue;
+        }
         const url = Linking.createURL(`/${show.tmdbId}`);
-        const body = `${nextAirDate.formatted} - S${nextEpisodeToAir.seasonNumber}E${nextEpisodeToAir.episodeNumber}`;
+        const body = `${nextAirDate.formatted} - ${seasonEpisode}`;
         //~ Get the notification time from settings
         const { hour, minute } = settings$.notificationTime.peek();
         // Create a dayjs object for today at the desired time
@@ -113,6 +118,7 @@ export async function checkForShowUpdatesAndNotify() {
         // If you need a JS Date object:
         const notifyDateJS = notifyDate.toDate();
 
+        console.log('Send notification for ', show.name);
         // Schedule notification
         await Notifications.scheduleNotificationAsync({
           content: {
@@ -125,20 +131,22 @@ export async function checkForShowUpdatesAndNotify() {
             date: notifyDateJS,
           },
         });
-        // Update the next notify date to 3 days from the nextAirDate
-        savedShows$.shows[show.tmdbId].dateNextNotifyEpoch.set(
-          formatEpoch(addDaysToEpoch(nextAirDate?.epoch, 1))
-        );
+        // Update the last notify date to when we sent the notification
+        savedShows$.shows[show.tmdbId].dateLastNotifiedEpoch.set(formatEpoch(notifyDate.unix()));
+        savedShows$.shows[show.tmdbId].lastNotifySeasonEpisode.set(seasonEpisode);
         // Store in the notification history
         settings$.notificationHistory.set({
           ...settings$.notificationHistory.peek(),
           [show.tmdbId]: {
             Id: show.tmdbId,
             name: show.name,
+            season: nextEpisodeToAir.seasonNumber,
+            episode: nextEpisodeToAir.episodeNumber,
             dateSent: dayjs(notifyDateJS).unix(),
+            dateChecked: getEpochwithTime(),
             text: body,
             // FOR TESTING
-            otherInfo: `LAST-${lastAirDate.formatted} | NEXT-${nextAirDate.formatted} | TOTAL EP-${currentSeasons?.totalEpisodes} | LAST S-${lastEpisodeToAir.seasonNumber} E-${lastEpisodeToAir.episodeNumber}`,
+            otherInfo: `LAST-${lastAirDate.formatted} | NEXT-${nextAirDate.formatted} | LAST S-${lastEpisodeToAir.seasonNumber} E-${lastEpisodeToAir.episodeNumber}`,
           },
         });
       }
@@ -179,18 +187,24 @@ export function selectEligibleShows() {
 
     // If nextNotifyEpoch is not set, set it to currentEpoch
     // it is null, then it will be added to showsToCheck
-    const nextNotifyEpoch = !show?.dateNextNotifyEpoch ? currentEpoch : show.dateNextNotifyEpoch;
+    const nextNotifyOffset = !show?.nextNotifyOffset ? 1 : show.nextNotifyOffset;
+    // if null subtract one day so that show will be added to showsToCheck
+    const lastNotifyCheckEpoch = !show?.dateLastNotifyCheckedEpoch
+      ? Math.floor(currentEpoch - 86400)
+      : // this offset is used for inactive shows (no next airdate) so we don't check everyday
+        show.dateLastNotifyCheckedEpoch + nextNotifyOffset * 86400; //Offset by value stored on show
+    // UPDATE the dateLastNotifyCheckedEpoch
+    savedShows$.shows[show.tmdbId].dateLastNotifyCheckedEpoch.set(lastNotifyCheckEpoch);
 
-    console.log('nextepoch', nextNotifyEpoch, currentEpoch);
-    // if currentEpoch is greater than nextNotifyEpoch, then add to showsToCheck
-    if (nextNotifyEpoch <= currentEpoch || !nextNotifyEpoch) {
+    // if lastNotifyCheckEpoch is less than currentEpoch then add to showsToCheck
+    if (lastNotifyCheckEpoch < currentEpoch) {
       showsToCheck.push(show);
       // savedShows$.shows[key].dateLastNotifiedEpoch.set(addDaysToEpoch(nextNotifyEpoch, 5));
     }
   }
-  console.log(
-    'showsToCheck',
-    showsToCheck.map((el) => el.name)
-  );
+  // console.log(
+  //   'showsToCheck',
+  //   showsToCheck.map((el) => el.name)
+  // );
   return showsToCheck;
 }

@@ -14,7 +14,10 @@ type DownloadOptions = {
 type NotificationRecord = {
   Id: string;
   name: string;
-  dateSent: number; // Unix epoch time
+  season: number; // Season of last notification
+  episode: number; // episode of last notification
+  dateSent?: number; // Unix epoch time
+  dateChecked?: number; // check date
   text: string;
   otherInfo?: string;
 };

@@ -141,7 +141,9 @@ const SettingsContainer = () => {
             onPress={() => {
               const shows = savedShows$.shows.peek();
               Object.keys(shows).forEach((key) => {
-                savedShows$.shows[key].dateNextNotifyEpoch.set(undefined);
+                savedShows$.shows[key].lastNotifySeasonEpisode.set(undefined);
+                savedShows$.shows[key].dateLastNotifyCheckedEpoch.set(undefined);
+                savedShows$.shows[key].nextNotifyOffset.set(undefined);
               });
               Alert.alert('NextNotifyDates Reset DONE');
             }}

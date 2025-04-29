@@ -1,3 +1,4 @@
+import Constants from 'expo-constants';
 import { Stack, useRouter } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
 import { View, Text, Pressable } from 'react-native';
@@ -6,7 +7,7 @@ import { useCustomTheme } from '~/utils/customColorTheme';
 export default function SettingsLayout() {
   const { colors } = useCustomTheme();
   const router = useRouter();
-
+  const appVersion = Constants.expoConfig?.version;
   return (
     <Stack>
       <Stack.Screen
@@ -16,11 +17,18 @@ export default function SettingsLayout() {
           headerLargeTitleShadowVisible: true,
           // headerTransparent: true,
           // headerShown: true,
-          headerRight: () => (
+          headerLeft: () => (
             <Pressable onPress={() => router.back()}>
               <SymbolView name="house.fill" size={30} tintColor={colors.text} />
             </Pressable>
           ),
+          headerRight: () => {
+            return (
+              <Pressable onPress={() => router.back()}>
+                <Text className="text-lg font-semibold">v{appVersion}</Text>
+              </Pressable>
+            );
+          },
         }}
       />
       <Stack.Screen name="tagsetup" options={{ headerShown: true, title: 'Tag Setup' }} />

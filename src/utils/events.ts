@@ -20,11 +20,13 @@ export const setupEvents = (queryClient: QueryClient) => {
     // Get a list of ALL of the runtimes for the episodes in the seasons
     // and calculate the trimmed mean.  Lop off 10% of the top and bottom
     // runtimes to get a more accurate average.
-    const runTimes = seasonData.reduce((acc, season) => {
-      season.episodes.forEach((episode) => acc.push(episode.runTime));
-      return acc;
-    }, [] as number[]);
-
+    const runTimes = seasonData
+      .reduce((acc, season) => {
+        season.episodes.forEach((episode) => acc.push(episode.runTime));
+        return acc;
+      }, [] as number[])
+      .filter((el) => el);
+    console.log('RUN TIMES', runTimes);
     const avgRunTime = trimmedMean(runTimes, 0.1);
     savedShows$.shows[showId].avgEpisodeRunTime.set(avgRunTime);
     // savedShows$.shows[showId].avgEpisodeRunTime.set(Math.trunc(seasonData[0].episodeAvgRunTime));

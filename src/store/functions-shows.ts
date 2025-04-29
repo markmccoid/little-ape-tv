@@ -46,9 +46,12 @@ export type SavedShow = {
   dateLastUpdatedEpoch: number; // Unix timestamp in seconds
   //! Not sure if we will use this or not
   dateLastNotifiedEpoch?: number; // Date of last notification Unix timestamp in seconds
+  dateLastNotifyCheckedEpoch?: number; // Date of the last time we check on show for a notification
+  lastNotifySeasonEpisode?: string; // S1E1 format
   // This is set in the background task and determines how often we let the show through
   // to be processed for possible notification to be sent.
-  dateNextNotifyEpoch?: number; // Date of the next notification Unix timestamp in seconds
+  // will default to 1, but if a show is not active, the interval will be longer (7)
+  nextNotifyOffset?: number; // Number of days offset for when to recheck a show
   // Stores the streaming data for a show (allows for search)
   streaming?: {
     dateAddedEpoch: number;
