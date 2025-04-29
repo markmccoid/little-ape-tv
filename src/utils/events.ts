@@ -26,7 +26,6 @@ export const setupEvents = (queryClient: QueryClient) => {
         return acc;
       }, [] as number[])
       .filter((el) => el);
-    console.log('RUN TIMES', runTimes);
     const avgRunTime = trimmedMean(runTimes, 0.1);
     savedShows$.shows[showId].avgEpisodeRunTime.set(avgRunTime);
     // savedShows$.shows[showId].avgEpisodeRunTime.set(Math.trunc(seasonData[0].episodeAvgRunTime));
