@@ -1,3 +1,4 @@
+import { settings } from './../store/store-settings';
 import { ShowAttributes } from './../store/functions-showAttributes';
 import * as BackgroundFetch from 'expo-background-fetch';
 import * as TaskManager from 'expo-task-manager';
@@ -28,7 +29,7 @@ TaskManager.defineTask(BACKGROUND_FETCH_TASK, async () => {
 export async function registerBackgroundFetch() {
   try {
     await BackgroundFetch.registerTaskAsync(BACKGROUND_FETCH_TASK, {
-      minimumInterval: 60, //1 hour to test then ->  360 * 60, // 6 hours in seconds
+      minimumInterval: 360 * 60, // 6 hours in seconds
       stopOnTerminate: false, // Continue running after app is closed (iOS)
       startOnBoot: true, // Restart task on device reboot (Android)
     });
@@ -209,5 +210,11 @@ export function selectEligibleShows() {
   //   'showsToCheck',
   //   showsToCheck.map((el) => el.name)
   // );
+  const existingRuns = settings$.notificationBackgroundRun.peek();
+  console.log('existing runs', existingRuns);
+  settings$.notificationBackgroundRun.set([
+    ...(existingRuns || []),
+    { dateTimeEpoch: getEpochwithTime(), numShows: showsToCheck.length },
+  ]);
   return showsToCheck;
 }

@@ -29,9 +29,12 @@ type Settings = {
   excludeGenresFromPerson: string[];
   defaultTheme: ThemeOption;
   userRatingMax: number;
+  // The user can set when notifications will be sent out
   notificationTime: { hour: number; minute: number };
   // Each show will only store the LAST notification sent to the user
   notificationHistory: Record<string, NotificationRecord>;
+  // history of when the background code runs and how many show
+  notificationBackgroundRun: { dateTimeEpoch: number; numShows: number }[];
 };
 //~ - - - - - - - - - - - - - - - - - -
 //~ settings$ Observable

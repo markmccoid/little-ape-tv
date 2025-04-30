@@ -2,6 +2,10 @@ import { useEffect } from 'react';
 import * as Notifications from 'expo-notifications';
 import { router } from 'expo-router';
 
+//~ -----------------------------------------------
+//~ This is called in the top level _layout.tsx
+//~ It will monitor for when a user clicks on a notification
+//~ -----------------------------------------------
 export default function useNotificationObserver() {
   useEffect(() => {
     // let isMounted = true;

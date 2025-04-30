@@ -133,9 +133,14 @@ const SettingsContainer = () => {
             LeftSymbol={() => <FilterIcon color={colors.buttonDarker} size={23} />}
           />
         </SettingsGroup>
-        <View className="flex-row items-center justify-between px-2 py-2">
+        <View className="flex-row flex-wrap items-center justify-center gap-2 px-2 py-2">
           <Pressable onPress={checkForShowUpdatesAndNotify} className="border bg-white p-2">
             <Text>Background Refresh Test</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => settings$.notificationHistory.set({})}
+            className="border bg-white p-2">
+            <Text>Clear Notification History</Text>
           </Pressable>
           <Pressable
             onPress={() => {
@@ -144,6 +149,7 @@ const SettingsContainer = () => {
                 savedShows$.shows[key].lastNotifySeasonEpisode.set(undefined);
                 savedShows$.shows[key].dateLastNotifyCheckedEpoch.set(undefined);
                 savedShows$.shows[key].nextNotifyOffset.set(undefined);
+                settings$.notificationBackgroundRun.set([]);
               });
               Alert.alert('NextNotifyDates Reset DONE');
             }}

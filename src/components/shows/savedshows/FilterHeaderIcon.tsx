@@ -8,10 +8,17 @@ import { use$ } from '@legendapp/state/react';
 
 const FilterHeaderIcon = () => {
   const { colors } = useCustomTheme();
-  const { excludeGenres, excludeTags, filterIsFavorited, includeTags, includeGenres } = use$(
-    filterCriteria$.baseFilters
-  );
+  const {
+    filterIsAllWatched,
+    excludeGenres,
+    excludeTags,
+    filterIsFavorited,
+    includeTags,
+    includeGenres,
+  } = use$(filterCriteria$.baseFilters);
 
+  const watchedOn = filterIsAllWatched !== 'off' ? 1 : 0;
+  const favedOn = filterIsFavorited !== 'off' ? 1 : 0;
   return (
     <Link href="./filtermodal" asChild>
       <Pressable className="mr-[5]" onLongPress={filterCriteria$.actionClearAllCriteria}>
@@ -26,6 +33,11 @@ const FilterHeaderIcon = () => {
             {!!includeGenres?.length && (
               <View className="absolute right-[-5] top-[-5] h-[15] w-[15] flex-row justify-center rounded-full bg-red-600">
                 <Text className="text-xs color-white">{includeGenres?.length}</Text>
+              </View>
+            )}
+            {!!(watchedOn + favedOn) && (
+              <View className="absolute bottom-[-5] ml-[5] h-[15] w-[15] flex-row justify-center rounded-full bg-yellow-600">
+                <Text className="text-xs color-white">{watchedOn + favedOn}</Text>
               </View>
             )}
           </>
