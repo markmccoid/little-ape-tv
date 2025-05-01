@@ -20,6 +20,7 @@ import { eventDispatcher, EventName } from '~/utils/EventDispatcher';
 import { queryClient } from '~/utils/queryClient';
 import { useEffect, useState } from 'react';
 import { update } from 'lodash';
+import { settings$ } from './store-settings';
 
 //~ -----------------------------------------------
 export type SavedShow = {
@@ -156,6 +157,7 @@ export const createShowFunctions = (
     removeShow: (showId) => {
       savedShows$.shows[showId].delete();
       savedShows$.showAttributes[showId].delete();
+      settings$.notificationHistory[showId].delete();
       //Retag items in search
       reTagSearch(savedShows$);
       // Need to resync list of genres in genres$.  Can't just filter out, must recalc

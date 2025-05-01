@@ -1,20 +1,24 @@
-import { View, Text, FlatList } from 'react-native';
+import { View, Text, FlatList, Pressable } from 'react-native';
 import React from 'react';
 import { settings$ } from '~/store/store-settings';
 import dayjs from 'dayjs';
 import { use$ } from '@legendapp/state/react';
-import { sortBy } from 'lodash';
+import { orderBy, sortBy } from 'lodash';
 import { ScrollView } from 'moti';
 import { savedShows$ } from '~/store/store-shows';
+import { useRouter } from 'expo-router';
 
 const NotificationList = () => {
+  const router = useRouter();
   const notificationHistory = use$(settings$.notificationHistory);
   const shows = use$(savedShows$.shows);
-  const notificationData = sortBy(
+  const notificationData = orderBy(
     Object.keys(notificationHistory).map((key) => notificationHistory[key]),
-    ['dateSent']
+    ['dateChecked'],
+    ['desc']
   );
   const backgroundRuns = settings$.notificationBackgroundRun.peek();
+
   return (
     <View className="mt-2 flex-1">
       <View className="ml-2 flex-row items-center justify-start self-start rounded-t-lg border border-b-0 bg-card p-2">
@@ -44,11 +48,17 @@ const NotificationList = () => {
             renderItem={({ item }) => {
               return (
                 <View key={item.Id} className="flex-col border-b-hairline bg-white p-2">
-                  <View className="flex-row items-center justify-between">
+                  <Pressable
+                    onPress={() => {
+                      router.replace({ pathname: `/[showid]`, params: { showid: item.Id } });
+                    }}
+                    className="flex-row items-center justify-between">
                     <Text className="text-lg font-semibold">{item.name}</Text>
                     <Text>Offset-{shows[item.Id].nextNotifyOffset}</Text>
-                    <Text>{item.Id}</Text>
-                  </View>
+                    <Text className="rounded-lg border bg-slate-200 px-3 py-1 text-blue-800">
+                      {item.Id}
+                    </Text>
+                  </Pressable>
                   <View className="flex-row items-center justify-start">
                     <Text className="text-lg font-semibold">Message: </Text>
                     <Text className="text-lg">{item.text}</Text>

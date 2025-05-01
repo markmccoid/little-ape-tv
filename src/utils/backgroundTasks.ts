@@ -1,14 +1,10 @@
-import { settings } from './../store/store-settings';
-import { ShowAttributes } from './../store/functions-showAttributes';
 import * as BackgroundFetch from 'expo-background-fetch';
 import * as TaskManager from 'expo-task-manager';
 import * as Notifications from 'expo-notifications';
 import { savedShows$ } from '~/store/store-shows';
 import { tvGetShowDetails } from '@markmccoid/tmdb_api';
 import * as Linking from 'expo-linking';
-import { addDaysToEpoch, formatEpoch, getEpochwithTime } from './utils';
-import { expandSummaryNames } from '~/store/functions-showAttributes';
-import { SeasonsSummaryVerbose } from '~/store/functions-showAttributes';
+import { addDaysToEpoch, formatEpoch, getEpochwithTime, subtractDaysFromEpoch } from './utils';
 import { settings$ } from '~/store/store-settings';
 import dayjs from 'dayjs';
 
@@ -45,7 +41,7 @@ export async function checkForShowUpdatesAndNotify() {
   // Returns shows that have not yet ended and are marked to be tracked
   const eligibleShows = selectEligibleShows();
   const currentDate = getEpochwithTime();
-  const NOTIFICATION_INTERVAL = 3;
+  const NOTIFICATION_INTERVAL = 2;
   for (const show of eligibleShows) {
     try {
       // Default the offset days to 1...we will check everyday until
@@ -77,6 +73,9 @@ export async function checkForShowUpdatesAndNotify() {
           },
         });
       } else if (nextAirDate.epoch > addDaysToEpoch(currentDate, NOTIFICATION_INTERVAL)) {
+        // set the offset date to be on the day of the show
+        const daysUntilNextAir = dayjs.unix(nextAirDate.epoch).diff(dayjs.unix(currentDate), 'day');
+        savedShows$.shows[show.tmdbId].nextNotifyOffset.set(daysUntilNextAir);
         // Store in the notification history
         settings$.notificationHistory.set({
           ...settings$.notificationHistory.peek(),
