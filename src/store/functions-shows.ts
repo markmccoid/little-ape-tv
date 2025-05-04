@@ -55,13 +55,12 @@ export type SavedShow = {
   nextNotifyOffset?: number; // Number of days offset for when to recheck a show
   // Stores the streaming data for a show (allows for search)
   streaming?: {
-    dateAddedEpoch: number;
+    dateUpdatedEpoch: number;
     providers: number[];
   };
   isStoredLocally: boolean;
 };
 
-type AddShowParms = Omit<SavedShow, 'userRating' | 'useTags' | 'isStoredLocally'>;
 type ShowId = string;
 export type SavedShows = Record<ShowId, SavedShow>;
 

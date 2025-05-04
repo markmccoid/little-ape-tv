@@ -24,20 +24,14 @@ import { HomeIcon } from '~/components/common/Icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useHeaderHeight } from '@react-navigation/elements';
 import TransparentBackground from '~/components/common/TransparentBackground';
-import UserRatingContainer from './userRating/UserRatingContainer';
-import { UserRatingDetailScreen, MenuItem } from './userRating/UserRatingDetailScreen';
+
 import DetailInfo from './DetailInfo';
 import HiddenContainerAnimated from '~/components/common/HiddenContainer/HiddenContainerAnimated';
 import CastContainer from './cast/CastContainer';
 import WatchProviderContainer from './watchProviders/WatchProviderContainer';
 import DetailRecommendations from './DetailRecommendations';
 import DetailVideos from './watchProviders/DetailVideos';
-import { Ruler } from './userRating/UserRatingRuler';
 import UserRatingDetailScreenRuler from './userRating/UserRatingDetailScreenRuler';
-// const WatchProviderContainer = lazy(() => import('./watchProviders/WatchProviderContainer'));
-// const DetailRecommendations = lazy(() => import('./DetailRecommendations'));
-// const DetailVideos = lazy(() => import('./watchProviders/DetailVideos'));
-// const CastContainer = lazy(() => import('./cast/CastContainer'));
 const { width, height } = Dimensions.get('window');
 
 type Props = {

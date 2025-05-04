@@ -1,7 +1,7 @@
 import { ShowAttributes, updateSeasonSummary } from './../store/functions-showAttributes';
 import { QueryClient } from '@tanstack/react-query';
 import { eventDispatcher, EventName } from './EventDispatcher';
-import { fetchSeasonsData, useShowSeasonData } from '~/data/query.shows';
+import { fetchSeasonsData, getWatchProviders, useShowSeasonData } from '~/data/query.shows';
 import { savedShows$ } from '~/store/store-shows';
 
 //!! -------------------------------------------------------
@@ -55,6 +55,16 @@ export const setupEvents = (queryClient: QueryClient) => {
 eventDispatcher.on(EventName.UpdateSeasonSummary, async (showId, seasonsArray) => {
   const seasonData = await fetchSeasonsData(parseInt(showId), seasonsArray);
   updateSeasonSummary(showId, seasonData);
+});
+
+//# --------------------------------------
+//# UpdateSavedShowDetail -> Is called from when we view a show.
+//# makes ure the show details are up to date.
+//# --------------------------------------
+eventDispatcher.on(EventName.UpdateWatchProviders, async (showId) => {
+  const watchProviders = await getWatchProviders(showId);
+  console.log('EVENT WATCH PROVIDERS', watchProviders.watchProviders);
+  console.log('updated providres', savedShows$.shows[showId].streaming);
 });
 
 //# --------------------------------------

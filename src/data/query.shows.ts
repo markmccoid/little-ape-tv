@@ -27,6 +27,7 @@ import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { settings$ } from '~/store/store-settings';
 import { eventDispatcher, EventName } from '~/utils/EventDispatcher';
+import { formatEpoch } from '~/utils/utils';
 dayjs.extend(customParseFormat);
 
 //~ ------------------------------------------------------
@@ -421,9 +422,10 @@ export const usePersonDetails = (personId: string | undefined) => {
   return { data, isLoading, ...rest };
 };
 
-//~ ------------------------------------------------------
-//~ useWatchProviders
-//~ ------------------------------------------------------
+//# ----------------------------------------------------
+//# useWatchProviders
+//#
+//# ----------------------------------------------------
 export type ProviderInfo = {
   provider: string;
   logoURL: string;
@@ -432,9 +434,7 @@ export type ProviderInfo = {
 };
 export type WatchProvidersType = {
   justWatchLink: string;
-  stream: ProviderInfo[];
-  rent: ProviderInfo[];
-  buy: ProviderInfo[];
+  watchProviders: WatchProviderOnly[];
 };
 export type WatchProviderOnly = {
   type: 'stream' | 'rent' | 'buy' | 'justWatchLink';
@@ -445,18 +445,111 @@ export const useWatchProviders = (showId: string, region: string = 'US') => {
   return useQuery({
     queryKey: ['watchProviders', showId],
     queryFn: async () => {
-      const tempData = await tvGetWatchProviders(parseInt(showId), [region]);
+      return await fetchWatchProviders(showId, region);
+      // const tempData = await tvGetWatchProviders(parseInt(showId), [region]);
 
-      const data = tempData.data.results.US;
-      const watchProviders: WatchProviderOnly[] = [
-        { type: 'stream', title: 'Stream', providers: data?.stream },
-        { type: 'rent', title: 'Rent', providers: data?.rent },
-        { type: 'buy', title: 'Buy', providers: data?.buy },
-      ];
-      return { watchProviders, justWatchLink: data?.justWatchLink };
+      // const data = tempData.data.results.US;
+      // const watchProviders: WatchProviderOnly[] = [
+      //   { type: 'stream', title: 'Stream', providers: data?.stream },
+      //   { type: 'rent', title: 'Rent', providers: data?.rent },
+      //   { type: 'buy', title: 'Buy', providers: data?.buy },
+      // ];
+      // return { watchProviders, justWatchLink: data?.justWatchLink };
     },
   });
 };
+//~ Function to call tmdb api and get watch providers
+const fetchWatchProviders = async (showId: string, region: string = 'US') => {
+  const tempData = await tvGetWatchProviders(parseInt(showId), [region]);
+
+  const data = tempData.data.results.US;
+  const watchProviders: WatchProviderOnly[] = [
+    { type: 'stream', title: 'Stream', providers: data?.stream },
+    { type: 'rent', title: 'Rent', providers: data?.rent },
+    { type: 'buy', title: 'Buy', providers: data?.buy },
+  ];
+
+  //-- 1.  Update savedShows$ streaming providers id data whenever we query for watchProvider
+  // We will also do this via a scheduled job via events
+  // pull the streaming providers and only grab their ids
+  const streamingProviders = [
+    ...(watchProviders.find((el) => el.type === 'stream')?.providers || []),
+  ] as ProviderInfo[];
+  const updatedProviders = streamingProviders.map((el) => el.providerId) || [];
+  savedShows$.shows[showId].streaming.set({
+    providers: updatedProviders,
+    dateUpdatedEpoch: formatEpoch(Date.now()),
+  });
+  //-- 2.  Update settings$ streamingProvidersLookup data. make sure all are located in this array
+  const existingSavedProviders = settings$.savedStreamingProviders.peek();
+  const newProviders = mergeStreamingProviders(existingSavedProviders, [...streamingProviders]);
+
+  settings$.savedStreamingProviders.set(newProviders || []);
+
+  // Return data
+  return { watchProviders, justWatchLink: data?.justWatchLink };
+};
+
+//~ ------------------------------------------------------
+//# getWatchProviders
+//~ Called from events. first checks react query for data
+//~  if none, calls fetchWatchProviders
+//~ ------------------------------------------------------
+export const getWatchProviders = async (showId: string) => {
+  // Match the query key for useShowSeasonData so we can grab cached data if available
+  const queryKey = ['watchProviders', showId];
+
+  let watchProviders: WatchProvidersType | undefined = queryClient.getQueryData(queryKey);
+
+  if (!watchProviders) {
+    watchProviders = await fetchWatchProviders(showId);
+  }
+  return watchProviders;
+};
+
+//# ------------------------------------------------------
+//# ------------------------------------------------------
+//# ------------------------------------------------------
+/**
+ * Merges existing streaming providers with new providers data.
+ * If a provider with the same providerId exists, updates its provider name and logoURL.
+ * If a provider doesn't exist, adds it to the array.
+ *
+ * @param existingProviders - The current array of streaming providers
+ * @param newProviders - The new providers data to merge
+ * @returns The merged array of providers
+ */
+function mergeStreamingProviders(
+  existingProviders: ProviderInfo[],
+  newProviders: ProviderInfo[]
+): ProviderInfo[] {
+  // Create a Map for O(1) lookups using providerId as the key
+  const providerMap = new Map<number, ProviderInfo>();
+
+  // Populate the map with existing providers
+  for (const provider of existingProviders) {
+    providerMap.set(provider.providerId, provider);
+  }
+
+  // Process new providers - update existing or add new ones
+  for (const newProvider of newProviders) {
+    const existing = providerMap.get(newProvider.providerId);
+
+    if (existing) {
+      // Update only the provider name and logoURL of existing provider
+      existing.provider = newProvider.provider;
+      existing.logoURL = newProvider.logoURL;
+    } else {
+      // Add new provider to the map
+      providerMap.set(newProvider.providerId, newProvider);
+    }
+  }
+
+  // Convert the map values back to an array
+  return Array.from(providerMap.values());
+}
+
+//# ------------------------------------------------------
 
 //~ ------------------------------------------------------
 //~ useOMDBData

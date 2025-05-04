@@ -91,32 +91,36 @@ const SeasonEpisodeList: React.FC<Props> = ({ seasons, showData }) => {
   useEffect(() => {
     if (!seasonSummary?.lastWatchedSeason) return;
 
-    const lastSeasonWatched = seasonSummary.lastWatchedSeason;
-    const episodeIndex =
-      lastSeasonWatched + 1 <= seasons.length
-        ? seasonSummary?.[lastSeasonWatched + 1]?.watched || 0
-        : 0;
-    const seasonIndexToScroll =
-      lastSeasonWatched === seasons.length ? lastSeasonWatched - 1 : lastSeasonWatched;
+    // Get the last watched season
+    const lastSeasonNumberWatched = seasonSummary.lastWatchedSeason;
+    let episodeIndex = 0;
+    // Find the next season with episodes, if it exists
+    let nextSeasonNumber = lastSeasonNumberWatched + 1;
+    const nextSeasonEpisodeWatched = seasonSummary?.[lastSeasonNumberWatched + 1]?.watched;
 
-    // Initial scroll to season
-    scrollToLocation(seasonIndexToScroll, 0);
+    if (
+      nextSeasonNumber <= seasons.length && // Make sure there is a next season
+      // BE CAREFUL, when we access the seasons array, we use zero based indexes
+      // when we access seasonSummary we use the actual season number, i.e seasonNumber 1 needs to be 0 when accessing the seasons array
+      seasons[nextSeasonNumber - 1]?.episodes?.length > 0 //Make sure there are episodes in the next season object
+    ) {
+      episodeIndex = nextSeasonEpisodeWatched || 0;
+    } else {
+      nextSeasonNumber = lastSeasonNumberWatched;
+      episodeIndex = seasonSummary?.[nextSeasonNumber]?.watched || 0;
+    }
+
+    const seasonIndexToScroll = nextSeasonNumber - 1; // convert to an index for our scroll
+    // If we are not moving to a new season, don't do the first scroll
+    //NOTE: this first scroll was trying to fix an issue with the header now updating properly
+    // need to check the episodeIndex (if first condition true, then don't scroll if we are another season with episodes watched)
+    if (lastSeasonNumberWatched !== nextSeasonNumber && episodeIndex === 0) {
+      scrollToLocation(seasonIndexToScroll, 0);
+    }
 
     // Scroll to specific episode after a slight delay
     setTimeout(() => scrollToLocation(seasonIndexToScroll, episodeIndex), 100);
-  }, [seasonSummary?.lastWatchedSeason, seasons.length, scrollToLocation]);
-
-  //! SHOULD BE ABLE TO DELETE after testing - 04/22/2025
-  // useEffect(() => {
-  //   console.log('Scroll 2');
-  //   if (seasonScrollRef.current && seasonSummary?.lastWatchedSeason) {
-  //     const xOffset = (seasonSummary.lastWatchedSeason - 1) * 105;
-  //     if (xOffset >= 0) {
-  //       setTimeout(() => seasonScrollRef.current?.scrollTo({ x: xOffset, animated: false }), 0);
-  //     }
-  //   }
-  // }, [seasonSummary?.lastWatchedSeason]);
-  //!
+  }, [seasonSummary?.lastWatchedSeason, seasons.length]);
 
   //==============================================
   // Render section header (season name)
@@ -192,7 +196,7 @@ const SeasonEpisodeList: React.FC<Props> = ({ seasons, showData }) => {
         contentContainerStyle={{ paddingBottom: 115 }}
         // style={{ width: '100%', paddingBottom: 105, height: '100%' }}
         getItemLayout={buildGetItemLayout}
-        initialScrollIndex={seasonSummary?.grandTotalWatched || 0}
+        // initialScrollIndex={seasonSummary?.grandTotalWatched || 0}
         // onEndReached={() => {
         //   console.log('End reached');
         // }}

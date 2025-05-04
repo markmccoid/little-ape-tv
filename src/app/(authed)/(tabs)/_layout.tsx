@@ -1,6 +1,7 @@
+import { BlurView } from 'expo-blur';
 import { Link, Tabs } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
-import { Alert, Pressable, Text, View } from 'react-native';
+import { Alert, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AddIcon, SettingsIcon, ViewTVShowIcon } from '~/components/common/Icons';
 
@@ -15,6 +16,13 @@ export default function TabLayout() {
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: 'black',
+          tabBarBackground: () => (
+            <BlurView tint="systemThickMaterial" intensity={60} style={StyleSheet.absoluteFill} />
+          ),
+          tabBarStyle: Platform.select({
+            ios: { position: 'absolute' },
+            default: {},
+          }),
           // tabBarStyle: { position: 'absolute', bottom: 0 },
         }}>
         <Tabs.Screen
@@ -50,6 +58,7 @@ export default function TabLayout() {
           name="(search)"
           options={{
             title: 'Add Show',
+            // tabBarLabelPosition: 'beside-icon',
             headerShown: false,
             tabBarIcon: ({ color }) => <AddIcon color={color} size={25} />,
           }}

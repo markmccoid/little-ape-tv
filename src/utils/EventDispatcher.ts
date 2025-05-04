@@ -13,8 +13,9 @@ export enum EventName {
   GenerateGenresArray = 'GENERATE_GENRES_ARRAY',
   AppInitialized = 'APP_INITIALIZED',
   UpdateSavedShowDetail = 'UPDATE_SAVED_SHOW_DETAIL',
-  UpdateAvgEpisodeRuntime = 'UPDATE_AVG_EPISODE_RUNTIME', // Added your event
-  UpdateSeasonSummary = 'UPDATE_SEASON_SUMMARY',
+  UpdateAvgEpisodeRuntime = 'UPDATE_AVG_EPISODE_RUNTIME', // IN USE
+  UpdateSeasonSummary = 'UPDATE_SEASON_SUMMARY', // IN USE
+  UpdateWatchProviders = 'UPDATE_WATCH_PROVIDERS', // IN USE
 }
 
 // Define payload types for each event
@@ -28,6 +29,7 @@ interface EventPayloads {
   [EventName.UpdateSavedShowDetail]: [showId: string, showDetail: TVShowDetails]; // Define payload for your event
   [EventName.UpdateAvgEpisodeRuntime]: [showId: string, seasonsArray: number[]]; // Define payload for your event
   [EventName.UpdateSeasonSummary]: [showId: string, seasonsArray: number[]]; // Define payload for your event
+  [EventName.UpdateWatchProviders]: [showId: string]; // Define payload for your event
 }
 
 // Type for callbacks, tied to event payloads

@@ -12,6 +12,7 @@ export default function ShowIdLayout() {
         options={{
           headerShown: true,
           // headerTransparent: true,
+          // headerBlurEffect: 'systemChromeMaterial',
         }}
         getId={({ params }) => params.showid}
       />

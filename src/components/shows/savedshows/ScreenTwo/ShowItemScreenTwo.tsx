@@ -12,14 +12,10 @@ import Animated, {
 // import { SavedShow, useSavedShow } from '~/store/functions-shows';
 import { savedShows$, useSavedShow } from '~/store/store-shows';
 import dayjs from 'dayjs';
-import { useSavedSeasonSummary } from '~/store/functions-showAttributes';
 import { useRouter } from 'expo-router';
 import ScreenTwoSeasonData from './ScreenTwoSeasonData';
-import ScreenTwoTagCloud from './ScreenTwoTagCloud';
-import TagModal from './TagRatingEditModal';
-import { Portal } from '@gorhom/portal';
-import SimpleModal from './TagRatingEditModal';
 import TagRatingEditModal from './TagRatingEditModal';
+import { createProviderLookup, settings$ } from '~/store/store-settings';
 
 const missingPosterURI = require('../../../../../assets/missingPoster.png');
 
@@ -32,13 +28,6 @@ type Props = {
 };
 const ShowItemScreenTwo = ({ showId, imageWidth, imageHeight, index, scrollX }: Props) => {
   const { favorite, posterURL, name, dateAddedEpoch } = useSavedShow(showId);
-  // const [showModal, setShowModal] = useState(false);
-
-  // const toggleModalVisible = useCallback(() => {
-  //   setShowModal((state) => !state);
-  // }, []);
-  // console.log('secondScreen NextDLEpisodeDate', nextDLEpisodeDate);
-  const router = useRouter();
 
   const animStyle = useAnimatedStyle(() => {
     return {

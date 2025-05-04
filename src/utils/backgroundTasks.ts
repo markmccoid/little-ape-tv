@@ -8,10 +8,10 @@ import { addDaysToEpoch, formatEpoch, getEpochwithTime, subtractDaysFromEpoch } 
 import { settings$ } from '~/store/store-settings';
 import dayjs from 'dayjs';
 
-const BACKGROUND_FETCH_TASK = 'check-new-episodes';
+const CHECK_NEW_EPISODES_TASK = 'check-new-episodes';
 
-// Define the background task
-TaskManager.defineTask(BACKGROUND_FETCH_TASK, async () => {
+// Define the background tasks
+TaskManager.defineTask(CHECK_NEW_EPISODES_TASK, async () => {
   try {
     await checkForShowUpdatesAndNotify();
     return BackgroundFetch.BackgroundFetchResult.NewData;
@@ -24,7 +24,7 @@ TaskManager.defineTask(BACKGROUND_FETCH_TASK, async () => {
 // Register the background task
 export async function registerBackgroundFetch() {
   try {
-    await BackgroundFetch.registerTaskAsync(BACKGROUND_FETCH_TASK, {
+    await BackgroundFetch.registerTaskAsync(CHECK_NEW_EPISODES_TASK, {
       minimumInterval: 360 * 60, // 6 hours in seconds
       stopOnTerminate: false, // Continue running after app is closed (iOS)
       startOnBoot: true, // Restart task on device reboot (Android)
@@ -115,7 +115,7 @@ export async function checkForShowUpdatesAndNotify() {
         if (notifyDate.isBefore(dayjs())) {
           notifyDate = notifyDate.add(1, 'day');
         }
-        // If you need a JS Date object:
+        // convert to JS Date object:
         const notifyDateJS = notifyDate.toDate();
 
         console.log('Send notification for ', show.name);
@@ -210,10 +210,12 @@ export function selectEligibleShows() {
   //   showsToCheck.map((el) => el.name)
   // );
   const existingRuns = settings$.notificationBackgroundRun.peek();
-  console.log('existing runs', existingRuns);
-  settings$.notificationBackgroundRun.set([
-    ...(existingRuns || []),
-    { dateTimeEpoch: getEpochwithTime(), numShows: showsToCheck.length },
-  ]);
+
+  settings$.notificationBackgroundRun.set(
+    [
+      ...(existingRuns || []),
+      { dateTimeEpoch: getEpochwithTime(), numShows: showsToCheck.length },
+    ].slice(-25)
+  ); // Just keep the last 25 runs
   return showsToCheck;
 }

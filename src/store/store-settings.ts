@@ -5,6 +5,7 @@ import { ObservablePersistMMKV } from '@legendapp/state/persist-plugins/mmkv';
 import { authManager } from '~/authentication/AuthProvider';
 import { synced } from '@legendapp/state/sync';
 import { ThemeOption } from '~/components/settings/ThemeSelector';
+import { ProviderInfo } from '~/data/query.shows';
 //**
 
 type DownloadOptions = {
@@ -21,6 +22,9 @@ type NotificationRecord = {
   text: string;
   otherInfo?: string;
 };
+
+type SavedStreamingProviderInfo = ProviderInfo & { displayFlag?: boolean };
+
 type Settings = {
   searchNumColumns: 2 | 3;
   showImageInEpisode: boolean;
@@ -35,6 +39,9 @@ type Settings = {
   notificationHistory: Record<string, NotificationRecord>;
   // history of when the background code runs and how many show
   notificationBackgroundRun: { dateTimeEpoch: number; numShows: number }[];
+  // Any show that is added gets its streaming providers added here
+  // Lookup table for items stored on
+  savedStreamingProviders: SavedStreamingProviderInfo[];
 };
 //~ - - - - - - - - - - - - - - - - - -
 //~ settings$ Observable
@@ -60,3 +67,30 @@ export const settings$ = observable<Settings>(
     },
   })
 );
+
+/**
+ * Creates a lookup function that can efficiently find providers by providerId
+ * using a Map for O(1) lookups. Useful when doing multiple lookups on the same array.
+ *
+ * @param providers - Array of ProviderInfo objects to create a lookup for
+ * @returns A function that takes a providerId and returns the matching provider or undefined
+ * USAGE:
+     const providerLookup = createProviderLookup();
+     // Returns an array of provider info
+      const streamindData = streaming?.providers
+        .map((providerId) => providerLookup(providerId))
+        .filter((provider) => provider !== undefined);
+ */
+export const createProviderLookup = (providers?: SavedStreamingProviderInfo[]) => {
+  // Create a Map for O(1) lookups
+  const providerMap = new Map<number, SavedStreamingProviderInfo>();
+  providers = settings$.savedStreamingProviders.get();
+  // Populate the map
+  providers.forEach((provider) => {
+    providerMap.set(provider.providerId, provider);
+  });
+
+  // Return a lookup function that uses the map
+  return (providerId: number): SavedStreamingProviderInfo | undefined =>
+    providerMap.get(providerId);
+};

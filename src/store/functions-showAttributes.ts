@@ -517,7 +517,6 @@ const calculateSeasonSummary = (
           lastWatchedSeason = seasonNum;
         }
         grandTotalWatched = grandTotalWatched + numWatched;
-
         // Calculate asw for this season (skip season 0, force true on season 0)
         // Need to do this so that our final.asw && seasonAsw works properly.
         const seasonAsw = seasonNum === 0 ? true : numWatched === seasonEpisodeCounts[seasonNum];
