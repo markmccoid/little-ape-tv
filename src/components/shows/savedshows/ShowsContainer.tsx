@@ -1,8 +1,7 @@
 import React, { useCallback, useDeferredValue, useState } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View, Dimensions } from 'react-native';
 import { Link, Stack, useFocusEffect, useRouter } from 'expo-router';
-import { useAuth } from '~/authentication/AuthProvider';
-import { savedShows$ } from '~/store/store-shows';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useFilteredShows } from '~/data/query.shows';
 import Animated, {
   runOnJS,
@@ -29,6 +28,7 @@ const IMG_WIDTH = (width - MARGIN * 3) / 2;
 const IMG_HEIGHT = IMG_WIDTH * 1.5;
 
 const ShowsContainer = () => {
+  const tabBarHeight = useBottomTabBarHeight();
   const showsInit = useFilteredShows();
   const router = useRouter();
   const { colors } = useCustomTheme();
@@ -157,6 +157,7 @@ const ShowsContainer = () => {
           getItemLayout={getItemLayout}
           showsVerticalScrollIndicator={false}
           keyboardDismissMode="on-drag"
+          contentContainerStyle={{ paddingBottom: tabBarHeight + 20 }}
         />
       </View>
     </>

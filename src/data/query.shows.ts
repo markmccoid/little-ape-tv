@@ -469,6 +469,11 @@ const fetchWatchProviders = async (showId: string, region: string = 'US') => {
     { type: 'buy', title: 'Buy', providers: data?.buy },
   ];
 
+  // If not storedLocallacy just return info.
+  // console.log('local', savedShows$.shows[showId]?.isStoredLocally.peek());
+  if (!savedShows$.shows[showId]?.isStoredLocally.peek()) {
+    return { watchProviders, justWatchLink: data?.justWatchLink };
+  }
   //-- 1.  Update savedShows$ streaming providers id data whenever we query for watchProvider
   // We will also do this via a scheduled job via events
   // pull the streaming providers and only grab their ids

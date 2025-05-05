@@ -14,7 +14,7 @@ export default function ShowIdLayout() {
           // headerTransparent: true,
           // headerBlurEffect: 'systemChromeMaterial',
         }}
-        getId={({ params }) => params.showid}
+        // getId={({ params }) => params.showid}
       />
       <Stack.Screen
         name="[personid]"
@@ -22,7 +22,7 @@ export default function ShowIdLayout() {
           headerShown: false,
           // headerTransparent: true,
         }}
-        getId={({ params }) => params.showid}
+        // getId={({ params }) => params.showid}
       />
       <Stack.Screen
         name="detailimagemodal"

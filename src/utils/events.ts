@@ -62,9 +62,10 @@ eventDispatcher.on(EventName.UpdateSeasonSummary, async (showId, seasonsArray) =
 //# makes ure the show details are up to date.
 //# --------------------------------------
 eventDispatcher.on(EventName.UpdateWatchProviders, async (showId) => {
-  const watchProviders = await getWatchProviders(showId);
-  console.log('EVENT WATCH PROVIDERS', watchProviders.watchProviders);
-  console.log('updated providres', savedShows$.shows[showId].streaming);
+  // The getWatchProviders function will update the streaming entry for the
+  // show in savedShows$ as well as update the settings$.savedStreaminProviders
+  // Just need to call it here
+  await getWatchProviders(showId);
 });
 
 //# --------------------------------------

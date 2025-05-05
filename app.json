@@ -27,7 +27,9 @@
         }
       ],
       "expo-font",
-      "expo-build-properties"
+      "expo-build-properties",
+      "expo-web-browser",
+      "expo-background-task"
     ],
     "experiments": {
       "typedRoutes": true,
@@ -48,7 +50,12 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.markmccoid.littleapetv",
       "infoPlist": {
-        "UIBackgroundModes": ["fetch"]
+        "UIBackgroundModes": [
+          "processing"
+        ],
+        "NSBackgroundProcessingAPIs": [
+          "BackgroundTask"
+        ]
       }
     },
     "android": {

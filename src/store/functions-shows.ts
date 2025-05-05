@@ -152,6 +152,7 @@ export const createShowFunctions = (
         showId,
         data.seasons.map((el) => el.seasonNumber) || []
       );
+      eventDispatcher.emit(EventName.UpdateWatchProviders, showId);
     },
     removeShow: (showId) => {
       savedShows$.shows[showId].delete();

@@ -34,6 +34,7 @@ type BaseFilters = {
   excludeTags?: string[];
   includeGenres?: string[];
   excludeGenres?: string[];
+  includeWatchProviders?: string[];
 };
 type NameFilter = {
   showName: string;
@@ -128,7 +129,7 @@ export type FilterCriteria = {
   savedFilters: SavedFilter[]; // Saved filters
 } & FilterCriteriaFunctions;
 
-//NOTE: Tag/Genre updates to BaseFilters done in fcUpdateTagsGenres
+//# NOTE: Tag/Genre updates to BaseFilters done in fcUpdateTagsGenres
 type FilterCriteriaFunctions = {
   actionClearTags: () => void;
   actionClearGenres: () => void;
@@ -136,6 +137,7 @@ type FilterCriteriaFunctions = {
   actionClearAllCriteria: () => void;
   updateSortSettings: (newSortFieldValues: SortField) => void;
   reorderSortSettings: (sortedIds: string[]) => void;
+  // actions for saved filters
   saveFilter: (newSavedFilter: SavedFilter) => void;
   deleteSavedFilter: (savedFilterId: string) => void;
   toggleFavoriteSavedFilter: (filterId: string) => void;
@@ -164,6 +166,7 @@ const filterCriteriaFunctions: FilterCriteriaFunctions = {
     filterCriteria$.actionClearTags();
     filterCriteria$.baseFilters.filterIsFavorited.set('off');
     filterCriteria$.baseFilters.filterIsAllWatched.set('off');
+    filterCriteria$.baseFilters.includeWatchProviders.set([]);
   },
   updateSortSettings: (newSortFieldValues) => {
     const sortSettings = filterCriteria$.sortSettings.peek();

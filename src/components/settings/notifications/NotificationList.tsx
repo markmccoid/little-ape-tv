@@ -54,7 +54,7 @@ const NotificationList = () => {
                     }}
                     className="flex-row items-center justify-between">
                     <Text className="text-lg font-semibold">{item.name}</Text>
-                    <Text>Offset-{shows[item.Id].nextNotifyOffset}</Text>
+                    <Text>Offset-{shows[item.Id]?.nextNotifyOffset}</Text>
                     <Text className="rounded-lg border bg-slate-200 px-3 py-1 text-blue-800">
                       {item.Id}
                     </Text>

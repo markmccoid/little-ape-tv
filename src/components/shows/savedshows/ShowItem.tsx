@@ -147,21 +147,6 @@ const ShowItem = ({ show, showId }: Props) => {
           paddingHorizontal: 0,
         }}
       />
-
-      {/* {currIndex === 1 && (
-        <>
-          <Animated.View style={[buttonStyle, { position: 'absolute', left: 0, top: -10 }]}>
-            <SetFavoriteButton showId={show.tmdbId} isFavorited={!!show.favorite} />
-          </Animated.View>
-          <Animated.View style={[buttonStyle, { position: 'absolute', right: 0, top: -10 }]}>
-            <DeleteShowButton showId={show.tmdbId} />
-          </Animated.View>
-        </>
-      )} */}
-
-      {/* Future Home of dynamic Info screen.  Maybe button (circle) in corner of image when long press
-          reveals more info screen */}
-      {/* <ShowItemBottom show={show} /> */}
     </Animated.View>
   );
 };

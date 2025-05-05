@@ -1,4 +1,4 @@
-import * as BackgroundFetch from 'expo-background-fetch';
+import * as BackgroundTask from 'expo-background-task';
 import * as TaskManager from 'expo-task-manager';
 import * as Notifications from 'expo-notifications';
 import { savedShows$ } from '~/store/store-shows';
@@ -14,26 +14,22 @@ const CHECK_NEW_EPISODES_TASK = 'check-new-episodes';
 TaskManager.defineTask(CHECK_NEW_EPISODES_TASK, async () => {
   try {
     await checkForShowUpdatesAndNotify();
-    return BackgroundFetch.BackgroundFetchResult.NewData;
+    return BackgroundTask.BackgroundTaskResult.Success; // Changed return type
   } catch (error) {
-    console.error('Background fetch failed:', error);
-    return BackgroundFetch.BackgroundFetchResult.Failed;
+    console.error('Background task failed:', error);
+    return BackgroundTask.BackgroundTaskResult.Failed;
   }
 });
 
-// Register the background task
-export async function registerBackgroundFetch() {
+export async function registerBackgroundTask() {
   try {
-    await BackgroundFetch.registerTaskAsync(CHECK_NEW_EPISODES_TASK, {
-      minimumInterval: 360 * 60, // 6 hours in seconds
-      stopOnTerminate: false, // Continue running after app is closed (iOS)
-      startOnBoot: true, // Restart task on device reboot (Android)
+    await BackgroundTask.registerTaskAsync(CHECK_NEW_EPISODES_TASK, {
+      minimumInterval: 360, // Now in minutes (6 hours) instead of seconds
     });
   } catch (error) {
-    console.error('Failed to register background fetch task:', error);
+    console.error('Failed to register background task:', error);
   }
 }
-
 //!! Need to implement a last checked date on the show object.
 //!! Don't need to check a show more than once a day.
 
@@ -42,6 +38,7 @@ export async function checkForShowUpdatesAndNotify() {
   const eligibleShows = selectEligibleShows();
   const currentDate = getEpochwithTime();
   const NOTIFICATION_INTERVAL = 2;
+
   for (const show of eligibleShows) {
     try {
       // Default the offset days to 1...we will check everyday until
