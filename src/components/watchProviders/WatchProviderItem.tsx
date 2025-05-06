@@ -1,0 +1,36 @@
+import { View, Text, Pressable } from 'react-native';
+import React from 'react';
+import { SavedStreamingProviderInfo } from '~/store/store-settings';
+import { SymbolView } from 'expo-symbols';
+import { Image } from 'expo-image';
+
+type Props = {
+  providerObj: SavedStreamingProviderInfo;
+  active: boolean;
+  toggleItem: (providerId: number) => void;
+};
+const WatchProviderItem = ({ providerObj, active, toggleItem }: Props) => {
+  return (
+    <Pressable
+      key={providerObj.providerId}
+      className="m-1 flex-col items-center rounded-lg p-2"
+      style={{ borderColor: active ? 'red' : 'white', borderWidth: 1 }}
+      onPress={() => toggleItem(providerObj.providerId)}>
+      {active && (
+        <View className="absolute right-0 top-0 z-10">
+          <SymbolView
+            type="palette"
+            name="checkmark.square.fill"
+            // tintColor="green"
+            colors={['white', 'green']}
+            size={25}
+          />
+        </View>
+      )}
+      <Image source={providerObj.logoURL} style={{ width: 50, height: 50, borderRadius: 10 }} />
+      {/* <Text>{el.provider}</Text> */}
+    </Pressable>
+  );
+};
+
+export default WatchProviderItem;

@@ -23,7 +23,7 @@ type NotificationRecord = {
   otherInfo?: string;
 };
 
-type SavedStreamingProviderInfo = ProviderInfo & { displayFlag?: boolean };
+export type SavedStreamingProviderInfo = ProviderInfo & { displayFlag?: boolean };
 
 type Settings = {
   searchNumColumns: 2 | 3;

@@ -34,7 +34,7 @@ type BaseFilters = {
   excludeTags?: string[];
   includeGenres?: string[];
   excludeGenres?: string[];
-  includeWatchProviders?: string[];
+  includeWatchProviders?: number[];
 };
 type NameFilter = {
   showName: string;
@@ -143,6 +143,9 @@ type FilterCriteriaFunctions = {
   toggleFavoriteSavedFilter: (filterId: string) => void;
   updateSavedFilterPositions: (sortedIds: string[]) => void;
   applySavedFilter: (filterId: string) => void;
+  // WatchProvider
+  toggleStreamProviderFilter: (providerId: number) => void;
+  clearStreamProviderFilter: () => void;
 };
 
 //# -----------------------------
@@ -253,6 +256,20 @@ const filterCriteriaFunctions: FilterCriteriaFunctions = {
     filterCriteria$.baseFilters.set({ ...filterToApply.filter });
     filterCriteria$.sortSettings.set([...filterToApply.sort]);
   },
+  toggleStreamProviderFilter: (providerId) => {
+    const includeWatchProviders = filterCriteria$.baseFilters.includeWatchProviders.peek() || [];
+    const index = includeWatchProviders.indexOf(providerId);
+    let newWatchProviders = [];
+    if (index === -1) {
+      // Not found, add it
+      newWatchProviders = [...includeWatchProviders, providerId];
+    } else {
+      // Found, remove it
+      newWatchProviders = includeWatchProviders.filter((id) => id !== providerId);
+    }
+    filterCriteria$.baseFilters.includeWatchProviders.set(newWatchProviders);
+  },
+  clearStreamProviderFilter: () => filterCriteria$.baseFilters.includeWatchProviders.set([]),
 };
 
 //# Initial State

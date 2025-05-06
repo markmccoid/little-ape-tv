@@ -40,6 +40,7 @@ export const useFilteredShows = () => {
     includeTags = [],
     excludeGenres = [],
     excludeTags = [],
+    includeWatchProviders = [],
   } = use$(filterCriteria$.baseFilters);
   const filterIsFavorited = use$(filterCriteria$.baseFilters.filterIsFavorited);
   const filterIsAllWatched = use$(filterCriteria$.baseFilters.filterIsAllWatched);
@@ -74,6 +75,22 @@ export const useFilteredShows = () => {
       includeGenres.every((genre) => showGenres.includes(genre)) &&
       !excludeGenres.some((genre) => showGenres.includes(genre))
     );
+  };
+
+  const matchesProviders = (show: SavedShow) => {
+    if (includeWatchProviders.length === 0) {
+      // If the filter list is empty, all shows match this criteria
+      return true;
+    }
+    const streamProviders = show.streaming?.providers || [];
+    // console.log(
+    //   'STREAM',
+    //   show.name,
+    //   streamProviders,
+    //   includeWatchProviders,
+    //   includeWatchProviders.some((provider) => streamProviders.includes(parseInt(provider)))
+    // );
+    return includeWatchProviders.some((provider) => streamProviders.includes(parseInt(provider)));
   };
 
   const matchesFavorite = (show: SavedShow) => {
@@ -119,6 +136,7 @@ export const useFilteredShows = () => {
       matchesTags(show) &&
       matchesGenres(show) &&
       matchesFavorite(show) &&
+      matchesProviders(show) &&
       matchesAllWatched(!!summaryData?.[show.tmdbId]?.summary?.asw)
     ) {
       //~ get show Attributes summary and add to filteredShows Also set the sortNextDLDate
@@ -474,22 +492,8 @@ const fetchWatchProviders = async (showId: string, region: string = 'US') => {
   if (!savedShows$.shows[showId]?.isStoredLocally.peek()) {
     return { watchProviders, justWatchLink: data?.justWatchLink };
   }
-  //-- 1.  Update savedShows$ streaming providers id data whenever we query for watchProvider
-  // We will also do this via a scheduled job via events
-  // pull the streaming providers and only grab their ids
-  const streamingProviders = [
-    ...(watchProviders.find((el) => el.type === 'stream')?.providers || []),
-  ] as ProviderInfo[];
-  const updatedProviders = streamingProviders.map((el) => el.providerId) || [];
-  savedShows$.shows[showId].streaming.set({
-    providers: updatedProviders,
-    dateUpdatedEpoch: formatEpoch(Date.now()),
-  });
-  //-- 2.  Update settings$ streamingProvidersLookup data. make sure all are located in this array
-  const existingSavedProviders = settings$.savedStreamingProviders.peek();
-  const newProviders = mergeStreamingProviders(existingSavedProviders, [...streamingProviders]);
 
-  settings$.savedStreamingProviders.set(newProviders || []);
+  updateShowStreamingProviders(showId, watchProviders);
 
   // Return data
   return { watchProviders, justWatchLink: data?.justWatchLink };
@@ -508,11 +512,34 @@ export const getWatchProviders = async (showId: string) => {
 
   if (!watchProviders) {
     watchProviders = await fetchWatchProviders(showId);
+  } else {
+    // store watachprovider info
+    updateShowStreamingProviders(showId, watchProviders.watchProviders);
   }
   return watchProviders;
 };
+//~ Function to update streaming providers
+const updateShowStreamingProviders = (showId: string, watchProviders: WatchProviderOnly[]) => {
+  //-- 1.  Update savedShows$ streaming providers id data whenever we query for watchProvider
+  // We will also do this via a scheduled job via events
+  // pull the streaming providers and only grab their ids
+  const streamingProviders = [
+    ...(watchProviders.find((el) => el.type === 'stream')?.providers || []),
+  ] as ProviderInfo[];
+  const updatedProviders = streamingProviders.map((el) => el.providerId) || [];
+  savedShows$.shows[showId].streaming.set({
+    providers: updatedProviders,
+    dateUpdatedEpoch: formatEpoch(Date.now()),
+  });
+  //-- 2.  Update settings$ streamingProvidersLookup data. make sure all are located in this array
+  const existingSavedProviders = settings$.savedStreamingProviders.peek();
+  const newProviders = mergeStreamingProviders(existingSavedProviders, [...streamingProviders]);
+
+  settings$.savedStreamingProviders.set(newProviders || []);
+};
 
 //# ------------------------------------------------------
+
 //# ------------------------------------------------------
 //# ------------------------------------------------------
 /**

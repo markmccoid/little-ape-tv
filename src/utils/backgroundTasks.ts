@@ -69,6 +69,7 @@ export async function checkForShowUpdatesAndNotify() {
             otherInfo: `Status: ${show.showStatus}`,
           },
         });
+        // Check if the next air date is past the current date + the interval
       } else if (nextAirDate.epoch > addDaysToEpoch(currentDate, NOTIFICATION_INTERVAL)) {
         // set the offset date to be on the day of the show
         const daysUntilNextAir = dayjs.unix(nextAirDate.epoch).diff(dayjs.unix(currentDate), 'day');
@@ -88,6 +89,7 @@ export async function checkForShowUpdatesAndNotify() {
             otherInfo: `Next Air Date-${nextAirDate.formatted}`,
           },
         });
+
         continue;
       }
 
@@ -190,11 +192,11 @@ export function selectEligibleShows() {
     const nextNotifyOffset = !show?.nextNotifyOffset ? 1 : show.nextNotifyOffset;
     // if null subtract one day so that show will be added to showsToCheck
     const lastNotifyCheckEpoch = !show?.dateLastNotifyCheckedEpoch
-      ? Math.floor(currentEpoch - 86400)
-      : // this offset is used for inactive shows (no next airdate) so we don't check everyday
-        show.dateLastNotifyCheckedEpoch + nextNotifyOffset * 86400; //Offset by value stored on show
-    // UPDATE the dateLastNotifyCheckedEpoch
-    savedShows$.shows[show.tmdbId].dateLastNotifyCheckedEpoch.set(lastNotifyCheckEpoch);
+      ? Math.floor(currentEpoch - 86400) // minus one day
+      : show.dateLastNotifyCheckedEpoch + nextNotifyOffset * 86400; //Offset by value stored on show
+
+    // UPDATE the dateLastNotifyCheckedEpoch with current date
+    savedShows$.shows[show.tmdbId].dateLastNotifyCheckedEpoch.set(currentEpoch);
 
     // if lastNotifyCheckEpoch is less than currentEpoch then add to showsToCheck
     if (lastNotifyCheckEpoch < currentEpoch) {
