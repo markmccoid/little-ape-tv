@@ -47,7 +47,8 @@ const ShowItemBottom = ({ showId }: Props) => {
                 pathname: `/seasonslistmodal`,
                 params: { showid: parseInt(showId) },
               })
-            }>
+            }
+            hitSlop={{ top: 10, bottom: 10, left: 5, right: 5 }}>
             <Text className="font-semibold" style={{ color: runTimeTextColor }}>
               {showInfo?.avgEpisodeRunTime} Min
             </Text>

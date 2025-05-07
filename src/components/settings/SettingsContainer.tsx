@@ -38,6 +38,13 @@ const SettingsContainer = () => {
             route="/(authed)/settings/tagsetup"
             LeftSymbol={() => <SymbolView name="tag" tintColor={colors.buttonDarker} size={28} />}
           />
+          <SettingsGroup.RouteItem
+            title="Streaming Provider Maintenance"
+            route="/(authed)/settings/streamingprovidersetup"
+            LeftSymbol={() => (
+              <SymbolView name="tv.badge.wifi" tintColor={colors.buttonDarker} size={28} />
+            )}
+          />
           {/* <SettingsGroup.SwitchItem /> */}
         </SettingsGroup>
 

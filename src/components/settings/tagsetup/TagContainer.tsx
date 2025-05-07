@@ -7,9 +7,12 @@ import { Tag } from '~/store/functions-tags';
 import { useCustomTheme } from '~/utils/customColorTheme';
 import showConfirmationPrompt from '~/components/common/showConfirmationPrompt';
 import TagItem from './TagItem';
+import Animated, { useAnimatedRef } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const TagContainer = () => {
-  const [newTag, setNewTag] = useState('');
+  const scrollableRef = useAnimatedRef<Animated.ScrollView>();
+  const { bottom } = useSafeAreaInsets();
   const tags = use$(tags$.tagList);
   const { colors } = useCustomTheme();
   const handleNewTagPrompt = () => {
@@ -49,26 +52,32 @@ const TagContainer = () => {
     []
   );
   return (
-    <View className="mx-2">
+    <View className="mx-2 flex-1">
       <View className="my-2 flex-row items-center">
         {/* <Text>TagContainer</Text> */}
         <Pressable onPress={handleNewTagPrompt} className="rounded-md bg-button px-2 py-2">
           <Text className="text-lg text-white">Add A New Tag</Text>
         </Pressable>
       </View>
-      <Sortable.Grid
-        columns={1}
-        data={tags}
-        renderItem={renderItem}
-        rowGap={4}
-        columnGap={10}
-        onDragEnd={(parms) => tags$.updateTagPositions(parms.indexToKey)}
-        enableActiveItemSnap={false}
-        activeItemScale={0.95}
-        // showDropIndicator
-        // itemEntering={BounceInRight}
-        hapticsEnabled={true}
-      />
+      <Animated.ScrollView
+        contentContainerStyle={{ padding: 10, flex: 1 }}
+        ref={scrollableRef}
+        style={{ flex: 1, marginBottom: bottom }}>
+        <Sortable.Grid
+          columns={1}
+          data={tags}
+          renderItem={renderItem}
+          rowGap={4}
+          columnGap={10}
+          onDragEnd={(parms) => tags$.updateTagPositions(parms.indexToKey)}
+          enableActiveItemSnap={false}
+          activeItemScale={0.95}
+          // showDropIndicator
+          // itemEntering={BounceInRight}
+          hapticsEnabled={true}
+          scrollableRef={scrollableRef}
+        />
+      </Animated.ScrollView>
     </View>
   );
 };

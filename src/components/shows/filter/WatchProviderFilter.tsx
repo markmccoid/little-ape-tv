@@ -12,14 +12,14 @@ const WatchProviderFilter = () => {
   const currentFilter = use$(filterCriteria$.baseFilters.includeWatchProviders);
 
   return (
-    <View className="mx-2 rounded-xl border-hairline border-border bg-card px-2 py-1">
+    <View className="mx-2 mb-2 rounded-xl border-hairline border-border bg-card px-2 py-1">
       <View className=" flex-row justify-between">
         <Text className="text-xl font-semibold">Stream Provider Filter</Text>
         <Pressable onPress={filterCriteria$.clearStreamProviderFilter} className="px-2">
           <EraserIcon />
         </Pressable>
       </View>
-      <ScrollView style={{ height: 200 }}>
+      <ScrollView style={{ maxHeight: 300 }}>
         <WatchProviderFilterContainer
           activeProviderIds={currentFilter || []}
           toggleProvider={filterCriteria$.toggleStreamProviderFilter}

@@ -90,7 +90,7 @@ export const useFilteredShows = () => {
     //   includeWatchProviders,
     //   includeWatchProviders.some((provider) => streamProviders.includes(parseInt(provider)))
     // );
-    return includeWatchProviders.some((provider) => streamProviders.includes(parseInt(provider)));
+    return includeWatchProviders.some((provider) => streamProviders.includes(provider));
   };
 
   const matchesFavorite = (show: SavedShow) => {

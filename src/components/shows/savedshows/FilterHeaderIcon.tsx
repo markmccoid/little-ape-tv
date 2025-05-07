@@ -15,6 +15,7 @@ const FilterHeaderIcon = () => {
     filterIsFavorited,
     includeTags,
     includeGenres,
+    includeWatchProviders,
   } = use$(filterCriteria$.baseFilters);
 
   const watchedOn = filterIsAllWatched !== 'off' ? 1 : 0;
@@ -25,19 +26,28 @@ const FilterHeaderIcon = () => {
         {({ pressed }) => (
           <>
             <FilterIcon size={25} color={colors.primary} style={{ opacity: pressed ? 0.5 : 1 }} />
-            {!!includeTags?.length && (
+            {(!!includeTags?.length || !!excludeTags?.length) && (
               <View className="absolute left-[-5] top-[-5] h-[15] w-[15] flex-row justify-center rounded-full bg-green-600">
-                <Text className="text-xs color-white">{includeTags?.length}</Text>
+                <Text className="text-xs color-white">
+                  {(includeTags?.length || 0) + (excludeTags?.length || 0)}
+                </Text>
               </View>
             )}
-            {!!includeGenres?.length && (
+            {(!!includeGenres?.length || !!excludeGenres?.length) && (
               <View className="absolute right-[-5] top-[-5] h-[15] w-[15] flex-row justify-center rounded-full bg-red-600">
-                <Text className="text-xs color-white">{includeGenres?.length}</Text>
+                <Text className="text-xs color-white">
+                  {(includeGenres?.length || 0) + (excludeGenres?.length || 0)}
+                </Text>
               </View>
             )}
             {!!(watchedOn + favedOn) && (
-              <View className="absolute bottom-[-5] ml-[5] h-[15] w-[15] flex-row justify-center rounded-full bg-yellow-600">
+              <View className="absolute bottom-[-5] ml-[15] h-[15] w-[15] flex-row justify-center rounded-full bg-yellow-600">
                 <Text className="text-xs color-white">{watchedOn + favedOn}</Text>
+              </View>
+            )}
+            {!!includeWatchProviders?.length && (
+              <View className="absolute bottom-[-5] ml-[-5] h-[15] w-[15] flex-row justify-center rounded-full bg-blue-600">
+                <Text className="text-xs color-white">{includeWatchProviders.length}</Text>
               </View>
             )}
           </>

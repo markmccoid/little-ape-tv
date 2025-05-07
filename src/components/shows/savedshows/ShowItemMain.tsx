@@ -62,30 +62,33 @@ const ScrollerMain = ({ showId, imageWidth, imageHeight, index, scrollX }: Props
         <ShowItemTop showId={showId} />
       </View>
       {/* )} */}
-      <Pressable
+      <View
         style={{ height: imageHeight + 26, flexDirection: 'row', alignItems: 'center' }}
-        onLongPress={() =>
-          router.push({
-            pathname: `/seasonslistmodal`,
-            params: { showid: parseInt(showId) },
-          })
-        }
-        onPress={() => router.push({ pathname: `/[showid]`, params: { showid: parseInt(showId) } })}
+
         // className="rounded-lg border-hairline border-primary active:border-hairline"
       >
-        <View
+        <Pressable
           style={{
             width: imageWidth,
             height: imageHeight,
           }}
-          className="overflow-hidden rounded-lg border-hairline">
+          className="overflow-hidden rounded-lg border-hairline"
+          onLongPress={() =>
+            router.push({
+              pathname: `/seasonslistmodal`,
+              params: { showid: parseInt(showId) },
+            })
+          }
+          onPress={() =>
+            router.push({ pathname: `/[showid]`, params: { showid: parseInt(showId) } })
+          }>
           <Image
             source={localPoster || missingPosterURI}
             contentFit="cover"
             style={{ width: imageWidth, height: imageHeight }}
           />
-        </View>
-      </Pressable>
+        </Pressable>
+      </View>
       {/* Make pressable to expand to show details? */}
       {/* <View className="absolute bottom-[-15] w-full flex-row justify-between rounded-b-lg border-hairline bg-green-800 p-1">
         {avgEpisodeRunTime && <Text className="text-white">{avgEpisodeRunTime} Mins</Text>}

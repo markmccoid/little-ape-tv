@@ -33,6 +33,10 @@ export default function SettingsLayout() {
       />
       <Stack.Screen name="tagsetup" options={{ headerShown: true, title: 'Tag Setup' }} />
       <Stack.Screen
+        name="streamingprovidersetup"
+        options={{ headerShown: true, title: 'Streaming Providers' }}
+      />
+      <Stack.Screen
         name="savedfiltersmaint"
         options={{ headerShown: true, title: 'Saved Filters' }}
       />

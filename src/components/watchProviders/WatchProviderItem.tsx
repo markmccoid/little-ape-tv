@@ -5,18 +5,17 @@ import { SymbolView } from 'expo-symbols';
 import { Image } from 'expo-image';
 
 type Props = {
-  providerObj: SavedStreamingProviderInfo;
-  active: boolean;
+  providerObj: SavedStreamingProviderInfo & { active: boolean };
   toggleItem: (providerId: number) => void;
 };
-const WatchProviderItem = ({ providerObj, active, toggleItem }: Props) => {
+const WatchProviderItem = ({ providerObj, toggleItem }: Props) => {
   return (
     <Pressable
       key={providerObj.providerId}
       className="m-1 flex-col items-center rounded-lg p-2"
-      style={{ borderColor: active ? 'red' : 'white', borderWidth: 1 }}
+      style={{ borderColor: providerObj.active ? 'red' : 'white', borderWidth: 1 }}
       onPress={() => toggleItem(providerObj.providerId)}>
-      {active && (
+      {providerObj.active && (
         <View className="absolute right-0 top-0 z-10">
           <SymbolView
             type="palette"
