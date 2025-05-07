@@ -9,10 +9,10 @@ import { use$ } from '@legendapp/state/react';
 const FilterHeaderIcon = () => {
   const { colors } = useCustomTheme();
   const {
-    filterIsAllWatched,
+    filterIsAllWatched = 'off',
     excludeGenres,
     excludeTags,
-    filterIsFavorited,
+    filterIsFavorited = 'off',
     includeTags,
     includeGenres,
     includeWatchProviders,

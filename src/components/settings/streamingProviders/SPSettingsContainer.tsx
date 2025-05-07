@@ -16,7 +16,7 @@ import { Image } from 'expo-image';
 import SPSettingsItem from './SPSettingsItem';
 
 const SPSettingsContainer = () => {
-  const providers = use$(settings$.savedStreamingProviders);
+  const providers = use$(settings$.savedStreamingProviders) || [];
   const { bottom } = useSafeAreaInsets();
   const scrollableRef = useAnimatedRef<Animated.ScrollView>();
 

@@ -1,7 +1,6 @@
 import { View, Text, Pressable } from 'react-native';
 import React from 'react';
 import { settings$ } from '~/store/store-settings';
-import { filterCriteria$ } from '~/store/store-filterCriteria';
 import { use$ } from '@legendapp/state/react';
 import WatchProviderItem from './WatchProviderItem';
 import { orderBy, sortBy } from 'lodash';
@@ -11,7 +10,7 @@ type Props = {
   toggleProvider: (providerId: number) => void;
 };
 const WatchProviderFilterContainer = ({ activeProviderIds = [], toggleProvider }: Props) => {
-  const providers = use$(settings$.savedStreamingProviders);
+  const providers = use$(settings$.savedStreamingProviders) || [];
   const taggedProviders = providers
     .map((el) => ({
       ...el,

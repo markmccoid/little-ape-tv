@@ -9,7 +9,7 @@ import WatchProviderFilterContainer from '~/components/watchProviders/WatchProvi
 import { EraserIcon } from '~/components/common/Icons';
 
 const WatchProviderFilter = () => {
-  const currentFilter = use$(filterCriteria$.baseFilters.includeWatchProviders);
+  const currentFilter = use$(filterCriteria$.baseFilters.includeWatchProviders) || [];
 
   return (
     <View className="mx-2 mb-2 rounded-xl border-hairline border-border bg-card px-2 py-1">

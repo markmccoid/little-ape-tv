@@ -531,8 +531,9 @@ const updateShowStreamingProviders = (showId: string, watchProviders: WatchProvi
     providers: updatedProviders,
     dateUpdatedEpoch: formatEpoch(Date.now()),
   });
+
   //-- 2.  Update settings$ streamingProvidersLookup data. make sure all are located in this array
-  const existingSavedProviders = settings$.savedStreamingProviders.peek();
+  const existingSavedProviders = settings$.savedStreamingProviders.peek() || [];
   const newProviders = mergeStreamingProviders(existingSavedProviders, [...streamingProviders]);
 
   settings$.savedStreamingProviders.set(newProviders || []);

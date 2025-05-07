@@ -35,7 +35,7 @@ const SearchItem = ({ searchItem, numColumns }: Props) => {
       {/* <Link href={{ pathname: `/[showid]`, params: { showid: searchItem.id }, key={searchItem.id} }}> */}
       <Pressable
         onPress={() => router.push({ pathname: `/[showid]`, params: { showid: searchItem.id } })}
-        className="rounded-lg border-green-600 active:border-hairline">
+        className="rounded-lg border-green-600">
         <View
           style={{
             width: imageWidth,
