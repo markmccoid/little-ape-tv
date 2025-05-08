@@ -1,7 +1,6 @@
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Pressable } from 'react-native';
 import React from 'react';
 import { getPersonDetails_typedef } from '@markmccoid/tmdb_api';
-import ShowImage from '~/components/common/ShowImage';
 import { Image } from 'expo-image';
 import Animated, {
   Extrapolation,
@@ -11,6 +10,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { getNoImageFound } from '~/utils/utils';
 import { useCustomTheme } from '~/utils/customColorTheme';
+import * as Linking from 'expo-linking';
 
 type Props = {
   personInfo: getPersonDetails_typedef['data'];
@@ -49,7 +49,11 @@ const PersonProfile = ({ personInfo, scrollY, headerHeight }: Props) => {
     };
   });
   return (
-    <View className="flex-row px-1 pt-[8]">
+    <Pressable
+      className="flex-row px-1 pt-[8]"
+      onPress={() => {
+        Linking.openURL(`https://www.imdb.com/name/${personInfo.imdbId}/`);
+      }}>
       <Animated.View
         style={[
           animatedProfileStyle,
@@ -69,7 +73,7 @@ const PersonProfile = ({ personInfo, scrollY, headerHeight }: Props) => {
       <ScrollView className="" contentContainerClassName="pb-5">
         <Text className="flex-1 px-1">{personInfo.biography}</Text>
       </ScrollView>
-    </View>
+    </Pressable>
   );
 };
 

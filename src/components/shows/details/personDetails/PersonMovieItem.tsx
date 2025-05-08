@@ -19,7 +19,7 @@ const PersonMovieItem = ({ movieItem, numColumns }: Props) => {
   const { imageHeight, imageWidth } = useImageSize(numColumns);
 
   return (
-    <View className="mb-[25]">
+    <View className="">
       <Pressable
         onPress={async () => {
           try {

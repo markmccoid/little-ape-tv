@@ -6,12 +6,16 @@ import { useRouter } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
 import { useCustomTheme } from '~/utils/customColorTheme';
 import Sortable, { SortableGridRenderItem } from 'react-native-sortables';
+import Animated, { useAnimatedRef } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // NOTE: This is the list of created filters.
 // The "Favorite" this is referring to is the indentifier that says to
 // show a filter on the main page.
 // If you need to edit the actual filters start with "AddEditFilter.tsx"
 const SavedFiltersContainer = () => {
+  const { bottom } = useSafeAreaInsets();
+  const scrollableRef = useAnimatedRef<Animated.ScrollView>();
   const { colors } = useCustomTheme();
   const savedFilters = use$(filterCriteria$.savedFilters);
   const router = useRouter();
@@ -22,7 +26,7 @@ const SavedFiltersContainer = () => {
   const handleFavorite = (filterId: string) => {
     filterCriteria$.toggleFavoriteSavedFilter(filterId);
   };
-
+  //# RENDER ITEM for Saved Filters SortableGrid
   const renderItem = ({ item: filter }: { item: SavedFilter }) => {
     return (
       <View
@@ -74,7 +78,10 @@ const SavedFiltersContainer = () => {
           <Text className="text-button-text font-semibold">Add</Text>
         </Pressable>
       </View>
-      <View>
+      <Animated.ScrollView
+        contentContainerClassName="p-2"
+        ref={scrollableRef}
+        style={{ marginBottom: bottom }}>
         <Sortable.Grid
           data={savedFilters}
           keyExtractor={(item) => item.id}
@@ -86,9 +93,10 @@ const SavedFiltersContainer = () => {
           activeItemScale={0.95}
           // showDropIndicator
           // itemEntering={BounceInRight}
+          scrollableRef={scrollableRef}
           hapticsEnabled={true}
         />
-      </View>
+      </Animated.ScrollView>
     </View>
   );
 };

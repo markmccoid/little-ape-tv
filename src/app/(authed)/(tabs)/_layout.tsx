@@ -4,7 +4,7 @@ import { SymbolView } from 'expo-symbols';
 import { Alert, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AddIcon, SettingsIcon, ViewTVShowIcon } from '~/components/common/Icons';
-
+import * as Haptics from 'expo-haptics';
 import { QuickFilters } from '~/components/zeego/QuickFilters';
 import { useCustomTheme } from '~/utils/customColorTheme';
 
@@ -37,6 +37,9 @@ export default function TabLayout() {
           name="quickfilter"
           options={{
             title: '',
+            // This icon is just here as a placeholder (note: opacity: 0)
+            // The QuickFilters component below renders the actual icon and handles
+            // the button press and showing of the action menu
             tabBarIcon: ({ color }) => (
               <SymbolView
                 name="line.3.horizontal.circle.fill"
@@ -51,6 +54,7 @@ export default function TabLayout() {
           listeners={{
             tabPress: (e) => {
               e.preventDefault();
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             },
           }}
         />

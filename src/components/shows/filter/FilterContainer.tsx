@@ -10,22 +10,24 @@ import { Stack, useRouter } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
 import { EraserIcon } from '~/components/common/Icons';
 import { filterCriteria$ } from '~/store/store-filterCriteria';
+import { useCustomTheme } from '~/utils/customColorTheme';
 
 const FilterContainer = () => {
   const router = useRouter();
+  const { colors } = useCustomTheme();
   return (
     <ScrollView contentContainerStyle={{ paddingBottom: 50 }}>
       <Stack.Screen
         options={{
-          headerRight: () => (
-            <Pressable onPress={() => router.back()} hitSlop={2}>
-              <SymbolView name="x.square" size={35} />
+          headerLeft: () => (
+            <Pressable onPress={() => router.back()} hitSlop={5}>
+              <SymbolView name="x.square.fill" tintColor={colors.primary} size={30} />
             </Pressable>
           ),
-          headerLeft: () => (
-            <Pressable onPress={() => filterCriteria$.actionClearAllCriteria()} hitSlop={2}>
-              {/* <SymbolView name="eraser" size={35} /> */}
-              <EraserIcon size={35} />
+          headerRight: () => (
+            <Pressable onPress={() => filterCriteria$.actionClearAllCriteria()} hitSlop={5}>
+              <SymbolView name="eraser.fill" size={35} />
+              {/* <EraserIcon size={30} /> */}
             </Pressable>
           ),
         }}

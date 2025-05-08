@@ -1,4 +1,4 @@
-import { View, Text, Pressable } from 'react-native';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
 import React from 'react';
 import { SavedStreamingProviderInfo } from '~/store/store-settings';
 import { SymbolView } from 'expo-symbols';
@@ -26,7 +26,10 @@ const WatchProviderItem = ({ providerObj, toggleItem }: Props) => {
           />
         </View>
       )}
-      <Image source={providerObj.logoURL} style={{ width: 50, height: 50, borderRadius: 10 }} />
+      <Image
+        source={providerObj.logoURL}
+        style={{ width: 50, height: 50, borderRadius: 10, borderWidth: StyleSheet.hairlineWidth }}
+      />
       {/* <Text>{el.provider}</Text> */}
     </Pressable>
   );

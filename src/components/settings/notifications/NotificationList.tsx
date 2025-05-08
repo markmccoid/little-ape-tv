@@ -17,7 +17,7 @@ const NotificationList = () => {
     ['dateChecked'],
     ['desc']
   );
-  const backgroundRuns = settings$.notificationBackgroundRun.peek();
+  const backgroundRuns = settings$.backgroundRunLog.peek() || [];
 
   return (
     <View className="mt-2 flex-1">
@@ -30,8 +30,13 @@ const NotificationList = () => {
             <View className="mx-4 flex-row flex-wrap justify-between">
               {backgroundRuns.map((el) => {
                 return (
-                  <View key={el.dateTimeEpoch} className="mb-2 border bg-lime-200 p-2">
-                    <Text className="text-buttontext">
+                  <View
+                    key={el.dateTimeEpoch}
+                    className="mb-2 border p-2"
+                    style={{ backgroundColor: el.type === 'notify' ? 'lime' : 'purple' }}>
+                    <Text
+                      className="font-semibold"
+                      style={{ color: el.type === 'notify' ? 'black' : 'white' }}>
                       {dayjs.unix(el.dateTimeEpoch).format('MM-DD-YY HH:mm:ss')}-({el.numShows})
                     </Text>
                   </View>

@@ -17,8 +17,8 @@ import TransparentBackground from '~/components/common/TransparentBackground';
 import { ScrollView } from 'react-native-gesture-handler';
 import Checkbox from 'expo-checkbox';
 import * as Burnt from 'burnt';
-import { priorityMergeArrays } from '~/utils/utils';
 import AddEditWatched from './AddEditWatched';
+import WatchProviderFilterContainer from '~/components/watchProviders/WatchProviderFilterContainer';
 
 type Props = {
   filterId?: string;
@@ -59,6 +59,21 @@ const AddEditFilter = ({ filterId }: Props) => {
     setIsWatched(inclusionState);
   };
 
+  //~ Watch Providers
+  const [activeProviders, setActiveProviders] = useState<number[]>(
+    savedFilter?.filter?.includeWatchProviders || []
+  );
+  const toggleActiveProviders = (providerId: number) => {
+    setActiveProviders((prev) => {
+      let newVals = [];
+      if (prev.includes(providerId)) {
+        newVals = prev.filter((el) => el !== providerId);
+      } else {
+        newVals = [...prev, providerId];
+      }
+      return newVals;
+    });
+  };
   //~ Load on Startup
   const [loadOnStartup, setLoadonStartup] = useState(savedFilter?.loadOnStartup || false);
   //# --- Sort Info, adding default sort fields at end
@@ -82,6 +97,7 @@ const AddEditFilter = ({ filterId }: Props) => {
         includeTags: stateArrays.includedTags,
         excludeGenres: genreStateArrays.excludedTags,
         includeGenres: genreStateArrays.includedTags,
+        includeWatchProviders: activeProviders,
         filterIsFavorited: isFav,
         filterIsAllWatched: isWatched,
       },
@@ -165,6 +181,16 @@ const AddEditFilter = ({ filterId }: Props) => {
           updateActiveFlag={updateActiveFlag}
           updateSortDirection={updateSortDirection}
           savedSortReorder={savedSortReorder}
+        />
+      </View>
+
+      {/* Streaming Providers */}
+      <View className="m-1 p-1 pb-5">
+        <TransparentBackground />
+        <Text className="px-3 text-lg font-semibold text-text">Streaming Providers</Text>
+        <WatchProviderFilterContainer
+          activeProviderIds={activeProviders}
+          toggleProvider={toggleActiveProviders}
         />
       </View>
       <View className="mx-2 mt-2 flex-row justify-end">

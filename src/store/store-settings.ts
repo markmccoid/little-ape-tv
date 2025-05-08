@@ -24,7 +24,11 @@ type NotificationRecord = {
 };
 
 export type SavedStreamingProviderInfo = ProviderInfo & { isHiddenFlag?: boolean };
-
+export type BackgroundRunLog = {
+  dateTimeEpoch: number;
+  numShows: number;
+  type: 'notify' | 'provider';
+};
 type Settings = {
   searchNumColumns: 2 | 3;
   showImageInEpisode: boolean;
@@ -38,7 +42,7 @@ type Settings = {
   // Each show will only store the LAST notification sent to the user
   notificationHistory: Record<string, NotificationRecord>;
   // history of when the background code runs and how many show
-  notificationBackgroundRun: { dateTimeEpoch: number; numShows: number }[];
+  backgroundRunLog: BackgroundRunLog[];
   // Any show that is added gets its streaming providers added here
   // Lookup table for items stored on
   savedStreamingProviders: SavedStreamingProviderInfo[];

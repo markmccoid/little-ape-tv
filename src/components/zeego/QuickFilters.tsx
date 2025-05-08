@@ -7,16 +7,23 @@ import { SymbolView } from 'expo-symbols';
 import { use$ } from '@legendapp/state/react';
 import { filterCriteria$ } from '~/store/store-filterCriteria';
 import { reverse } from 'lodash';
-import { useRouter } from 'expo-router';
+import { useNavigation, usePathname, useRouter, useSegments } from 'expo-router';
 
 export function QuickFilters() {
   const { colors } = useCustomTheme();
   const router = useRouter();
+  const navigation = useNavigation();
+  const segments = useSegments() as string[];
+
   const savedFiltersTemp = use$(filterCriteria$.savedFilters);
   const savedFilters = reverse([...savedFiltersTemp]);
 
   const applyFilter = (filterId: string) => {
-    router.push('/(authed)/(tabs)/(home)');
+    // ONLY replace route if NOT on home path
+    // this moves us to the right place if searching, etc
+    if (!segments.includes('(home)')) {
+      router.replace('/(authed)/(tabs)/(home)');
+    }
     filterCriteria$.applySavedFilter(filterId);
   };
 

@@ -13,7 +13,7 @@ export default function ShowIdLayout() {
           headerShown: true,
           // headerTransparent: true,
         }}
-        getId={({ params }) => params.personid}
+        // getId={({ params }) => params.personid}
       />
     </Stack>
   );

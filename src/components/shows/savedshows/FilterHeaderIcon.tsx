@@ -22,7 +22,10 @@ const FilterHeaderIcon = () => {
   const favedOn = filterIsFavorited !== 'off' ? 1 : 0;
   return (
     <Link href="./filtermodal" asChild>
-      <Pressable className="mr-[5]" onLongPress={filterCriteria$.actionClearAllCriteria}>
+      <Pressable
+        className="mr-[5]"
+        onLongPress={filterCriteria$.actionClearAllCriteria}
+        hitSlop={5}>
         {({ pressed }) => (
           <>
             <FilterIcon size={25} color={colors.primary} style={{ opacity: pressed ? 0.5 : 1 }} />

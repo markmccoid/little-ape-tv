@@ -5,6 +5,8 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import SeasonEpisodeList from './SeasonEpisodeList';
 import { CloseIcon } from '~/components/common/Icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SymbolView } from 'expo-symbols';
+import { useCustomTheme } from '~/utils/customColorTheme';
 
 type Props = {
   showData: ShowDetailsData;
@@ -12,6 +14,7 @@ type Props = {
 const SeasonsContainer = () => {
   const { showid } = useLocalSearchParams();
   const router = useRouter();
+  const { colors } = useCustomTheme();
   const { bottom } = useSafeAreaInsets();
   const { data: showData } = useShowDetails(parseInt(showid as string));
 
@@ -34,9 +37,10 @@ const SeasonsContainer = () => {
             {showData.name}
           </Text>
         </View>
-        <View className="absolute right-2 rounded-lg border-hairline bg-slate-300 p-[2]">
-          <Pressable onPress={() => router.back()}>
-            <CloseIcon size={20} />
+        <View className="absolute left-2 rounded-lg border-hairline  p-[2]">
+          <Pressable onPress={() => router.back()} hitSlop={5}>
+            {/* <CloseIcon size={20} /> */}
+            <SymbolView name="x.square.fill" tintColor={colors.button} size={30} />
           </Pressable>
         </View>
       </View>

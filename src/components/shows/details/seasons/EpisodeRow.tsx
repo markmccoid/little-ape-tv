@@ -1,4 +1,4 @@
-import { View, Text, Linking, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Linking, Pressable, StyleSheet, ScrollView } from 'react-native';
 import React, { useEffect } from 'react';
 import { Image } from 'expo-image';
 import {
@@ -109,7 +109,8 @@ const EpisodeRow = ({ showId, isStoredLocally, item }: Props) => {
               onPress={() => {
                 toggleEpisodeDownloaded(showId, item.seasonNumber, item.episodeNumber);
               }}
-              disabled={!isStoredLocally}>
+              disabled={!isStoredLocally}
+              hitSlop={5}>
               <Text
                 className="mx-2 py-[2] pl-[2] pr-[1] text-lg font-semibold text-text"
                 numberOfLines={1}>
@@ -135,17 +136,18 @@ const EpisodeRow = ({ showId, isStoredLocally, item }: Props) => {
             </View>
           </Pressable>
         )}
-        <View className="mx-2">
+        <ScrollView className="mx-2">
           <Text
             style={styles.overview}
             className="text-text"
-            numberOfLines={3}
-            ellipsizeMode="tail">
+            // numberOfLines={3}
+            // ellipsizeMode="tail"
+          >
             {item.overview}
           </Text>
-        </View>
+        </ScrollView>
         <View
-          className="ml-1 mt-1 flex-row items-center justify-between rounded-lg border-hairline bg-[#ffffff99] py-[2] pl-2 pr-2
+          className=" ml-1 mt-1 flex-row items-center justify-between rounded-lg border-hairline bg-[#ffffff99] py-[2] pl-2 pr-2
          dark:bg-[#77777777]">
           {/* FAVORITED? Only show if stored localally This is done with opacity so spacoing stays the same*/}
           <Pressable
@@ -153,7 +155,8 @@ const EpisodeRow = ({ showId, isStoredLocally, item }: Props) => {
             onPress={() => {
               toggleEpisodeFavorited(showId, item.seasonNumber, item.episodeNumber);
             }}
-            disabled={!isStoredLocally}>
+            disabled={!isStoredLocally}
+            hitSlop={5}>
             {!!attributes?.favorited ? (
               <View className="flex-row items-center justify-center">
                 <SymbolView name="heart.fill" size={25} tintColor={'red'} />
@@ -171,7 +174,8 @@ const EpisodeRow = ({ showId, isStoredLocally, item }: Props) => {
             onPress={() => {
               toggleEpisodeWatched(showId, item.seasonNumber, item.episodeNumber);
             }}
-            disabled={!isStoredLocally}>
+            disabled={!isStoredLocally}
+            hitSlop={6}>
             {!!attributes?.watched ? (
               <View className="flex-row items-center justify-center">
                 <ViewTVShowIcon size={25} color={'green'} />

@@ -13,7 +13,11 @@ import SettingsItem from './SettingsItem';
 import SettingsGroup from './SettingsGroup';
 import { FilterIcon } from '../common/Icons';
 import { ThemeOption } from './ThemeSelector';
-import { checkForShowUpdatesAndNotify } from '~/utils/backgroundTasks';
+import {
+  checkForProviderUpdates,
+  checkForShowUpdatesAndNotify,
+  clearStreamUpdatedEpoch,
+} from '~/utils/backgroundTasks';
 import { savedShows$ } from '~/store/store-shows';
 
 const SettingsContainer = () => {
@@ -156,12 +160,18 @@ const SettingsContainer = () => {
                 savedShows$.shows[key]?.lastNotifySeasonEpisode.set(undefined);
                 savedShows$.shows[key]?.dateLastNotifyCheckedEpoch.set(undefined);
                 savedShows$.shows[key]?.nextNotifyOffset.set(undefined);
-                settings$.notificationBackgroundRun.set([]);
+                settings$.backgroundRunLog.set([]);
               });
               Alert.alert('NextNotifyDates Reset DONE');
             }}
             className="border bg-white p-2">
             <Text>Reset NextNotifyDates</Text>
+          </Pressable>
+          <Pressable onPress={checkForProviderUpdates} className="border bg-yellow-400 p-2">
+            <Text>Check Provider Updates</Text>
+          </Pressable>
+          <Pressable onPress={clearStreamUpdatedEpoch} className="border bg-yellow-400 p-2">
+            <Text>Clear Stream Dates</Text>
           </Pressable>
         </View>
       </ScrollView>

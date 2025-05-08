@@ -5,10 +5,12 @@ import { savedShows$ } from '~/store/store-shows';
 import { tvGetShowDetails } from '@markmccoid/tmdb_api';
 import * as Linking from 'expo-linking';
 import { addDaysToEpoch, formatEpoch, getEpochwithTime, subtractDaysFromEpoch } from './utils';
-import { settings$ } from '~/store/store-settings';
+import { BackgroundRunLog, settings$ } from '~/store/store-settings';
 import dayjs from 'dayjs';
+import { getWatchProviders } from '~/data/query.shows';
 
 const CHECK_NEW_EPISODES_TASK = 'check-new-episodes';
+const UPDATE_WATCH_PROVIDERS = 'update-watch-providers';
 
 // Define the background tasks
 TaskManager.defineTask(CHECK_NEW_EPISODES_TASK, async () => {
@@ -20,11 +22,23 @@ TaskManager.defineTask(CHECK_NEW_EPISODES_TASK, async () => {
     return BackgroundTask.BackgroundTaskResult.Failed;
   }
 });
+TaskManager.defineTask(UPDATE_WATCH_PROVIDERS, async () => {
+  try {
+    await checkForProviderUpdates();
+    return BackgroundTask.BackgroundTaskResult.Success; // Changed return type
+  } catch (error) {
+    console.error('Background task failed:', error);
+    return BackgroundTask.BackgroundTaskResult.Failed;
+  }
+});
 
 export async function registerBackgroundTask() {
   try {
     await BackgroundTask.registerTaskAsync(CHECK_NEW_EPISODES_TASK, {
-      minimumInterval: 360, // Now in minutes (6 hours) instead of seconds
+      minimumInterval: 360 * 2, // Now in minutes (12 hours) instead of seconds
+    });
+    await BackgroundTask.registerTaskAsync(UPDATE_WATCH_PROVIDERS, {
+      minimumInterval: 1440 * 2, // In minutes (2 days)
     });
   } catch (error) {
     console.error('Failed to register background task:', error);
@@ -208,13 +222,56 @@ export function selectEligibleShows() {
   //   'showsToCheck',
   //   showsToCheck.map((el) => el.name)
   // );
-  const existingRuns = settings$.notificationBackgroundRun.peek();
+  const existingRuns = settings$.backgroundRunLog.peek();
 
-  settings$.notificationBackgroundRun.set(
+  settings$.backgroundRunLog.set(
     [
       ...(existingRuns || []),
-      { dateTimeEpoch: getEpochwithTime(), numShows: showsToCheck.length },
-    ].slice(-25)
+      { dateTimeEpoch: getEpochwithTime(), numShows: showsToCheck.length, type: 'notify' },
+    ].slice(-25) as BackgroundRunLog[]
   ); // Just keep the last 25 runs
   return showsToCheck;
 }
+
+//# ------------------------
+export const checkForProviderUpdates = async () => {
+  const shows = savedShows$.shows.peek();
+  // no time information just date (unix seconds)
+  const currentEpoch = formatEpoch(Date.now());
+
+  let showsToCheck = [];
+  for (const [key, show] of Object.entries(shows)) {
+    const lastUpdateEpoch = show.streaming?.dateUpdatedEpoch;
+    if (!lastUpdateEpoch) {
+      savedShows$.shows[key].streaming.dateUpdatedEpoch.set(currentEpoch);
+      await getWatchProviders(key);
+      showsToCheck.push(show);
+      continue;
+    }
+    const daysBetween = (currentEpoch - lastUpdateEpoch) / 86400;
+
+    if (daysBetween >= 10) {
+      savedShows$.shows[key].streaming.dateUpdatedEpoch.set(currentEpoch);
+      await getWatchProviders(key);
+      showsToCheck.push(show);
+    }
+  }
+
+  const existingRuns = settings$.backgroundRunLog.peek();
+
+  settings$.backgroundRunLog.set(
+    [
+      ...(existingRuns || []),
+      { dateTimeEpoch: getEpochwithTime(), numShows: showsToCheck.length, type: 'provider' },
+    ].slice(-25) as BackgroundRunLog[]
+  ); // Just keep the last 25 runs
+};
+//# REMOVE AFTER TEST - Clear stream update dates
+export const clearStreamUpdatedEpoch = () => {
+  const shows = savedShows$.shows.peek();
+  //clear the savedStreamingProviders too
+  settings$.savedStreamingProviders.set([]);
+  Object.keys(shows).forEach((key) =>
+    savedShows$.shows[key].streaming.set({ dateUpdatedEpoch: undefined, providers: [] })
+  );
+};
