@@ -1,8 +1,7 @@
 import * as DropdownMenu from 'zeego/dropdown-menu';
 import { TouchableOpacity, Text, View, Pressable } from 'react-native';
-
+import * as Haptics from 'expo-haptics';
 import { useCustomTheme } from '~/utils/customColorTheme';
-import { CloseIcon } from '../common/Icons';
 import { SymbolView } from 'expo-symbols';
 import { use$ } from '@legendapp/state/react';
 import { filterCriteria$ } from '~/store/store-filterCriteria';
@@ -30,7 +29,7 @@ export function QuickFilters() {
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger>
-        <Pressable>
+        <Pressable onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}>
           <SymbolView name="line.3.horizontal.circle.fill" tintColor={colors.primary} size={30} />
         </Pressable>
       </DropdownMenu.Trigger>

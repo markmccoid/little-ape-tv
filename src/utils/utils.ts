@@ -19,6 +19,14 @@ const hashStringToNumber = (str: string) => {
 export const noImageFound = {
   noimagefound: require('../../assets/images/noimagefound.jpeg'),
 };
+export const noImageFoundSeq = {
+  noimagefound_01: require('../../assets/images/noImageFound/Noimagefound_001.webp'),
+  noimagefound_02: require('../../assets/images/noImageFound/Noimagefound_002.webp'),
+  noimagefound_03: require('../../assets/images/noImageFound/Noimagefound_003.webp'),
+  noimagefound_04: require('../../assets/images/noImageFound/Noimagefound_004.webp'),
+  noimagefound_05: require('../../assets/images/noImageFound/Noimagefound_005.webp'),
+  noimagefound_06: require('../../assets/images/noImageFound/Noimagefound_006.webp'),
+};
 export const defaultVideosThumbs = {
   image_01: require('../../assets/images/defaultimages/video_comedy.jpeg'),
   image_02: require('../../assets/images/defaultimages/video_documentary.jpeg'),
@@ -38,7 +46,12 @@ export const defaultVideosThumbs = {
 export const getDefaultVideoImage = (filename: string) => {
   const hash = hashStringToNumber(filename);
   const num = (hash % Object.keys(defaultVideosThumbs).length) + 1;
-  return defaultVideosThumbs[`image${num.toString().padStart(2, '0')}`];
+  return defaultVideosThumbs[`image_${num.toString().padStart(2, '0')}`];
+};
+export const getNoImageFound2 = (id: string) => {
+  const hash = hashStringToNumber(id);
+  const num = (hash % Object.keys(noImageFoundSeq).length) + 1;
+  return noImageFoundSeq[`noimagefound_${num.toString().padStart(2, '0')}`];
 };
 export const getNoImageFound = () => {
   return noImageFound[`noimagefound`];

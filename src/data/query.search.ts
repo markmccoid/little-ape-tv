@@ -1,11 +1,17 @@
+import { use$ } from '@legendapp/state/react';
 import {
   movieSearchByTitle,
   tvDiscover,
-  tvGetPopular,
+  rawTVGetAllGenres,
   tvSearchByTitle,
+  getTMDBConsts,
 } from '@markmccoid/tmdb_api';
+import { getTMDBConfig, getTVGenres } from '@markmccoid/tmdb_api/config';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import dayjs from 'dayjs';
+import { first } from 'lodash';
 import { search$ } from '~/store/store-search';
+import { settings$ } from '~/store/store-settings';
 import { savedShows$ } from '~/store/store-shows';
 
 //~ ---------------------------------------------------------
@@ -17,9 +23,18 @@ export const useTitleSearch = (searchValue: string) => {
     queryFn: async ({ pageParam = 1 }) => {
       // If no searchValue passed then discover
       //! Should allow users to specify what they see here and do a search.  Give them inputs for default search.
+      const { firstAirDateYear, includeGenres, excludeGenres } = settings$.initialQuery.peek();
+
       if (!searchValue) {
         const discoverResults = await tvDiscover(
-          { firstAirDateYear: 2023, withOriginCountry: ['US'] },
+          {
+            firstAirDateYear:
+              parseInt(firstAirDateYear) || parseInt(dayjs().subtract(5, 'month').format('YYYY')),
+            genres: includeGenres || [],
+            withoutGenres: excludeGenres || [],
+            withOriginCountry: ['US'],
+            sortBy: 'popularity.desc',
+          },
           pageParam
         );
 
@@ -43,4 +58,14 @@ export const useTitleSearch = (searchValue: string) => {
   const taggedShows = savedShows$.tagShows(allPages);
 
   return { data: taggedShows, fetchNextPage, hasNextPage, isLoading, error };
+};
+
+//## ----------------------------------------------------------------
+//## useGenres - Get list of all genres on their Ids
+//## ----------------------------------------------------------------
+export const useAllGenres = () => {
+  const TMDBConsts = getTMDBConsts();
+  // console.log(TMDBConsts);
+  const genres = Object.entries(TMDBConsts.TV_GENRE_OBJ).map(([id, name]) => ({ id, name }));
+  return genres || [];
 };

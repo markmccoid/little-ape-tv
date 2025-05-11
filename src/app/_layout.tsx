@@ -12,6 +12,7 @@ import { CustomLightTheme, CustomDarkTheme } from '../utils/customColorTheme';
 import { ThemeProvider } from '@react-navigation/native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Asul_400Regular, Asul_700Bold } from '@expo-google-fonts/asul';
+import { Roboto_400Regular, Roboto_500Medium } from '@expo-google-fonts/roboto';
 import { useFonts } from '@expo-google-fonts/asul';
 import { setupEvents } from '~/utils/events';
 import { queryClient } from '~/utils/queryClient';
@@ -27,7 +28,7 @@ const InitialLayout = () => {
   const router = useRouter();
   const { currentUser, initialized } = useAuth();
   const segments = useSegments();
-  const [fontsLoaded, error] = useFonts({ Asul_700Bold });
+  const [fontsLoaded, error] = useFonts({ Asul_700Bold, Roboto_500Medium, Roboto_400Regular });
   //! Notification Observer.  Added because notification links were not
   //! getting through via expo-router defaults.
   useNotificationObserver();

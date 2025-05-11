@@ -130,7 +130,7 @@ const ShowDetailContainer = ({ showId }: Props) => {
         {/* Image W/ OMDB Details */}
         <View className={`mx-2 max-h-[300] flex-row`}>
           <View>
-            <DetailHeader showData={data} />
+            <DetailHeader showData={data} isLoading={isLoading} />
           </View>
           <View className="ml-1 flex-1 flex-col overflow-hidden">
             <ScrollView className="mb-1 h-1/3 flex-shrink rounded-lg border-hairline bg-[#ffffff77] p-1">

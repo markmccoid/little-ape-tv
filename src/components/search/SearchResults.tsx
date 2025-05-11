@@ -37,7 +37,9 @@ const SearchResults = () => {
         getItemLayout={getItemLayout}
         keyExtractor={(item) => item.id.toString()}
         // keyExtractor={(item) => item.id.toString() + item.isStoredLocally}
-        contentContainerClassName="px-[10]"
+        contentContainerClassName="px-[10] pb-[100]"
+        //style={{ marginBottom: 50, paddingBottom: 150 }}
+
         columnWrapperClassName="flex-row justify-between flex-1"
         renderItem={({ item }) => {
           return (

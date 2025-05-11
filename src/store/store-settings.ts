@@ -6,6 +6,8 @@ import { authManager } from '~/authentication/AuthProvider';
 import { synced } from '@legendapp/state/sync';
 import { ThemeOption } from '~/components/settings/ThemeSelector';
 import { ProviderInfo } from '~/data/query.shows';
+import { initial } from 'lodash';
+import dayjs from 'dayjs';
 //**
 
 type DownloadOptions = {
@@ -29,6 +31,11 @@ export type BackgroundRunLog = {
   numShows: number;
   type: 'notify' | 'provider';
 };
+type InitialQuery = {
+  firstAirDateYear: string;
+  includeGenres: string[];
+  excludeGenres: string[];
+};
 type Settings = {
   searchNumColumns: 2 | 3;
   showImageInEpisode: boolean;
@@ -42,15 +49,17 @@ type Settings = {
   // Each show will only store the LAST notification sent to the user
   notificationHistory: Record<string, NotificationRecord>;
   // history of when the background code runs and how many show
-  backgroundRunLog: BackgroundRunLog[];
+  backgroundRunLog?: BackgroundRunLog[];
   // Any show that is added gets its streaming providers added here
   // Lookup table for items stored on
-  savedStreamingProviders: SavedStreamingProviderInfo[];
+  savedStreamingProviders?: SavedStreamingProviderInfo[];
+  //
+  initialQuery: InitialQuery;
 };
 //~ - - - - - - - - - - - - - - - - - -
 //~ settings$ Observable
 //~ - - - - - - - - - - - - - - - - - -
-const initialState = {
+const initialState: Settings = {
   searchNumColumns: 2,
   showImageInEpisode: true,
   downloadOptions: { showNextDownloadInfo: false },
@@ -61,6 +70,7 @@ const initialState = {
   userRatingMax: 10,
   notificationTime: { hour: 16, minute: 0 },
   notificationHistory: {},
+  initialQuery: { firstAirDateYear: dayjs().format('YYYY') },
 };
 export const settings$ = observable<Settings>(
   synced({

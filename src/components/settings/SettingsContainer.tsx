@@ -53,7 +53,18 @@ const SettingsContainer = () => {
         </SettingsGroup>
 
         {/* Set Default Appearance */}
-        <SettingsGroup style={{ marginTop: 8 }}>
+        <SettingsGroup style={{ marginTop: 8 }} title="Customize">
+          <SettingsGroup.RouteItem
+            title="Initial Query"
+            route="/(authed)/settings/initialQueryRoute"
+            LeftSymbol={() => (
+              <SymbolView
+                name="waveform.badge.magnifyingglass"
+                tintColor={colors.buttonDarker}
+                size={28}
+              />
+            )}
+          />
           <SettingsGroup.ThemeSelect
             title="Default Appearance"
             selectCallback={(theme?: ThemeOption) => settings$.defaultTheme.set(theme || 'auto')}

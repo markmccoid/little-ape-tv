@@ -55,7 +55,6 @@ const ShowItemBottom = ({ showId }: Props) => {
           </Pressable>
         </View>
       )}
-
       <Animated.View style={[{ position: 'absolute', right: 0, top: -5 }]}>
         <DeleteShowButton showId={showId} />
       </Animated.View>

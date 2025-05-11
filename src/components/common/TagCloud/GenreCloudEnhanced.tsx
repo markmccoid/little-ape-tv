@@ -53,7 +53,7 @@ export const GenreItem = ({
       try {
         onToggleTag(tagId, newState);
       } catch (error) {
-        console.log('Error setting Genre Tag');
+        console.log('Error setting Genre Tag', error);
         setLocalState(prevState);
       }
     }, 0);
@@ -78,7 +78,7 @@ export const GenreItem = ({
     <TouchableOpacity
       onLongPress={onLongPress ? () => handleLongPress(tagId) : undefined}
       activeOpacity={0.8}
-      className="m-[5] border border-border px-[7] py-[1] text-center"
+      className="m-[4] border border-border px-[7] py-[1] text-center"
       style={{ backgroundColor: bgColor, borderRadius: 10 }}
       key={tagId}
       onPress={() => handleStateChange(tagId)}

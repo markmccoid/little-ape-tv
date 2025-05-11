@@ -7,12 +7,14 @@ import { SymbolView } from 'expo-symbols';
 import { savedShows$ } from '~/store/store-shows';
 import { AnimatePresence, MotiView } from 'moti';
 import DetailContextMenu from '~/components/zeego/DetailContextMenu';
+import ShowImage from '~/components/common/ShowImage';
 
 const { width, height } = Dimensions.get('window');
 type Props = {
   showData: (Partial<SavedShow> & Partial<TVShowDetails>) | undefined;
+  isLoading?: boolean;
 };
-const DetailHeader = ({ showData }: Props) => {
+const DetailHeader = ({ showData, isLoading = false }: Props) => {
   if (!showData) return;
 
   return (
@@ -42,9 +44,17 @@ const DetailHeader = ({ showData }: Props) => {
           showId={showData.id}
           showName={showData.name}
           shareLink={showData.imdbURL}>
-          <Image
+          {/* <Image
             source={showData?.posterURL}
             style={{ width: width / 2.3, height: (width / 2.3) * 1.5 }}
+          /> */}
+          <ShowImage
+            posterURL={showData?.posterURL}
+            title={showData.name || ''}
+            imageWidth={width / 2.3}
+            imageHeight={(width / 2.3) * 1.5}
+            resizeMode="contain"
+            isLoading={isLoading}
           />
         </DetailContextMenu>
       </View>

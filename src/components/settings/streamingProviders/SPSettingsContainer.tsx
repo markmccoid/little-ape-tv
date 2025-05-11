@@ -14,9 +14,12 @@ import Sortable from 'react-native-sortables';
 import { SavedStreamingProviderInfo, settings$ } from '~/store/store-settings';
 import { Image } from 'expo-image';
 import SPSettingsItem from './SPSettingsItem';
+import { orderBy } from 'lodash';
 
 const SPSettingsContainer = () => {
-  const providers = use$(settings$.savedStreamingProviders) || [];
+  const providersInit = use$(settings$.savedStreamingProviders) || [];
+  const providers = orderBy(providersInit, ['displayPriority'], ['asc']);
+
   const { bottom } = useSafeAreaInsets();
   const scrollableRef = useAnimatedRef<Animated.ScrollView>();
 
@@ -34,6 +37,7 @@ const SPSettingsContainer = () => {
   //  save it to the store
   const updatePositions = (parms: SortableGridDragEndParams<SavedStreamingProviderInfo>) => {
     const newOrder = parms.data.map((el, index) => ({ ...el, displayPriority: index + 1 }));
+
     settings$.savedStreamingProviders.set(newOrder);
   };
   return (

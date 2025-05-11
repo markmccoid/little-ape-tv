@@ -9,18 +9,13 @@ import { search$ } from '~/store/store-search';
 import { use$ } from '@legendapp/state/react';
 import { settings$ } from '~/store/store-settings';
 import { savedShows$ } from '~/store/store-shows';
+import { getNoImageFound2 } from '~/utils/utils';
+import ShowImage from '../common/ShowImage';
 
 const { width, height } = Dimensions.get('window');
 const IMG_WIDTH = (width - 30) / 2;
 const IMG_HEIGHT = IMG_WIDTH * 1.5;
-const missingPosterURI = require('../../../assets/missingPoster.png');
 
-// type SearchItemData = {
-//   id: string;
-//   name: string;
-//   posterURL: string;
-//   isStoredLocally: boolean
-// }
 type Props = {
   searchItem: TVSearchResultItem & { isStoredLocally: boolean };
   numColumns: 2 | 3;
@@ -28,7 +23,6 @@ type Props = {
 const SearchItem = ({ searchItem, numColumns }: Props) => {
   const router = useRouter();
   const posterURL = use$(savedShows$.shows[searchItem.id].posterURL);
-
   const { imageHeight, imageWidth } = useImageSize(numColumns);
   return (
     <View className="mb-[25]">
@@ -41,19 +35,12 @@ const SearchItem = ({ searchItem, numColumns }: Props) => {
             width: imageWidth,
           }}
           className="overflow-hidden rounded-lg border-hairline">
-          {!searchItem?.posterURL && (
-            <View className="absolute top-0 z-10 w-full px-[4] py-[2] ">
-              <Text
-                className="flex-1 text-center font-Asul-Bold text-xl font-medium"
-                numberOfLines={2}>
-                {searchItem.name}
-              </Text>
-            </View>
-          )}
-          <Image
-            source={posterURL || searchItem.posterURL || missingPosterURI}
-            contentFit="cover"
-            style={{ width: imageWidth, height: imageHeight }}
+          <ShowImage
+            title={searchItem.name}
+            posterURL={posterURL || searchItem.posterURL}
+            imageWidth={imageWidth}
+            imageHeight={imageHeight}
+            resizeMode="contain"
           />
         </View>
       </Pressable>

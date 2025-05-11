@@ -5,6 +5,7 @@ import { SavedStreamingProviderInfo, settings$ } from '~/store/store-settings';
 import Sortable from 'react-native-sortables';
 import { SymbolView } from 'expo-symbols';
 import { useCustomTheme } from '~/utils/customColorTheme';
+import { orderBy } from 'lodash';
 
 type Props = {
   provider: SavedStreamingProviderInfo;
@@ -13,7 +14,8 @@ const SPSettingsItem = ({ provider }: Props) => {
   const { colors } = useCustomTheme();
   const toggleIsHidden = (providerId: number) => {
     const providers = settings$.savedStreamingProviders.peek();
-    const newProviders = providers.map((el) => {
+
+    const newProviders = orderBy(providers, ['displayPriority'], ['asc']).map((el, index) => {
       if (el.providerId === providerId) {
         return { ...el, isHiddenFlag: !el?.isHiddenFlag };
       } else {

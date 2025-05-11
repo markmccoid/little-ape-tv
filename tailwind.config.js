@@ -9,6 +9,8 @@ module.exports = {
     extend: {
       fontFamily: {
         'Asul-Bold': ['Asul_700Bold', 'sans-serif'],
+        'Roboto-500': ['Roboto_500Medium', 'sans-serif'],
+        'Roboto-400': ['Roboto_400Regular', 'sans-serif'],
       },
       borderWidth: {
         hairline: hairlineWidth(),

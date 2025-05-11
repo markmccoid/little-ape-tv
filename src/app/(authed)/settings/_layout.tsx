@@ -37,6 +37,10 @@ export default function SettingsLayout() {
         options={{ headerShown: true, title: 'Streaming Providers' }}
       />
       <Stack.Screen
+        name="initialQueryRoute"
+        options={{ headerShown: true, title: 'Customize Initial Search' }}
+      />
+      <Stack.Screen
         name="savedfiltersmaint"
         options={{ headerShown: true, title: 'Saved Filters' }}
       />

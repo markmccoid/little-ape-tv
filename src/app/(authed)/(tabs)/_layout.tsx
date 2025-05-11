@@ -4,7 +4,6 @@ import { SymbolView } from 'expo-symbols';
 import { Alert, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AddIcon, SettingsIcon, ViewTVShowIcon } from '~/components/common/Icons';
-import * as Haptics from 'expo-haptics';
 import { QuickFilters } from '~/components/zeego/QuickFilters';
 import { useCustomTheme } from '~/utils/customColorTheme';
 
@@ -54,7 +53,6 @@ export default function TabLayout() {
           listeners={{
             tabPress: (e) => {
               e.preventDefault();
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             },
           }}
         />

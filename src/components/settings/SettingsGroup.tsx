@@ -16,7 +16,7 @@ type SettingsGroupProps = {
 const SettingsGroup = ({ title, children, style }: SettingsGroupProps) => {
   return (
     <View className="mx-2" style={style}>
-      {title && <Text className="mb-1 ml-2 text-2xl">{title}</Text>}
+      {title && <Text className="font-Roboto-400 mb-1 ml-2 text-2xl">{title}</Text>}
       <View className="overflow-hidden rounded-lg border-hairline border-gray-500">{children}</View>
     </View>
   );

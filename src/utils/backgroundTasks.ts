@@ -203,19 +203,18 @@ export function selectEligibleShows() {
 
     // If nextNotifyEpoch is not set, set it to currentEpoch
     // it is null, then it will be added to showsToCheck
-    const nextNotifyOffset = !show?.nextNotifyOffset ? 1 : show.nextNotifyOffset;
+    const nextNotifyOffset =
+      !show?.nextNotifyOffset || show.nextNotifyOffset <= 0 ? 1 : show.nextNotifyOffset;
     // if null subtract one day so that show will be added to showsToCheck
     const lastNotifyCheckEpoch = !show?.dateLastNotifyCheckedEpoch
       ? Math.floor(currentEpoch - 86400) // minus one day
       : show.dateLastNotifyCheckedEpoch + nextNotifyOffset * 86400; //Offset by value stored on show
 
-    // UPDATE the dateLastNotifyCheckedEpoch with current date
-    savedShows$.shows[show.tmdbId].dateLastNotifyCheckedEpoch.set(currentEpoch);
-
     // if lastNotifyCheckEpoch is less than currentEpoch then add to showsToCheck
     if (lastNotifyCheckEpoch < currentEpoch) {
       showsToCheck.push(show);
-      // savedShows$.shows[key].dateLastNotifiedEpoch.set(addDaysToEpoch(nextNotifyEpoch, 5));
+      // UPDATE the dateLastNotifyCheckedEpoch with current date
+      savedShows$.shows[show.tmdbId].dateLastNotifyCheckedEpoch.set(currentEpoch);
     }
   }
   // console.log(
@@ -230,7 +229,11 @@ export function selectEligibleShows() {
       { dateTimeEpoch: getEpochwithTime(), numShows: showsToCheck.length, type: 'notify' },
     ].slice(-25) as BackgroundRunLog[]
   ); // Just keep the last 25 runs
-  return showsToCheck;
+  // Sort so we process those with a stored nextAirDate first
+  return showsToCheck.sort(
+    (a, b) => (a.nextAirDateEpoch || Infinity) - (b.nextAirDateEpoch || Infinity)
+  );
+  // return showsToCheck;
 }
 
 //# ------------------------

@@ -30,9 +30,9 @@ import { eventDispatcher, EventName } from '~/utils/EventDispatcher';
 import { formatEpoch } from '~/utils/utils';
 dayjs.extend(customParseFormat);
 
-//~ ------------------------------------------------------
-//~ useShows - FILTERED SAVED Shows
-//~ ------------------------------------------------------
+//# ------------------------------------------------------
+//# useShows - FILTERED SAVED Shows
+//# ------------------------------------------------------
 export const useFilteredShows = () => {
   const savedShowsObj = use$(savedShows$.shows);
   const {
@@ -179,80 +179,9 @@ const handleNullDates = (
   return { sortDate, workingDate };
 };
 
-//!! FILTER useShows
-export const useShowsOLD = () => {
-  const savedShowsObj = use$(savedShows$.shows);
-  const {
-    includeGenres = [],
-    includeTags = [],
-    excludeGenres = [],
-    excludeTags = [],
-  } = use$(filterCriteria$.baseFilters);
-  const filterIsFavorited = use$(filterCriteria$.baseFilters.filterIsFavorited);
-  const { showName, ignoreOtherFilters } = use$(filterCriteria$.nameFilter);
-  const sortSettings = use$(filterCriteria$.sortSettings);
-  const savedShows = Object.values(savedShowsObj); // More performant than Object.keys().map()
-
-  // NO Early return for no filters because we also want a change in the sort to run.
-  // This shouldn't be triggered unless a change in the baseFilters, nameFilter or sortSettings
-  // const hasNoFilters =
-  //   !includeTags.length &&
-  //   !excludeTags.length &&
-  //   !includeGenres.length &&
-  //   !excludeGenres.length &&
-  //   filterIsFavorited === 'off' &&
-  //   !showName;
-  // if (hasNoFilters) return savedShows;
-
-  // Pre-process showName for better performance
-  const normalizedShowName = showName?.toLowerCase() || '';
-
-  // Filter predicates
-  // These functions will be called within the filter on savedShows
-  const matchesName = (show: SavedShow) =>
-    !normalizedShowName || show.name.toLowerCase().includes(normalizedShowName);
-
-  const matchesTags = (show: SavedShow) => {
-    const userTags = show.userTags || [];
-    return (
-      includeTags.every((tag) => userTags.includes(tag)) &&
-      !excludeTags.some((tag) => userTags.includes(tag))
-    );
-  };
-
-  const matchesGenres = (show: SavedShow) => {
-    const showGenres = show.genres || [];
-    return (
-      includeGenres.every((genre) => showGenres.includes(genre)) &&
-      !excludeGenres.some((genre) => showGenres.includes(genre))
-    );
-  };
-
-  const matchesFavorite = (show: SavedShow) => {
-    const isFavorite = !!show.favorite;
-    return filterIsFavorited === 'include'
-      ? isFavorite
-      : filterIsFavorited === 'exclude'
-        ? !isFavorite
-        : true;
-  };
-
-  const filteredShows = savedShows.filter((show) => {
-    // Quick name-only filter when ignoring other filters
-    if (ignoreOtherFilters && normalizedShowName) {
-      return matchesName(show);
-    }
-    // Full filter
-    return matchesName(show) && matchesTags(show) && matchesGenres(show) && matchesFavorite(show);
-  });
-  const { sortFields, sortDirections } = getSort(sortSettings);
-
-  return orderBy(filteredShows, sortFields, sortDirections);
-};
-
-//~ ------------------------------------------------------
-//~ useShowDetail - GET DETAILS For a Shows
-//~ ------------------------------------------------------
+//# ------------------------------------------------------
+//# useShowDetail - GET DETAILS For a Shows
+//# ------------------------------------------------------
 export type UseShowDetailsReturn = ReturnType<typeof useShowDetails>;
 export type ShowDetailsData = UseShowDetailsReturn['data'];
 
@@ -291,9 +220,9 @@ export const useShowDetails = (showId: number) => {
   return { data: { ...data, ...localShow }, ...rest };
 };
 
-//*=================================
-//*- Get TV Show Season Details from TMDB Api
-//*=================================
+//# =================================
+//# - Get TV Show Season Details from TMDB Api
+//# =================================
 export const useShowSeasonData = (showId: string, seasonNumbers: number[]) => {
   // console.log('useseasons', showId, seasonNumbers);
   if (!showId || !seasonNumbers) return [];
@@ -371,9 +300,9 @@ export const getEpisodeIMDBURL = async (
   return results.data;
 };
 
-//~ ------------------------------------------------------
-//~ useShowCast
-//~ ------------------------------------------------------
+//# ------------------------------------------------------
+//# useShowCast
+//# ------------------------------------------------------
 export const useShowCast = (showId: string | undefined) => {
   if (!showId) return;
   const { data, isLoading, ...rest } = useQuery({
@@ -388,9 +317,9 @@ export const useShowCast = (showId: string | undefined) => {
   return { data, isLoading, ...rest };
 };
 
-//~ ------------------------------------------------------
-//~ usePersonDetails
-//~ ------------------------------------------------------
+//# ------------------------------------------------------
+//# usePersonDetails
+//# ------------------------------------------------------
 // --- Combined Type for the Hook's Data ---
 export type PersonCredit = {
   tvShows: CastTVShows[];
