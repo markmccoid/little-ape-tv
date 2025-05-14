@@ -1,7 +1,7 @@
 import { View, Text } from 'react-native';
 import React, { useMemo } from 'react';
 import ShadowBackground from '~/components/common/ShadowBackground';
-import { useAllGenres } from '~/data/query.search';
+import { useTMDBConfig } from '~/data/query.search';
 import GenreCloudEnhanced, { GenreItem } from '~/components/common/TagCloud/GenreCloudEnhanced';
 import { settings$ } from '~/store/store-settings';
 import { use$ } from '@legendapp/state/react';
@@ -33,7 +33,7 @@ const mergeGenres = (
 };
 
 const InitQueryGenres = ({ invalidateQuery }: { invalidateQuery: () => void }) => {
-  const genres = useAllGenres();
+  const { genres } = useTMDBConfig();
   const includeGenres = use$(settings$.initialQuery.includeGenres) || [];
   const excludeGenres = use$(settings$.initialQuery.excludeGenres) || [];
 

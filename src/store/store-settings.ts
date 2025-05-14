@@ -1,3 +1,4 @@
+import { WatchProvider } from './../../node_modules/@markmccoid/tmdb_api/types/APICurated/API_TV.d';
 import { Notification } from './../../node_modules/expo-notifications/build/Notifications.types.d';
 // import uuid from 'react-native-uuid';
 import { observable } from '@legendapp/state';
@@ -6,9 +7,25 @@ import { authManager } from '~/authentication/AuthProvider';
 import { synced } from '@legendapp/state/sync';
 import { ThemeOption } from '~/components/settings/ThemeSelector';
 import { ProviderInfo } from '~/data/query.shows';
-import { initial } from 'lodash';
 import dayjs from 'dayjs';
+import { getTMDBConsts } from '@markmccoid/tmdb_api';
 //**
+
+export const initializeWatchProviders = () => {
+  const currProviders = settings$.watchProviderAttributes.peek();
+  if (!currProviders) {
+    const tmdbConsts = getTMDBConsts();
+    const initProviders = tmdbConsts.WATCH_PROVIDERS.slice(0, 30);
+
+    const augmentedProviders: WatchProviderAttributes[] = initProviders.map((el) => ({
+      ...el,
+      isHidden: false,
+      isSearchOnly: false,
+      showsWithProvider: 0,
+    }));
+    settings$.watchProviderAttributes.set(augmentedProviders);
+  }
+};
 
 type DownloadOptions = {
   showNextDownloadInfo: boolean;
@@ -36,6 +53,15 @@ type InitialQuery = {
   includeGenres: string[];
   excludeGenres: string[];
 };
+export type WatchProviderAttributes = {
+  providerId: number;
+  provider: string;
+  logoPath: string;
+  displayPriority: number;
+  showsWithProvider?: number; // 0 no saved shows with this provider, 1 yes -- could instead store count of show
+  isHidden?: boolean; //is this provider hidden from search/filter lists
+  isSearchOnly: boolean; // true indicates it will NOT show up on settings screen.  It can be found in search and turned "on"
+};
 type Settings = {
   searchNumColumns: 2 | 3;
   showImageInEpisode: boolean;
@@ -53,6 +79,8 @@ type Settings = {
   // Any show that is added gets its streaming providers added here
   // Lookup table for items stored on
   savedStreamingProviders?: SavedStreamingProviderInfo[];
+  // list of watch providers with
+  watchProviderAttributes?: WatchProviderAttributes[];
   //
   initialQuery: InitialQuery;
 };
@@ -70,7 +98,7 @@ const initialState: Settings = {
   userRatingMax: 10,
   notificationTime: { hour: 16, minute: 0 },
   notificationHistory: {},
-  initialQuery: { firstAirDateYear: dayjs().format('YYYY') },
+  initialQuery: { firstAirDateYear: dayjs().format('YYYY'), includeGenres: [], excludeGenres: [] },
 };
 export const settings$ = observable<Settings>(
   synced({
@@ -82,6 +110,8 @@ export const settings$ = observable<Settings>(
   })
 );
 
+// settings$.watchProviderAttributes.delete();
+console.log('SETTINGS', settings$.watchProviderAttributes.length);
 /**
  * Creates a lookup function that can efficiently find providers by providerId
  * using a Map for O(1) lookups. Useful when doing multiple lookups on the same array.
@@ -107,4 +137,23 @@ export const createProviderLookup = (providers?: SavedStreamingProviderInfo[]) =
   // Return a lookup function that uses the map
   return (providerId: number): SavedStreamingProviderInfo | undefined =>
     providerMap.get(providerId);
+};
+
+export const toggleWatchProviderAttribs = (providerObj: WatchProviderAttributes) => {
+  const providerAttribs = settings$.watchProviderAttributes.peek() || [];
+  // Does the passed provider exist in the watchProviderAttributes array
+  // Is so, remove, else add
+  const providerIndex = providerAttribs.findIndex((el) => el.providerId === providerObj.providerId);
+  if (providerIndex === -1) {
+    //Adding to attribs
+    const newProvider: WatchProviderAttributes = {
+      ...providerObj,
+      isHidden: false,
+      isSearchOnly: false,
+      displayPriority: providerAttribs.length + 1,
+    };
+    settings$.watchProviderAttributes.push(newProvider);
+  } else {
+    settings$.watchProviderAttributes[providerIndex].delete();
+  }
 };

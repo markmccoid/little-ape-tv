@@ -22,7 +22,7 @@
     "@expo/vector-icons": "^14.0.0",
     "@legendapp/list": "^1.0.0-beta.11",
     "@legendapp/state": "^3.0.0-beta.23",
-    "@markmccoid/tmdb_api": "^0.5.2",
+    "@markmccoid/tmdb_api": "^0.5.9",
     "@quidone/react-native-wheel-picker": "^1.4.0",
     "@react-native-segmented-control/segmented-control": "2.5.7",
     "@react-navigation/native": "^7.0.3",

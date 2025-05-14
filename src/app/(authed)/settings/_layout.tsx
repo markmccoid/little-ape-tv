@@ -33,8 +33,12 @@ export default function SettingsLayout() {
       />
       <Stack.Screen name="tagsetup" options={{ headerShown: true, title: 'Tag Setup' }} />
       <Stack.Screen
-        name="streamingprovidersetup"
-        options={{ headerShown: true, title: 'Streaming Providers' }}
+        name="watchprovidersetup"
+        options={{ headerShown: true, title: 'Watch Providers' }}
+      />
+      <Stack.Screen
+        name="addwatchprovider"
+        options={{ headerShown: true, title: 'Add Watch Provider', presentation: 'modal' }}
       />
       <Stack.Screen
         name="initialQueryRoute"

@@ -19,7 +19,7 @@ import { queryClient } from '~/utils/queryClient';
 import { useSyncQueries } from 'tanstack-query-dev-tools-expo-plugin';
 import { selectEligibleShows, registerBackgroundTask } from '~/utils/backgroundTasks';
 import { use$ } from '@legendapp/state/react';
-import { settings$ } from '~/store/store-settings';
+import { initializeWatchProviders, settings$ } from '~/store/store-settings';
 import * as Notifications from 'expo-notifications';
 import { askNotificationPermissions } from '~/utils/permissions';
 import useNotificationObserver from '~/utils/notificationObserver';
@@ -44,6 +44,7 @@ const InitialLayout = () => {
       if (!tmdbKey) throw new Error('TMDB API Key not defined');
       await initTMDB(tmdbKey);
       setupEvents(queryClient);
+      initializeWatchProviders();
       await askNotificationPermissions();
 
       await registerBackgroundTask();

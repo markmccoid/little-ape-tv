@@ -43,8 +43,8 @@ const SettingsContainer = () => {
             LeftSymbol={() => <SymbolView name="tag" tintColor={colors.buttonDarker} size={28} />}
           />
           <SettingsGroup.RouteItem
-            title="Streaming Provider Maintenance"
-            route="/(authed)/settings/streamingprovidersetup"
+            title="Watch Provider Maintenance"
+            route="/(authed)/settings/watchprovidersetup"
             LeftSymbol={() => (
               <SymbolView name="tv.badge.wifi" tintColor={colors.buttonDarker} size={28} />
             )}

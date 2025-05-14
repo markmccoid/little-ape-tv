@@ -3,7 +3,6 @@ import React from 'react';
 import ShadowBackground from '~/components/common/ShadowBackground';
 import FirstAirDate from './FirstAirDate';
 import { queryClient } from '~/utils/queryClient';
-import { useAllGenres } from '~/data/query.search';
 import InitQueryGenres from './InitQueryGenres';
 
 const InitialQueryContainer = () => {

@@ -29,7 +29,7 @@ export function QuickFilters() {
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger>
-        <Pressable onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}>
+        <Pressable onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)}>
           <SymbolView name="line.3.horizontal.circle.fill" tintColor={colors.primary} size={30} />
         </Pressable>
       </DropdownMenu.Trigger>
