@@ -1,21 +1,22 @@
 import React, { useEffect, useLayoutEffect } from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import { Text, View, StyleSheet, Pressable } from 'react-native';
 import SPSettingsContainer from '~/components/settings/streamingProviders/SPSettingsContainer';
 import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
-import { Link, useNavigation } from 'expo-router';
+import { Link, useNavigation, useRouter } from 'expo-router';
+import { SymbolView } from 'expo-symbols';
 
 const WatchProviderSetup = () => {
   const [shouldRender, setShouldRender] = React.useState(false);
   const navigation = useNavigation();
-  // const router = useRouter();
+  const router = useRouter();
 
   useLayoutEffect(() => {
     const options: NativeStackNavigationOptions = {
       headerRight: () => {
         return (
-          <Link href={`/settings/addwatchprovider`}>
-            <Text>Add Provider</Text>
-          </Link>
+          <Pressable className="" onPress={() => router.push('/settings/addwatchprovider')}>
+            <SymbolView name="minus.plus.batteryblock.stack" size={35} />
+          </Pressable>
         );
       },
     };

@@ -38,7 +38,7 @@ const SPSettingsItem = ({ provider }: Props) => {
       if (!a.isHidden && b.isHidden) return -1;
       return 0;
     });
-    console.log(sortedProviders.map((el) => `${el.displayPriority}-${!!el.isHidden}`));
+
     // Update displayPriority to ensure correct numbering
     const updatedProviders = sortedProviders.map((provider, index) => {
       return {

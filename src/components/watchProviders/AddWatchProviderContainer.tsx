@@ -84,6 +84,7 @@ const AddWatchProviderContainer = () => {
   return (
     <View className="">
       <View className="flex-row items-center border-b-hairline">
+        {/* Text Input START */}
         <View className="items-cneter my-2 w-1/2 px-2">
           <TextInput
             className="rounded-md border-hairline bg-white p-2"
@@ -110,21 +111,31 @@ const AddWatchProviderContainer = () => {
             </Pressable>
           )}
         </View>
+        {/* Text Input END */}
+        {/* BUTTONS All / Enabled / Disabled 
+        FUTURE -> Make underline slide between selections
+        */}
         <View className="mr-2 flex-grow flex-row justify-between">
           <Pressable
             className={`${filterState === 'all' && 'border-b'} p-1`}
             onPress={() => setFilterState('all')}>
-            <Text>All</Text>
+            <Text className={`${filterState === 'all' ? 'text-black' : 'text-gray-500'} p-1`}>
+              All
+            </Text>
           </Pressable>
           <Pressable
             className={`${filterState === 'enabled' && 'border-b'} p-1`}
             onPress={() => setFilterState('enabled')}>
-            <Text>Enabled</Text>
+            <Text className={`${filterState === 'enabled' ? 'text-black' : 'text-gray-500'} p-1`}>
+              Enabled
+            </Text>
           </Pressable>
           <Pressable
             className={`${filterState === 'disabled' && 'border-b'} p-1`}
             onPress={() => setFilterState('disabled')}>
-            <Text>Disabled</Text>
+            <Text className={`${filterState === 'disabled' ? 'text-black' : 'text-gray-500'} p-1`}>
+              Disabled
+            </Text>
           </Pressable>
         </View>
       </View>

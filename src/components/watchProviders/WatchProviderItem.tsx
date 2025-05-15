@@ -1,11 +1,11 @@
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import React from 'react';
-import { SavedStreamingProviderInfo } from '~/store/store-settings';
+import { SavedStreamingProviderInfo, WatchProviderAttributes } from '~/store/store-settings';
 import { SymbolView } from 'expo-symbols';
 import { Image } from 'expo-image';
 
 type Props = {
-  providerObj: SavedStreamingProviderInfo & { active: boolean };
+  providerObj: WatchProviderAttributes & { active: boolean };
   toggleItem: (providerId: number) => void;
 };
 const WatchProviderItem = ({ providerObj, toggleItem }: Props) => {
@@ -27,7 +27,7 @@ const WatchProviderItem = ({ providerObj, toggleItem }: Props) => {
         </View>
       )}
       <Image
-        source={providerObj.logoURL}
+        source={providerObj.logoPath}
         style={{ width: 50, height: 50, borderRadius: 10, borderWidth: StyleSheet.hairlineWidth }}
       />
       {/* <Text>{el.provider}</Text> */}

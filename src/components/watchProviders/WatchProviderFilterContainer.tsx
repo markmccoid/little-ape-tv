@@ -10,13 +10,13 @@ type Props = {
   toggleProvider: (providerId: number) => void;
 };
 const WatchProviderFilterContainer = ({ activeProviderIds = [], toggleProvider }: Props) => {
-  const providers = use$(settings$.savedStreamingProviders) || [];
+  const providers = use$(settings$.watchProviderAttributes) || [];
   const taggedProviders = providers
     .map((el) => ({
       ...el,
       active: activeProviderIds.includes(el.providerId),
     }))
-    .filter((el) => !el.isHiddenFlag);
+    .filter((el) => !el.isHidden);
   const sortedProviders = orderBy(taggedProviders, ['active', 'displayPriority'], ['desc', 'asc']);
 
   return (
