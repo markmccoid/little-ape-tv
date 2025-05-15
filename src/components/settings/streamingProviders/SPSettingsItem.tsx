@@ -21,9 +21,6 @@ const SPSettingsItem = ({ provider }: Props) => {
   //! --------------------
   //! FIX toggle to use new WatchProviderAttributes
   const toggleIsHidden = (providerId: number) => {
-    // const providers = settings$.savedStreamingProviders.peek();
-    // const providers = settings$.watchProviderAttributes.peek();
-
     const newProviders = orderBy(providers, ['displayPriority'], ['asc']).map((el, index) => {
       if (el.providerId === providerId) {
         return { ...el, isHidden: !el?.isHidden };

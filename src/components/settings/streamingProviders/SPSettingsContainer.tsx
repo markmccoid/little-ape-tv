@@ -22,12 +22,7 @@ import { orderBy } from 'lodash';
 import { useWatchProviderAttribs } from '~/data/query.search';
 
 const SPSettingsContainer = () => {
-  // const providersInit = use$(settings$.savedStreamingProviders) || [];
   const providersInit = useWatchProviderAttribs();
-
-  //! Need to handle the large list.  Can't show all.  Probably 50 max
-  //! Start will all hidden and only show top 50
-  //! allow search for provider and then can unhide those.
   const providers = orderBy(providersInit, ['isHidden', 'displayPriority'], ['asc', 'asc']);
 
   const { bottom } = useSafeAreaInsets();

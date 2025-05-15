@@ -462,10 +462,10 @@ const updateShowStreamingProviders = (showId: string, watchProviders: WatchProvi
   });
 
   //-- 2.  Update settings$ streamingProvidersLookup data. make sure all are located in this array
-  const existingSavedProviders = settings$.savedStreamingProviders.peek() || [];
-  const newProviders = mergeStreamingProviders(existingSavedProviders, [...streamingProviders]);
-
-  settings$.savedStreamingProviders.set(newProviders || []);
+  //! NO LONGER USING savedStreamingProviders
+  // const existingSavedProviders = settings$.savedStreamingProviders.peek() || [];
+  // const newProviders = mergeStreamingProviders(existingSavedProviders, [...streamingProviders]);
+  // settings$.savedStreamingProviders.set(newProviders || []);
 };
 
 //# ------------------------------------------------------

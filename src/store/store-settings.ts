@@ -31,18 +31,18 @@ type DownloadOptions = {
   showNextDownloadInfo: boolean;
 };
 
-type NotificationRecord = {
+export type NotificationRecord = {
   Id: string;
   name: string;
   season: number; // Season of last notification
   episode: number; // episode of last notification
   dateSent?: number; // Unix epoch time
   dateChecked?: number; // check date
+  dateLastNotify?: number; // stored in savedShows[] records
   text: string;
   otherInfo?: string;
 };
 
-export type SavedStreamingProviderInfo = ProviderInfo & { isHiddenFlag?: boolean };
 export type BackgroundRunLog = {
   dateTimeEpoch: number;
   numShows: number;
@@ -76,9 +76,6 @@ type Settings = {
   notificationHistory: Record<string, NotificationRecord>;
   // history of when the background code runs and how many show
   backgroundRunLog?: BackgroundRunLog[];
-  // Any show that is added gets its streaming providers added here
-  // Lookup table for items stored on
-  savedStreamingProviders?: SavedStreamingProviderInfo[];
   // list of watch providers with
   watchProviderAttributes?: WatchProviderAttributes[];
   //
@@ -111,33 +108,6 @@ export const settings$ = observable<Settings>(
 );
 
 // settings$.watchProviderAttributes.delete();
-console.log('SETTINGS', settings$.watchProviderAttributes.length);
-/**
- * Creates a lookup function that can efficiently find providers by providerId
- * using a Map for O(1) lookups. Useful when doing multiple lookups on the same array.
- *
- * @param providers - Array of ProviderInfo objects to create a lookup for
- * @returns A function that takes a providerId and returns the matching provider or undefined
- * USAGE:
-     const providerLookup = createProviderLookup();
-     // Returns an array of provider info
-      const streamindData = streaming?.providers
-        .map((providerId) => providerLookup(providerId))
-        .filter((provider) => provider !== undefined);
- */
-export const createProviderLookup = (providers?: SavedStreamingProviderInfo[]) => {
-  // Create a Map for O(1) lookups
-  const providerMap = new Map<number, SavedStreamingProviderInfo>();
-  providers = settings$.savedStreamingProviders.get();
-  // Populate the map
-  providers.forEach((provider) => {
-    providerMap.set(provider.providerId, provider);
-  });
-
-  // Return a lookup function that uses the map
-  return (providerId: number): SavedStreamingProviderInfo | undefined =>
-    providerMap.get(providerId);
-};
 
 export const toggleWatchProviderAttribs = (providerObj: WatchProviderAttributes) => {
   const providerAttribs = settings$.watchProviderAttributes.peek() || [];

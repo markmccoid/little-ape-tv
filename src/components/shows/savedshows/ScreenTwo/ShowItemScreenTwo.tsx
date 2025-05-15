@@ -15,7 +15,6 @@ import dayjs from 'dayjs';
 import { useRouter } from 'expo-router';
 import ScreenTwoSeasonData from './ScreenTwoSeasonData';
 import TagRatingEditModal from './TagRatingEditModal';
-import { createProviderLookup, settings$ } from '~/store/store-settings';
 
 const missingPosterURI = require('../../../../../assets/missingPoster.png');
 

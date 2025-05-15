@@ -78,6 +78,7 @@ export async function checkForShowUpdatesAndNotify() {
             episode: 0,
             dateSent: undefined,
             dateChecked: getEpochwithTime(),
+            dateLastNotify: savedShows$.shows[show.tmdbId].dateLastNotifyCheckedEpoch.peek(),
             text: 'INACTIVE CHECKING IN 7 DAYS',
             // FOR TESTING
             otherInfo: `Status: ${show.showStatus}`,
@@ -157,6 +158,7 @@ export async function checkForShowUpdatesAndNotify() {
             episode: nextEpisodeToAir.episodeNumber,
             dateSent: dayjs(notifyDateJS).unix(),
             dateChecked: getEpochwithTime(),
+            dateLastNotify: savedShows$.shows[show.tmdbId].dateLastNotifyCheckedEpoch.peek(),
             text: body,
             // FOR TESTING
             otherInfo: `LAST-${lastAirDate.formatted} | NEXT-${nextAirDate.formatted} | LAST S-${lastEpisodeToAir.seasonNumber} E-${lastEpisodeToAir.episodeNumber}`,
@@ -211,7 +213,7 @@ export function selectEligibleShows() {
       : show.dateLastNotifyCheckedEpoch + nextNotifyOffset * 86400; //Offset by value stored on show
 
     // if lastNotifyCheckEpoch is less than currentEpoch then add to showsToCheck
-    if (lastNotifyCheckEpoch < currentEpoch) {
+    if (lastNotifyCheckEpoch <= currentEpoch) {
       showsToCheck.push(show);
       // UPDATE the dateLastNotifyCheckedEpoch with current date
       savedShows$.shows[show.tmdbId].dateLastNotifyCheckedEpoch.set(currentEpoch);
@@ -273,7 +275,7 @@ export const checkForProviderUpdates = async () => {
 export const clearStreamUpdatedEpoch = () => {
   const shows = savedShows$.shows.peek();
   //clear the savedStreamingProviders too
-  settings$.savedStreamingProviders.set([]);
+  // settings$.savedStreamingProviders.set([]);
   Object.keys(shows).forEach((key) =>
     savedShows$.shows[key].streaming.set({ dateUpdatedEpoch: undefined, providers: [] })
   );

@@ -1,6 +1,6 @@
-import { View, Text, FlatList, Pressable } from 'react-native';
-import React from 'react';
-import { settings$ } from '~/store/store-settings';
+import { View, Text, FlatList, Pressable, TextInput } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { NotificationRecord, settings$ } from '~/store/store-settings';
 import dayjs from 'dayjs';
 import { use$ } from '@legendapp/state/react';
 import { orderBy, sortBy } from 'lodash';
@@ -8,17 +8,48 @@ import { ScrollView } from 'moti';
 import { savedShows$ } from '~/store/store-shows';
 import { useRouter } from 'expo-router';
 
+type Filter = {
+  offset: 'one' | 'more' | undefined;
+  name: string;
+  hasSent: boolean;
+};
 const NotificationList = () => {
   const router = useRouter();
   const notificationHistory = use$(settings$.notificationHistory);
   const shows = use$(savedShows$.shows);
-  const notificationData = orderBy(
-    Object.keys(notificationHistory).map((key) => notificationHistory[key]),
-    ['dateChecked'],
-    ['desc']
-  );
+  const [filter, setFilter] = useState<{ name: string; hasSent: boolean | undefined }>({
+    name: '',
+    hasSent: undefined,
+  });
+
+  const notificationData = useMemo(() => {
+    let filteredData = orderBy(
+      Object.keys(notificationHistory).map((key) => notificationHistory[key]),
+      ['dateChecked'],
+      ['desc']
+    );
+    if (filter.hasSent !== undefined) {
+      filteredData = filteredData.filter((el) =>
+        filter.hasSent ? el.dateSent !== undefined : el.dateSent === undefined
+      );
+    }
+    if (filter.name !== '') {
+      filteredData = filteredData.filter((el) =>
+        el.name.toLowerCase().includes(filter.name.toLowerCase())
+      );
+    }
+    return filteredData;
+  }, [filter]);
+  // const [notificationData, setNotificationData] = useState<NotificationRecord[]>(
+  //   orderBy(
+  //     Object.keys(notificationHistory).map((key) => notificationHistory[key]),
+  //     ['dateChecked'],
+  //     ['desc']
+  //   )
+  // );
   const backgroundRuns = settings$.backgroundRunLog.peek() || [];
 
+  useEffect(() => {});
   return (
     <View className="mt-2 flex-1">
       <View className="ml-2 flex-row items-center justify-start self-start rounded-t-lg border border-b-0 bg-card p-2">
@@ -46,6 +77,31 @@ const NotificationList = () => {
           </ScrollView>
         </View>
         <View className="flex-1 border-t">
+          <View className="flex-row gap-2 p-2">
+            <Pressable
+              onPress={() =>
+                setFilter((prev) => ({
+                  ...prev,
+                  hasSent:
+                    prev.hasSent === undefined ? true : prev.hasSent === true ? false : undefined,
+                }))
+              }
+              className="flex-row items-center border-hairline bg-white p-1">
+              <Text>
+                {filter.hasSent
+                  ? 'Showing Sent'
+                  : filter.hasSent === undefined
+                    ? 'No Sent Filter'
+                    : 'Show Sent'}
+              </Text>
+            </Pressable>
+            <TextInput
+              className="w-[200] border-hairline bg-white p-2"
+              value={filter.name}
+              placeholder="Filter by Name"
+              onChangeText={(el) => setFilter((prev) => ({ ...prev, name: el }))}
+            />
+          </View>
           <FlatList
             data={notificationData}
             keyExtractor={(item) => item.Id.toString()}
@@ -64,6 +120,14 @@ const NotificationList = () => {
                       {item.Id}
                     </Text>
                   </Pressable>
+                  <View className="flex-row items-center justify-start">
+                    <Text className="text-lg font-semibold">Last Notify Date: </Text>
+                    <Text className="text-lg">
+                      {item.dateLastNotify
+                        ? dayjs.unix(item.dateLastNotify).format('MM-DD-YYYY HH:mm:ss')
+                        : '-----'}
+                    </Text>
+                  </View>
                   <View className="flex-row items-center justify-start">
                     <Text className="text-lg font-semibold">Message: </Text>
                     <Text className="text-lg">{item.text}</Text>
