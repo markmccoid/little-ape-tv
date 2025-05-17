@@ -8,7 +8,9 @@ import { styled } from 'nativewind'; // Import styled if you want to pre-style c
 // Otherwise, define it here:
 export type ThemeOption = 'auto' | 'light' | 'dark';
 
-const THEME_OPTIONS: ThemeOption[] = ['auto', 'light', 'dark'];
+const THEME_OPTIONS: ThemeOption[] = ['light', 'dark'];
+//! Took out auto because couldn't get useColorScheme to recognize a system change
+// const THEME_OPTIONS: ThemeOption[] = ['auto', 'light', 'dark'];
 
 interface ThemeSelectorProps {
   selectedValue: ThemeOption;

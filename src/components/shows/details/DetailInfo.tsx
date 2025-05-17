@@ -32,11 +32,11 @@ const DetailInfo = ({ data }: Props) => {
             <LabelTextDisplay label="Next:" text={data?.nextAirDate?.formatted} />
           </View>
         )}
-        <View className="mr-2 flex-col items-center justify-start rounded-lg border-hairline bg-green-500/40 px-2 py-1">
-          <LabelTextDisplay label="First:" text={data?.firstAirDate?.formatted} />
-        </View>
         <View className="mr-2 flex-col items-center justify-start rounded-lg border-hairline bg-red-500/40 px-2 py-1">
           <LabelTextDisplay label="Last:" text={data?.lastAirDate?.formatted} />
+        </View>
+        <View className="mr-2 flex-col items-center justify-start rounded-lg border-hairline bg-green-500/40 px-2 py-1">
+          <LabelTextDisplay label="First:" text={data?.firstAirDate?.formatted} />
         </View>
       </ScrollView>
       <Text>{`${data?.numberOfSeasons} Seasons / ${data?.numberOfEpisodes} Episodes`}</Text>

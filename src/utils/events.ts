@@ -47,26 +47,28 @@ export const setupEvents = (queryClient: QueryClient) => {
       );
     }
   });
-};
-//# --------------------------------------
-//# UpdateSavedShowDetail -> Is called from when we view a show.
-//# makes ure the show details are up to date.
-//# --------------------------------------
-eventDispatcher.on(EventName.UpdateSeasonSummary, async (showId, seasonsArray) => {
-  const seasonData = await fetchSeasonsData(parseInt(showId), seasonsArray);
-  updateSeasonSummary(showId, seasonData);
-});
+  //# --------------------------------------
+  //# UpdateSavedShowDetail -> Is called from when we view a show.
+  //# makes ure the show details are up to date.
+  //# --------------------------------------
+  eventDispatcher.on(EventName.UpdateSeasonSummary, async (showId, seasonsArray) => {
+    const seasonData = await fetchSeasonsData(parseInt(showId), seasonsArray);
+    updateSeasonSummary(showId, seasonData);
+  });
 
-//# --------------------------------------
-//# UpdateSavedShowDetail -> Is called from when we view a show.
-//# makes ure the show details are up to date.
-//# --------------------------------------
-eventDispatcher.on(EventName.UpdateWatchProviders, async (showId) => {
-  // The getWatchProviders function will update the streaming entry for the
-  // show in savedShows$ as well as update the settings$.savedStreaminProviders
-  // Just need to call it here
-  await getWatchProviders(showId);
-});
+  //# --------------------------------------
+  //# UpdateSavedShowDetail -> Is called from when we view a show.
+  //# makes ure the show details are up to date.
+  //# --------------------------------------
+  eventDispatcher.on(EventName.UpdateWatchProviders, async (showId) => {
+    // The getWatchProviders function will update the streaming entry for the
+    // show in savedShows$ as well as update the settings$.savedStreaminProviders
+    // Just need to call it here
+    await getWatchProviders(showId);
+  });
+
+  //-- Add more events here and they will be loaded when app starts from root _layout.tsx
+};
 
 //# --------------------------------------
 //# Trimmed Mean helper function

@@ -41,10 +41,9 @@ const InitialLayout = () => {
       if (!tmdbKey) throw new Error('TMDB API Key not defined');
       await initTMDB(tmdbKey);
       setupEvents(queryClient);
+      await registerBackgroundTask();
       initializeWatchProviders();
       await askNotificationPermissions();
-
-      await registerBackgroundTask();
     };
 
     mainInit();

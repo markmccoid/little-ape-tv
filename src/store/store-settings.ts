@@ -13,6 +13,7 @@ import { getTMDBConsts } from '@markmccoid/tmdb_api';
 
 export const initializeWatchProviders = () => {
   const currProviders = settings$.watchProviderAttributes.peek();
+
   if (!currProviders) {
     const tmdbConsts = getTMDBConsts();
     const initProviders = tmdbConsts.WATCH_PROVIDERS.slice(0, 30);
@@ -46,7 +47,8 @@ export type NotificationRecord = {
 export type BackgroundRunLog = {
   dateTimeEpoch: number;
   numShows: number;
-  type: 'notify' | 'provider';
+  type: 'notify' | 'provider' | 'notify-ERROR';
+  detail?: string;
 };
 type InitialQuery = {
   firstAirDateYear: string;

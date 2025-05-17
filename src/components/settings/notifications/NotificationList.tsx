@@ -70,6 +70,9 @@ const NotificationList = () => {
                       style={{ color: el.type === 'notify' ? 'black' : 'white' }}>
                       {dayjs.unix(el.dateTimeEpoch).format('MM-DD-YY HH:mm:ss')}-({el.numShows})
                     </Text>
+                    {el.type === 'notify-ERROR' && (
+                      <Text className="font-semibold">ERROR - {el.detail}</Text>
+                    )}
                   </View>
                 );
               })}

@@ -19,6 +19,13 @@ TaskManager.defineTask(CHECK_NEW_EPISODES_TASK, async () => {
     return BackgroundTask.BackgroundTaskResult.Success; // Changed return type
   } catch (error) {
     console.error('Background task failed:', error);
+    const existingRuns = settings$.backgroundRunLog.peek();
+    settings$.backgroundRunLog.set(
+      [
+        ...(existingRuns || []),
+        { dateTimeEpoch: getEpochwithTime(), numShows: -1, type: 'notify-ERROR', detail: error },
+      ].slice(-25) as BackgroundRunLog[]
+    ); // Just keep the last 25 runs
     return BackgroundTask.BackgroundTaskResult.Failed;
   }
 });
@@ -35,7 +42,7 @@ TaskManager.defineTask(UPDATE_WATCH_PROVIDERS, async () => {
 export async function registerBackgroundTask() {
   try {
     await BackgroundTask.registerTaskAsync(CHECK_NEW_EPISODES_TASK, {
-      minimumInterval: 360 * 2, // Now in minutes (12 hours) instead of seconds
+      minimumInterval: 120 * 2, // Now in minutes (12 hours) instead of seconds
     });
     await BackgroundTask.registerTaskAsync(UPDATE_WATCH_PROVIDERS, {
       minimumInterval: 1440 * 2, // In minutes (2 days)
