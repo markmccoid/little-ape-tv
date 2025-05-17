@@ -66,9 +66,9 @@ const ShowDetailContainer = ({ showId }: Props) => {
 
   // Set title and left/right header buttons
   useLayoutEffect(() => {
-    navigation.setOptions({
-      animationEnabled: false, // Disable animations for testing
-    });
+    // navigation.setOptions({
+    //   animationEnabled: false, // Disable animations for testing
+    // });
     const options: NativeStackNavigationOptions = {
       title: data?.name || '...',
       headerLeft: () => <BackHeaderButton />,

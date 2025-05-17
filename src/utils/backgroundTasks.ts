@@ -39,13 +39,14 @@ TaskManager.defineTask(UPDATE_WATCH_PROVIDERS, async () => {
   }
 });
 
+// NOTE: Per expo docs the last minimum interval is used for ALL background tasks
 export async function registerBackgroundTask() {
   try {
     await BackgroundTask.registerTaskAsync(CHECK_NEW_EPISODES_TASK, {
-      minimumInterval: 120 * 2, // Now in minutes (12 hours) instead of seconds
+      minimumInterval: 60 * 6, // Now in minutes ( hours) instead of seconds
     });
     await BackgroundTask.registerTaskAsync(UPDATE_WATCH_PROVIDERS, {
-      minimumInterval: 1440 * 2, // In minutes (2 days)
+      minimumInterval: 60 * 6, // In minutes
     });
   } catch (error) {
     console.error('Failed to register background task:', error);
@@ -189,12 +190,7 @@ export function selectEligibleShows() {
 
   /*
    SHOW Status options from tdmb api
-    Returning Series
-    Planned
-    In Production
-    Ended
-    Canceled
-    Pilot ?
+    Returning Series, Planned, In Production, Ended, Canceled, Pilot
    */
   const showsToCheck = [];
   for (const [key, show] of Object.entries(shows)) {

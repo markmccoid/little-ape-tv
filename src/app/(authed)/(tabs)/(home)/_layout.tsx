@@ -2,13 +2,12 @@ import { Link, Stack, useRouter } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
 import { View, Text, Pressable } from 'react-native';
 import { FilterIcon, SettingsIcon } from '~/components/common/Icons';
-import { HeaderButton } from '~/components/HeaderButton';
 import FilterHeaderIcon from '~/components/shows/savedshows/FilterHeaderIcon';
 import { useCustomTheme } from '~/utils/customColorTheme';
 
 export default function HomeLayout() {
   const { colors } = useCustomTheme();
-
+  const router = useRouter();
   return (
     <Stack>
       <Stack.Screen
@@ -18,9 +17,12 @@ export default function HomeLayout() {
           headerRight: () => <FilterHeaderIcon />,
           headerLeft: () => {
             return (
-              <Link href="/settings" className="ml-3">
+              <Pressable
+                className="h-[40] w-[40] items-center justify-center "
+                onPress={() => router.push('/settings')}
+                hitSlop={25}>
                 <SettingsIcon size={25} color={colors.primary} />
-              </Link>
+              </Pressable>
             );
           },
         }}

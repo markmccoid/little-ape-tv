@@ -1,6 +1,6 @@
-import React, { useCallback, useDeferredValue, useState } from 'react';
+import React, { useCallback, useDeferredValue, useLayoutEffect, useState } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View, Dimensions } from 'react-native';
-import { Link, Stack, useFocusEffect, useRouter } from 'expo-router';
+import { Link, Stack, useFocusEffect, useNavigation, useRouter } from 'expo-router';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useFilteredShows } from '~/data/query.shows';
 import Animated, {
@@ -20,6 +20,7 @@ import { FilterIcon } from '~/components/common/Icons';
 import { useCustomTheme } from '~/utils/customColorTheme';
 import { search$ } from '~/store/store-search';
 import ShowItemBottom from './ShowItemBottom';
+import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
 
 //!! MOVE TO A FUNCTION SO ONE source of TRUTH
 const { width, height } = Dimensions.get('window');
@@ -31,6 +32,7 @@ const ShowsContainer = () => {
   const tabBarHeight = useBottomTabBarHeight();
   const showsInit = useFilteredShows();
   const router = useRouter();
+  const navigation = useNavigation();
   const { colors } = useCustomTheme();
 
   // Defers the render of the shows.  Seems to let things like the filter screen update more smoothly
@@ -42,6 +44,13 @@ const ShowsContainer = () => {
   const scrollY = useSharedValue(0);
   const animHeight = useSharedValue(0);
   const searchY = useSharedValue(-40);
+
+  useLayoutEffect(() => {
+    const options: NativeStackNavigationOptions = {
+      title: `Shows (${showsInit.length})`,
+    };
+    navigation.setOptions(options);
+  }, [showsInit]);
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
       scrollY.value = event.contentOffset.y;
@@ -84,7 +93,7 @@ const ShowsContainer = () => {
   //!!
   const renderShow = useCallback(({ item }: { item: SavedShow }) => {
     return (
-      <View>
+      <View className="border-2 border-red-900">
         <ShowItem show={item} showId={item.tmdbId} />
         <View className="absolute bottom-[15] left-0 w-full">
           <ShowItemBottom showId={item.tmdbId} />
@@ -102,7 +111,6 @@ const ShowsContainer = () => {
   };
   return (
     <>
-      <Stack.Screen options={{ title: 'Shows' }} />
       <View className="flex-1">
         <Animated.View style={[hStyle]} className="absolute z-20 w-full">
           <ShowNameSearch
