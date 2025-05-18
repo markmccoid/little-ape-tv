@@ -3,7 +3,6 @@ import { useEffect } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
 import SettingsContainer from '~/components/settings/SettingsContainer';
-import SettingsMock from '~/components/settings/SettingsMock';
 
 export default function Settings() {
   const navigation = useNavigation();
@@ -15,5 +14,4 @@ export default function Settings() {
   }, []);
 
   return <SettingsContainer />;
-  return <SettingsMock />;
 }

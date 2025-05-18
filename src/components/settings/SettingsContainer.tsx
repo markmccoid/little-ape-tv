@@ -1,15 +1,10 @@
 import { View, Text, Pressable, ScrollView, Switch, SafeAreaView, Alert } from 'react-native';
 import React from 'react';
 import { Link, useRouter } from 'expo-router';
-// import { List, FormItem, Section, Link } from '~/components/expo-router-forms/ui/Form';
-import * as Form from '~/components/expo-router-forms/ui/Form';
-import { IconSymbol } from '../expo-router-forms/ui/IconSymbol.ios';
-import * as AC from '@bacons/apple-colors';
 import { SymbolView } from 'expo-symbols';
 import { useCustomTheme } from '~/utils/customColorTheme';
 import { settings$ } from '~/store/store-settings';
 import { use$ } from '@legendapp/state/react';
-import SettingsItem from './SettingsItem';
 import SettingsGroup from './SettingsGroup';
 import { FilterIcon } from '../common/Icons';
 import { ThemeOption } from './ThemeSelector';
@@ -17,8 +12,12 @@ import {
   checkForProviderUpdates,
   checkForShowUpdatesAndNotify,
   clearStreamUpdatedEpoch,
+  getBGTaskStatus,
+  registerBackgroundTask,
+  removeBackgroundTask,
 } from '~/utils/backgroundTasks';
 import { savedShows$ } from '~/store/store-shows';
+import * as BackgroundTask from 'expo-background-task';
 
 const SettingsContainer = () => {
   const router = useRouter();
@@ -155,35 +154,61 @@ const SettingsContainer = () => {
             LeftSymbol={() => <FilterIcon color={colors.buttonDarker} size={23} />}
           />
         </SettingsGroup>
-        <View className="flex-row flex-wrap items-center justify-center gap-2 px-2 py-2">
-          <Pressable onPress={checkForShowUpdatesAndNotify} className="border bg-white p-2">
-            <Text>Background Refresh Test</Text>
-          </Pressable>
-          <Pressable
-            onPress={() => settings$.notificationHistory.set({})}
-            className="border bg-white p-2">
-            <Text>Clear Notification History</Text>
-          </Pressable>
-          <Pressable
-            onPress={() => {
-              const shows = savedShows$.shows.peek();
-              Object.keys(shows).forEach((key) => {
-                savedShows$.shows[key]?.lastNotifySeasonEpisode.set(undefined);
-                savedShows$.shows[key]?.dateLastNotifyCheckedEpoch.set(undefined);
-                savedShows$.shows[key]?.nextNotifyOffset.set(undefined);
-                settings$.backgroundRunLog.set([]);
-              });
-              Alert.alert('NextNotifyDates Reset DONE');
-            }}
-            className="border bg-white p-2">
-            <Text>Reset NextNotifyDates</Text>
-          </Pressable>
-          <Pressable onPress={checkForProviderUpdates} className="border bg-yellow-400 p-2">
-            <Text>Check Provider Updates</Text>
-          </Pressable>
-          <Pressable onPress={clearStreamUpdatedEpoch} className="border bg-yellow-400 p-2">
-            <Text>Clear Stream Dates</Text>
-          </Pressable>
+        <View className="flex-col items-center justify-center gap-2 px-2 py-2">
+          <View className="mx-2 w-full flex-row justify-between">
+            <View className="flex-col gap-2">
+              <Pressable onPress={checkForShowUpdatesAndNotify} className="border bg-white p-2">
+                <Text>Manual Check Show</Text>
+              </Pressable>
+
+              <Pressable
+                onPress={() => {
+                  const shows = savedShows$.shows.peek();
+                  Object.keys(shows).forEach((key) => {
+                    savedShows$.shows[key]?.lastNotifySeasonEpisode.set(undefined);
+                    savedShows$.shows[key]?.dateLastNotifyCheckedEpoch.set(undefined);
+                    savedShows$.shows[key]?.nextNotifyOffset.set(undefined);
+                    settings$.backgroundRunLog.set([]);
+                  });
+                  Alert.alert(
+                    `DONE Reset -> lastNotifySeasonEpisode\ndateLastNotifyCheckedEpoch\nnextNotifyOffset `
+                  );
+                }}
+                className="border bg-white p-2">
+                <Text>Reset NextNotifyDates</Text>
+              </Pressable>
+            </View>
+            <View className="flex-col gap-2">
+              <Pressable onPress={checkForProviderUpdates} className="border bg-yellow-400 p-2">
+                <Text>Manual Check Providers</Text>
+              </Pressable>
+              <Pressable onPress={clearStreamUpdatedEpoch} className="border bg-yellow-400 p-2">
+                <Text>Clear Stream Dates</Text>
+              </Pressable>
+            </View>
+          </View>
+          <View className="flex-col gap-2">
+            <Pressable
+              onPress={() => settings$.notificationHistory.set({})}
+              className="border bg-blue-300 p-2">
+              <Text>Clear Notification History</Text>
+            </Pressable>
+            <Pressable
+              onPress={async () => await removeBackgroundTask('check-new-episodes')}
+              className="border bg-blue-300 p-2">
+              <Text>Remove Task 'check-new-episodes'</Text>
+            </Pressable>
+            <Pressable
+              onPress={async () => await registerBackgroundTask()}
+              className="border bg-blue-300 p-2">
+              <Text>Register Background Tasks</Text>
+            </Pressable>
+            <Pressable
+              onPress={async () => await getBGTaskStatus()}
+              className="border bg-blue-300 p-2">
+              <Text>Background Task Status</Text>
+            </Pressable>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>

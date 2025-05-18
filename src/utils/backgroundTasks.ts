@@ -8,6 +8,7 @@ import { addDaysToEpoch, formatEpoch, getEpochwithTime, subtractDaysFromEpoch } 
 import { BackgroundRunLog, settings$ } from '~/store/store-settings';
 import dayjs from 'dayjs';
 import { getWatchProviders } from '~/data/query.shows';
+import { Alert } from 'react-native';
 
 const CHECK_NEW_EPISODES_TASK = 'check-new-episodes';
 const UPDATE_WATCH_PROVIDERS = 'update-watch-providers';
@@ -19,13 +20,6 @@ TaskManager.defineTask(CHECK_NEW_EPISODES_TASK, async () => {
     return BackgroundTask.BackgroundTaskResult.Success; // Changed return type
   } catch (error) {
     console.error('Background task failed:', error);
-    const existingRuns = settings$.backgroundRunLog.peek();
-    settings$.backgroundRunLog.set(
-      [
-        ...(existingRuns || []),
-        { dateTimeEpoch: getEpochwithTime(), numShows: -1, type: 'notify-ERROR', detail: error },
-      ].slice(-25) as BackgroundRunLog[]
-    ); // Just keep the last 25 runs
     return BackgroundTask.BackgroundTaskResult.Failed;
   }
 });
@@ -35,6 +29,13 @@ TaskManager.defineTask(UPDATE_WATCH_PROVIDERS, async () => {
     return BackgroundTask.BackgroundTaskResult.Success; // Changed return type
   } catch (error) {
     console.error('Background task failed:', error);
+    const existingRuns = settings$.backgroundRunLog.peek();
+    settings$.backgroundRunLog.set(
+      [
+        ...(existingRuns || []),
+        { dateTimeEpoch: getEpochwithTime(), numShows: -1, type: 'notify-ERROR', detail: error },
+      ].slice(-25) as BackgroundRunLog[]
+    ); // Just keep the last 25 runs
     return BackgroundTask.BackgroundTaskResult.Failed;
   }
 });
@@ -282,4 +283,20 @@ export const clearStreamUpdatedEpoch = () => {
   Object.keys(shows).forEach((key) =>
     savedShows$.shows[key].streaming.set({ dateUpdatedEpoch: undefined, providers: [] })
   );
+};
+
+//# REMOVE TASK
+export const removeBackgroundTask = async (taskName: string) => {
+  try {
+    await BackgroundTask.unregisterTaskAsync(taskName);
+    Alert.alert(`Removal of Background Task ${taskName} complete`);
+  } catch (e) {
+    Alert.alert(`Removal of Background Task ${taskName} failed: ${e}`);
+  }
+};
+
+export const getBGTaskStatus = async () => {
+  const status = await BackgroundTask.getStatusAsync();
+  // console.log('STT', status);
+  Alert.alert(`BG Status is ${status === 1 ? 'Restricted' : 'Available'}`);
 };
