@@ -27,8 +27,11 @@ const ShowItemBottom = ({ showId }: Props) => {
   const { favorite } = useSavedShow(showId);
   const showInfo = useSavedShow(showId);
   const [runTimeBGColor, runTimeTextColor] = getBGColor(showInfo.avgEpisodeRunTime) || ['', ''];
-  // console.log('showItemBottom', Object.keys(savedShows$.shows));
-  // savedShows$.shows.set({});
+
+  const hasAvgTime =
+    showInfo?.avgEpisodeRunTime !== undefined &&
+    !isNaN(showInfo.avgEpisodeRunTime) &&
+    showInfo.avgEpisodeRunTime > 0;
   return (
     <Animated.View
       className="relative z-10 mx-3 my-[-15] h-[25] flex-row items-center justify-center rounded-lg border p-1"
@@ -36,8 +39,7 @@ const ShowItemBottom = ({ showId }: Props) => {
       <Animated.View style={[{ position: 'absolute', left: 0, top: -5 }]}>
         <SetFavoriteButton showId={showId} isFavorited={!!favorite} />
       </Animated.View>
-
-      {showInfo?.avgEpisodeRunTime && (
+      {hasAvgTime && (
         <View
           className="absolute rounded-full border-hairline p-2"
           style={{ backgroundColor: runTimeBGColor }}>
@@ -50,7 +52,7 @@ const ShowItemBottom = ({ showId }: Props) => {
             }
             hitSlop={{ top: 10, bottom: 10, left: 5, right: 5 }}>
             <Text className="font-semibold" style={{ color: runTimeTextColor }}>
-              {showInfo?.avgEpisodeRunTime} Min
+              {showInfo.avgEpisodeRunTime} Min
             </Text>
           </Pressable>
         </View>

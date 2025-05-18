@@ -18,9 +18,8 @@ export default function HomeLayout() {
           headerLeft: () => {
             return (
               <Pressable
-                className="h-[40] w-[40] items-center justify-center "
-                onPress={() => router.push('/settings')}
-                hitSlop={25}>
+                className="h-[40] w-[40] items-center justify-center"
+                onPress={() => router.push('/settings')}>
                 <SettingsIcon size={25} color={colors.primary} />
               </Pressable>
             );
