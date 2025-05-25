@@ -100,6 +100,31 @@ export const useShowTags = (showId: string) => {
 
   return { matchedTags, toggleTagState };
 };
+
+//# ============================================================================
+//# Export Show Data
+//# ============================================================================
+export const exportShowData = () => {
+  const shows = savedShows$.shows.peek();
+  const showAttributes = savedShows$.showAttributes.peek();
+  const tags = tags$.tagList.peek();
+
+  return {
+    shows,
+    showAttributes,
+    tags,
+  };
+};
+
+export const importShowData = (data: any) => {
+  const { shows, showAttributes, tags } = data;
+  // If null don't set the value
+  if (shows) savedShows$.shows.set(shows);
+  if (showAttributes) savedShows$.showAttributes.set(showAttributes);
+  if (tags) tags$.tagList.set(tags);
+};
+//~ ==================
+
 //-- ===================
 //-- Handle Auth Change
 //-- ===================

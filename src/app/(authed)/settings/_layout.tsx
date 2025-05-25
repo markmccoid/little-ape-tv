@@ -53,6 +53,10 @@ export default function SettingsLayout() {
         options={{ headerShown: true, title: 'Change Me', presentation: 'fullScreenModal' }}
       />
       <Stack.Screen
+        name="exportdata"
+        options={{ headerShown: true, presentation: 'modal', title: 'Export Data' }}
+      />
+      <Stack.Screen
         name="schedulednotifications"
         options={{ headerShown: true, presentation: 'modal', title: 'Scheduled Notifications' }}
       />

@@ -1,4 +1,7 @@
 import { Share } from 'react-native';
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
+import { Alert } from 'react-native';
 
 //# --------------------------------------
 //# Default Images
@@ -159,4 +162,39 @@ export const priorityMergeArrays = <T extends { id: string }>(arr1: T[], arr2: T
 
   // Return the original arr1 with unique new items added
   return [...arr1, ...uniqueNewItems];
+};
+
+//# --------------------------------------
+//# Save JSON to Files
+//# --------------------------------------
+export const saveJSONToFiles = async (dataObject: any) => {
+  try {
+    // Convert the JavaScript object to a JSON string
+    const jsonString = JSON.stringify(dataObject, null, 2);
+
+    // Define the file path in the app's document directory
+    const fileUri = `${FileSystem.documentDirectory}sample-data.json`;
+
+    // Write the JSON string to a file
+    await FileSystem.writeAsStringAsync(fileUri, jsonString, {
+      encoding: FileSystem.EncodingType.UTF8,
+    });
+
+    // Check if sharing is available on the device
+    if (!(await Sharing.isAvailableAsync())) {
+      Alert.alert('Error', 'Sharing is not available on this device');
+      return;
+    }
+
+    // Share the file to the iOS Files app
+    await Sharing.shareAsync(fileUri, {
+      UTI: 'public.json', // Universal Type Identifier for JSON files
+      mimeType: 'application/json',
+    });
+
+    Alert.alert('Success', 'JSON file saved successfully!');
+  } catch (error) {
+    console.error('Error saving JSON file:', error);
+    Alert.alert('Error', `Failed to save JSON file: ${error.message}`);
+  }
 };

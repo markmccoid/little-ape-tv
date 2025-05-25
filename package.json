@@ -74,7 +74,10 @@
     "react-native-vector-icons": "^10.2.0",
     "react-native-web": "^0.20.0",
     "vaul": "^1.1.2",
-    "zeego": "^3.0.5"
+    "zeego": "^3.0.5",
+    "expo-file-system": "~18.1.10",
+    "expo-sharing": "~13.1.5",
+    "expo-document-picker": "~13.1.5"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

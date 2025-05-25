@@ -6,7 +6,7 @@ import { useCustomTheme } from '~/utils/customColorTheme';
 import { settings$ } from '~/store/store-settings';
 import { use$ } from '@legendapp/state/react';
 import SettingsGroup from './SettingsGroup';
-import { FilterIcon } from '../common/Icons';
+import { FilterIcon, FlagIcon } from '../common/Icons';
 import { ThemeOption } from './ThemeSelector';
 import {
   checkForProviderUpdates,
@@ -148,6 +148,11 @@ const SettingsContainer = () => {
         {/* Scheduled Notifications */}
         <View className="mt-2" />
         <SettingsGroup title="View ">
+          <SettingsGroup.RouteItem
+            title="Export/Import Data"
+            route="/(authed)/settings/exportdata"
+            LeftSymbol={() => <FlagIcon color={colors.buttonDarker} size={23} />}
+          />
           <SettingsGroup.RouteItem
             title="Scheduled Notifications"
             route="/(authed)/settings/schedulednotifications"

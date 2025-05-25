@@ -453,6 +453,20 @@ const handleoffState = (includeTags: string[] = [], excludeTags: string[] = [], 
 // - Tag update helpers END ----------
 
 //# -----------------------------------------------------------------------------------------------
+//# Export the filterCriteria$ observable data
+//# -----------------------------------------------------------------------------------------------
+export const exportFilterCriteria = () => {
+  const filterCriteria = filterCriteria$.peek();
+  const filterCriteriaExport = {
+    savedFilters: filterCriteria.savedFilters,
+  };
+  return filterCriteriaExport;
+};
+export const importFilterCriteria = (data: any) => {
+  const { savedFilters } = data;
+  if (savedFilters) filterCriteria$.savedFilters.set(savedFilters);
+};
+//# -----------------------------------------------------------------------------------------------
 //# HELPER FUNCTIONS
 //# -----------------------------------------------------------------------------------------------
 // --------------

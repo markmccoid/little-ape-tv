@@ -56,7 +56,7 @@ const AnimatedShowItem = ({
     // Interpolate opacity: 1 when item is fully visible, 0 when it's at the top
     const opacity = interpolate(
       itemTop,
-      [-(IMG_HEIGHT + 26), -20], // Fade out when item
+      [-(IMG_HEIGHT + 26), -155], // Fade out when item
       [0, 1],
       'clamp'
     );
@@ -64,19 +64,19 @@ const AnimatedShowItem = ({
     // Interpolate scale: 0.7 when at top, 1 when fully visible
     const scale = interpolate(
       itemTop,
-      [-(IMG_HEIGHT + 26), -20], // Scale down when item
-      [0.75, 1],
+      [-(IMG_HEIGHT + 26), -125], // Scale down when item
+      [0.85, 1],
       'clamp'
     );
     const transformX = interpolate(
       itemTop,
-      [-(IMG_HEIGHT + 26), -20], // Scale down when item
-      [isOdd ? -40 : 40, 0],
+      [-(IMG_HEIGHT + 26), -125], // Scale down when item
+      [isOdd ? -20 : 20, 0],
       'clamp'
     );
     const translateY = interpolate(
       itemTop,
-      [-(IMG_HEIGHT + 26), -20], // Scale down when item
+      [-(IMG_HEIGHT + 26), -125], // Scale down when item
       [30, 0],
       'clamp'
     );
