@@ -1,4 +1,6 @@
 import { View, Text, TextInput, Alert, Pressable } from 'react-native';
+import { SymbolView } from 'expo-symbols';
+import * as Haptics from 'expo-haptics';
 import React, { useCallback, useState } from 'react';
 import { tags$ } from '~/store/store-shows';
 import { use$ } from '@legendapp/state/react';
@@ -31,9 +33,9 @@ const TagContainer = () => {
             if (name) {
               try {
                 tags$.addTag(name);
-              } catch (e) {
+              } catch (e: any) {
                 // Checking for custom error being thrown
-                if (e.message.includes('duplicate')) {
+                if (e?.message?.includes('duplicate')) {
                   Alert.alert('Duplicate Tag', 'Tag Already Exists, nothing added');
                 }
               }
@@ -55,8 +57,19 @@ const TagContainer = () => {
     <View className="mx-2 flex-1">
       <View className="my-2 flex-row items-center">
         {/* <Text>TagContainer</Text> */}
-        <Pressable onPress={handleNewTagPrompt} className="rounded-md bg-button px-2 py-2">
-          <Text className="text-lg text-white">Add A New Tag</Text>
+        <Pressable 
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            handleNewTagPrompt();
+          }}
+          className="flex-row items-center rounded-full border-hairline px-4 py-2.5 active:opacity-80"
+          style={{
+            backgroundColor: colors.primary + '44',
+            borderColor: colors.primary,
+          }}
+          accessibilityLabel="Add a new tag">
+          <SymbolView name="plus" tintColor={colors.primary} size={16} style={{ marginRight: 6 }} />
+          <Text className="font-medium text-primary">Add A New Tag</Text>
         </Pressable>
       </View>
       <Animated.ScrollView

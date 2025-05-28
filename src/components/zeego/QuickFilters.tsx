@@ -15,7 +15,7 @@ export function QuickFilters() {
   const segments = useSegments() as string[];
 
   const savedFiltersTemp = use$(filterCriteria$.savedFilters);
-  const savedFilters = reverse([...savedFiltersTemp]);
+  const savedFilters = reverse([...savedFiltersTemp.filter((el) => el.favorite)]);
 
   const applyFilter = (filterId: string) => {
     // ONLY replace route if NOT on home path

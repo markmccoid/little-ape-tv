@@ -111,16 +111,38 @@ export const SettingsNumberSelect = ({
 }: SelectProps) => {
   const { colors } = useCustomTheme();
   const [localValue, setLocalValue] = React.useState(selectValue.toString());
+  const [isActive, setIsActive] = React.useState(false);
+
   React.useEffect(() => {
     setLocalValue(selectValue.toString());
   }, [selectValue]);
+
   const handleChange = (val: string) => {
     const parsedValue = parseInt(val);
-    if (!isNaN(parsedValue)) {
+    if (!isNaN(parsedValue) && parsedValue >= 0 && parsedValue <= 100) {
       setLocalValue(val);
-      selectCallback(parsedValue);
     }
   };
+
+  const handleBlur = () => {
+    const parsedValue = parseInt(localValue);
+    if (!isNaN(parsedValue) && parsedValue >= 0 && parsedValue <= 100) {
+      selectCallback(parsedValue);
+    }
+    setIsActive(false);
+  };
+
+  const handlePress = () => {
+    setIsActive(true);
+  };
+
+  const [selection, setSelection] = React.useState({ start: 0, end: localValue.length });
+
+  const handleFocus = () => {
+    // Select all text when input is focused
+    setSelection({ start: 0, end: localValue.length });
+  };
+
   return (
     <View
       className="flex-row items-center justify-between rounded-lg border-gray-300 p-1 pl-2 active:bg-card"
@@ -128,23 +150,34 @@ export const SettingsNumberSelect = ({
         backgroundColor: `${colors.card}`,
         borderWidth: StyleSheet.hairlineWidth,
         borderRadius: 10,
-        // borderTopLeftRadius: isLast ? 0 : 10,
-        // borderTopRightRadius: isLast ? 0 : 10,
-        // borderBottomLeftRadius: isFirst ? 0 : 10,
-        // borderBottomRightRadius: isFirst ? 0 : 10,
         ...childStyle,
       }}>
       <View className="flex-row items-center">
         {LeftSymbol ? <LeftSymbol /> : null}
         <Text className="p-1 text-lg text-text">{title}</Text>
       </View>
-      <TextInput
-        className="flex-row justify-end border-b-hairline text-right"
-        style={{ fontSize: 20, width: 50 }}
-        value={localValue}
-        onChangeText={handleChange}
-        keyboardType="numeric"
-      />
+      <Pressable onPress={handlePress} className="mr-2">
+        {isActive ? (
+          <TextInput
+            className="flex-row justify-end border-b-hairline border-primary text-right"
+            style={{ fontSize: 20, width: 50 }}
+            value={localValue}
+            onChangeText={handleChange}
+            keyboardType="numeric"
+            onBlur={handleBlur}
+            onSubmitEditing={handleBlur}
+            onFocus={handleFocus}
+            selection={selection}
+            onSelectionChange={({ nativeEvent: { selection } }) => setSelection(selection)}
+            selectTextOnFocus={true}
+            autoFocus={true}
+          />
+        ) : (
+          <Text className="text-right" style={{ fontSize: 20, width: 50 }}>
+            {localValue}
+          </Text>
+        )}
+      </Pressable>
     </View>
   );
 };

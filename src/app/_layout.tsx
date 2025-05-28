@@ -17,7 +17,7 @@ import { useFonts } from '@expo-google-fonts/asul';
 import { setupEvents } from '~/utils/events';
 import { queryClient } from '~/utils/queryClient';
 import { useSyncQueries } from 'tanstack-query-dev-tools-expo-plugin';
-import { registerBackgroundTask } from '~/utils/backgroundTasks';
+import { checkForShowUpdatesAndNotify, registerBackgroundTask } from '~/utils/backgroundTasks';
 import { use$ } from '@legendapp/state/react';
 import { initializeWatchProviders, settings$ } from '~/store/store-settings';
 import { askNotificationPermissions } from '~/utils/permissions';
@@ -44,6 +44,7 @@ const InitialLayout = () => {
       await registerBackgroundTask();
       initializeWatchProviders();
       await askNotificationPermissions();
+      await checkForShowUpdatesAndNotify();
     };
 
     mainInit();

@@ -1,5 +1,7 @@
-import { View, Text, Alert } from 'react-native';
+import { View, Text, Alert, Pressable } from 'react-native';
 import React from 'react';
+import { SymbolView } from 'expo-symbols';
+import * as Haptics from 'expo-haptics';
 import { Tag } from '~/store/functions-tags';
 import showConfirmationPrompt from '~/components/common/showConfirmationPrompt';
 import { tags$ } from '~/store/store-shows';
@@ -23,9 +25,9 @@ const handleEditTagPrompt = (tag: Tag) => {
           if (name) {
             try {
               tags$.editTag(tag.id, name);
-            } catch (e) {
+            } catch (e: any) {
               // Checking for custom error being thrown
-              if (e.message.includes('duplicate')) {
+              if (e?.message?.includes('duplicate')) {
                 Alert.alert('Duplicate Tag', 'Tag Already Exists, nothing added');
               }
             }
@@ -58,16 +60,38 @@ const TagItem = ({ tagItem }: { tagItem: Tag }) => {
   const { colors } = useCustomTheme();
 
   return (
-    <View className="flex-row items-center rounded-xl border-hairline border-gray-400 bg-white p-2">
-      <View className="mr-2 flex-grow ">
-        <Text className="text-lg">{tagItem.name}</Text>
+    <View className="mb-2 flex-row items-center justify-between overflow-hidden rounded-lg border border-hairline bg-white p-3 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+      <View className="flex-1">
+        <Text className="text-lg font-medium text-text dark:text-white">{tagItem.name}</Text>
       </View>
-      <Sortable.Pressable onPress={() => handleEditTagPrompt(tagItem)} className="mx-1">
-        <EditIcon size={20} color={colors.primary} />
-      </Sortable.Pressable>
-      <Sortable.Pressable onPress={() => handleTagRemove(tagItem.id)} className="mx-1">
-        <DeleteIcon size={20} />
-      </Sortable.Pressable>
+      <View className="flex-row items-center gap-2">
+        <Pressable
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            handleEditTagPrompt(tagItem);
+          }}
+          className="rounded-full border border-hairline p-2 active:opacity-70"
+          style={{
+            backgroundColor: colors.primary + '10',
+            borderColor: colors.border,
+          }}
+          accessibilityLabel={`Edit tag ${tagItem.name}`}>
+          <SymbolView name="pencil" tintColor={colors.primary} size={18} />
+        </Pressable>
+        <Pressable
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            handleTagRemove(tagItem.id);
+          }}
+          className="rounded-full border border-hairline p-2 active:opacity-70"
+          style={{
+            backgroundColor: colors.deleteRed + '10',
+            borderColor: colors.border,
+          }}
+          accessibilityLabel={`Delete tag ${tagItem.name}`}>
+          <SymbolView name="trash" tintColor={colors.deleteRed} size={18} />
+        </Pressable>
+      </View>
     </View>
   );
 };

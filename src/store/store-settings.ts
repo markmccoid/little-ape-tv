@@ -11,6 +11,8 @@ import dayjs from 'dayjs';
 import { getTMDBConsts } from '@markmccoid/tmdb_api';
 //**
 
+//# -- Get the first 30 watch providers from TMDB contants IF we have not yet
+//# -- Initialized the watchProviderAttributes array in settings$.
 export const initializeWatchProviders = () => {
   const currProviders = settings$.watchProviderAttributes.peek();
 

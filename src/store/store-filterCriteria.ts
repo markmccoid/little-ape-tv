@@ -224,6 +224,10 @@ const filterCriteriaFunctions: FilterCriteriaFunctions = {
         return filter;
       }
     });
+    console.log(
+      'finalFilters',
+      finalFilters.map((el) => `${el.name}: ${el.favorite}`)
+    );
     filterCriteria$.savedFilters.set(finalFilters);
   },
   updateSavedFilterPositions: (sortedIds: string[]) => {

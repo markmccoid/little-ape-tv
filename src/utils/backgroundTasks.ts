@@ -43,11 +43,13 @@ TaskManager.defineTask(UPDATE_WATCH_PROVIDERS, async () => {
 // NOTE: Per expo docs the last minimum interval is used for ALL background tasks
 export async function registerBackgroundTask() {
   try {
+    // Register both tasks with the same minimum interval (6 hours)
+    // This is required by Expo's background task system
     await BackgroundTask.registerTaskAsync(CHECK_NEW_EPISODES_TASK, {
-      minimumInterval: 60 * 6, // Now in minutes ( hours) instead of seconds
+      minimumInterval: 60 * 6, // 6 hours in minutes
     });
     await BackgroundTask.registerTaskAsync(UPDATE_WATCH_PROVIDERS, {
-      minimumInterval: 60 * 6, // In minutes
+      minimumInterval: 60 * 6, // Must match the first task's interval
     });
   } catch (error) {
     console.error('Failed to register background task:', error);
@@ -141,7 +143,6 @@ export async function checkForShowUpdatesAndNotify() {
         // convert to JS Date object:
         const notifyDateJS = notifyDate.toDate();
 
-        console.log('Send notification for ', show.name);
         // Schedule notification
         await Notifications.scheduleNotificationAsync({
           content: {
