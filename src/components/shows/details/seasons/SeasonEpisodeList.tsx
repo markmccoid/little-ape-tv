@@ -69,6 +69,18 @@ const SeasonEpisodeList: React.FC<Props> = ({ seasons, showData }) => {
     [seasons, seasonSummary]
   );
 
+  //~ ----------------------------
+  //~ Scroll Season Scrollview
+  //~ ----------------------------
+  const scrollSeasons = (seasonNumber: number) => {
+    const seasonIndex = sections.findIndex((section) => section.seasonNumber === seasonNumber);
+    if (seasonIndex === -1) return;
+    seasonScrollRef.current?.scrollTo({ x: seasonIndex * 105, y: 0, animated: true });
+  };
+  useEffect(() => {
+    // seasonSummary.lastWatchedSeason;
+    scrollSeasons(seasonSummary?.lastWatchedSeason || 0);
+  }, [seasonSummary?.lastWatchedSeason]);
   //!! ----- DEBUG GET ITEM LAYOUT ---
   const buildGetItemLayout = getItemLayout({
     getItemHeight: ITEM_HEIGHT,
@@ -89,7 +101,7 @@ const SeasonEpisodeList: React.FC<Props> = ({ seasons, showData }) => {
   // Scroll to the last watched season and episode
   //==============================================
   useEffect(() => {
-    if (!seasonSummary?.lastWatchedSeason) return;
+    if (seasonSummary?.lastWatchedSeason === undefined) return;
 
     // Get the last watched season
     const lastSeasonNumberWatched = seasonSummary.lastWatchedSeason;
@@ -120,7 +132,7 @@ const SeasonEpisodeList: React.FC<Props> = ({ seasons, showData }) => {
 
     // Scroll to specific episode after a slight delay
     setTimeout(() => scrollToLocation(seasonIndexToScroll, episodeIndex), 100);
-  }, [seasonSummary?.lastWatchedSeason, seasons.length]);
+  }, [seasonSummary?.lastWatchedSeason, seasons.length, seasonSummary?.lastWatchedSeason == 0]);
 
   //==============================================
   // Render section header (season name)

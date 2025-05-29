@@ -15,6 +15,7 @@ const SegmentedControls = () => {
   return (
     <View>
       <SegmentedControl
+        tintColor="orange"
         className="w-[100]"
         values={['Ignore', 'Favorites', 'Exclude Favs']}
         selectedIndex={getInclusionIndex(filterIsFavorited)}
@@ -24,6 +25,7 @@ const SegmentedControls = () => {
         }}
       />
       <SegmentedControl
+        tintColor="orange"
         className="w-[100]"
         values={['Ignore', 'Watched', 'Exclude Watched']}
         selectedIndex={getInclusionIndex(filterIsAllWatched)}

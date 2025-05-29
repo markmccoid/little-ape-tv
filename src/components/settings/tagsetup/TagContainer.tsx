@@ -57,7 +57,7 @@ const TagContainer = () => {
     <View className="mx-2 flex-1">
       <View className="my-2 flex-row items-center">
         {/* <Text>TagContainer</Text> */}
-        <Pressable 
+        <Pressable
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
             handleNewTagPrompt();
@@ -73,7 +73,7 @@ const TagContainer = () => {
         </Pressable>
       </View>
       <Animated.ScrollView
-        contentContainerStyle={{ padding: 10, flex: 1 }}
+        contentContainerStyle={{ padding: 10 }}
         ref={scrollableRef}
         style={{ flex: 1, marginBottom: bottom }}>
         <Sortable.Grid

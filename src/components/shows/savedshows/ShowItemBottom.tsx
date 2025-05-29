@@ -39,24 +39,24 @@ const ShowItemBottom = ({ showId }: Props) => {
       <Animated.View style={[{ position: 'absolute', left: 0, top: -5 }]}>
         <SetFavoriteButton showId={showId} isFavorited={!!favorite} />
       </Animated.View>
-      {hasAvgTime && (
-        <View
-          className="absolute rounded-full border-hairline p-2"
-          style={{ backgroundColor: runTimeBGColor }}>
-          <Pressable
-            onPress={() =>
-              router.push({
-                pathname: `/seasonslistmodal`,
-                params: { showid: parseInt(showId) },
-              })
-            }
-            hitSlop={{ top: 10, bottom: 10, left: 5, right: 5 }}>
-            <Text className="font-semibold" style={{ color: runTimeTextColor }}>
-              {showInfo.avgEpisodeRunTime} Min
-            </Text>
-          </Pressable>
-        </View>
-      )}
+
+      <View
+        className="absolute rounded-full border-hairline p-2"
+        style={{ backgroundColor: runTimeBGColor }}>
+        <Pressable
+          onPress={() =>
+            router.push({
+              pathname: `/seasonslistmodal`,
+              params: { showid: parseInt(showId) },
+            })
+          }
+          hitSlop={{ top: 10, bottom: 10, left: 5, right: 5 }}>
+          <Text className="font-semibold" style={{ color: runTimeTextColor }}>
+            {`${hasAvgTime ? showInfo.avgEpisodeRunTime : ' ?? '}`} Min
+          </Text>
+        </Pressable>
+      </View>
+
       <Animated.View style={[{ position: 'absolute', right: 0, top: -5 }]}>
         <DeleteShowButton showId={showId} />
       </Animated.View>

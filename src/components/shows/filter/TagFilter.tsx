@@ -11,7 +11,7 @@ const TagFilter = () => {
   return (
     <View className="mx-2 my-2 rounded-xl border-hairline border-border bg-card px-2 py-1">
       <View className=" flex-row justify-between">
-        <Text className="text-xl font-semibold">Tag Filter</Text>
+        <Text className="text-xl font-semibold text-green-800">Tag Filter</Text>
         <Pressable onPress={filterCriteria$.actionClearTags} className="px-2" hitSlop={5}>
           <EraserIcon size={25} />
         </Pressable>

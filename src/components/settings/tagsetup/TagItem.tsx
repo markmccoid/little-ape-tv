@@ -60,9 +60,9 @@ const TagItem = ({ tagItem }: { tagItem: Tag }) => {
   const { colors } = useCustomTheme();
 
   return (
-    <View className="mb-2 flex-row items-center justify-between overflow-hidden rounded-lg border border-hairline bg-white p-3 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+    <View className="mb-1 flex-row items-center justify-between overflow-hidden rounded-lg border-hairline bg-white p-3 shadow-sm dark:border-slate-700 dark:bg-slate-800">
       <View className="flex-1">
-        <Text className="text-lg font-medium text-text dark:text-white">{tagItem.name}</Text>
+        <Text className="text-xl font-medium text-text dark:text-white">{tagItem.name}</Text>
       </View>
       <View className="flex-row items-center gap-2">
         <Pressable
@@ -70,7 +70,7 @@ const TagItem = ({ tagItem }: { tagItem: Tag }) => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
             handleEditTagPrompt(tagItem);
           }}
-          className="rounded-full border border-hairline p-2 active:opacity-70"
+          className="rounded-full border-hairline p-2 active:opacity-70"
           style={{
             backgroundColor: colors.primary + '10',
             borderColor: colors.border,
@@ -83,7 +83,7 @@ const TagItem = ({ tagItem }: { tagItem: Tag }) => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
             handleTagRemove(tagItem.id);
           }}
-          className="rounded-full border border-hairline p-2 active:opacity-70"
+          className="rounded-full border-hairline p-2 active:opacity-70"
           style={{
             backgroundColor: colors.deleteRed + '10',
             borderColor: colors.border,

@@ -14,7 +14,7 @@ const WatchProviderFilter = () => {
   return (
     <View className="mx-2 mb-2 rounded-xl border-hairline border-border bg-card px-2 py-1">
       <View className=" flex-row justify-between">
-        <Text className="text-xl font-semibold">Stream Provider Filter</Text>
+        <Text className="text-xl font-semibold text-blue-800">Stream Provider Filter</Text>
         <Pressable onPress={filterCriteria$.clearStreamProviderFilter} className="px-2" hitSlop={5}>
           <EraserIcon />
         </Pressable>

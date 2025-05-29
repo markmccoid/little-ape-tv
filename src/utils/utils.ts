@@ -137,7 +137,7 @@ const rtColors = {
 const rtColorArray = [15, 30, 45, 60];
 export const getBGColor = (runTime: number | undefined) => {
   // Find the next greater key
-  if (!runTime) return undefined;
+  if (!runTime) return ['white', 'black'];
 
   for (const key of rtColorArray) {
     if (key >= runTime) {
