@@ -30,6 +30,7 @@ const tagInitialState: { tagList: Tag[] } = { tagList: [] };
 //~ --- savedShow$ --------
 //~ Create the Observable, minus the functions
 //~ ==================
+export const showMMKV = new ObservablePersistMMKV({ id: authManager.currentUser?.id });
 export type SavedShowObservable = {
   shows: SavedShows;
   showAttributes: ShowAttributes;
@@ -38,7 +39,7 @@ export const savedShows$ = observable<SavedShowObservable>(
   synced({
     initial: initialState,
     persist: {
-      plugin: new ObservablePersistMMKV({ id: authManager.currentUser?.id }),
+      plugin: showMMKV, //new ObservablePersistMMKV({ id: authManager.currentUser?.id }),
       name: 'savedshows',
     },
   })

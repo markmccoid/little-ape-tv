@@ -147,7 +147,7 @@ const SettingsContainer = () => {
 
         {/* Scheduled Notifications */}
         <View className="mt-2" />
-        <SettingsGroup title="View ">
+        <SettingsGroup title="Other">
           <SettingsGroup.RouteItem
             title="Export/Import Data"
             route="/(authed)/settings/exportdata"
@@ -198,7 +198,7 @@ const SettingsContainer = () => {
               className="border bg-blue-300 p-2">
               <Text>Clear Notification History</Text>
             </Pressable>
-            <Pressable
+            {/* <Pressable
               onPress={async () => await removeBackgroundTask('check-new-episodes')}
               className="border bg-blue-300 p-2">
               <Text>Remove Task 'check-new-episodes'</Text>
@@ -212,7 +212,7 @@ const SettingsContainer = () => {
               onPress={async () => await getBGTaskStatus()}
               className="border bg-blue-300 p-2">
               <Text>Background Task Status</Text>
-            </Pressable>
+            </Pressable> */}
           </View>
         </View>
       </ScrollView>

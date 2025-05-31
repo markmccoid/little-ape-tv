@@ -59,19 +59,20 @@ const NotificationList = () => {
         <View style={{ height: 100 }}>
           <ScrollView className="mb-2 border-hairline bg-white">
             <View className="mx-4 flex-row flex-wrap justify-between">
-              {backgroundRuns.map((el) => {
+              {backgroundRuns.map((el, index) => {
                 return (
                   <View
-                    key={el.dateTimeEpoch}
+                    key={el?.dateTimeEpoch || index}
                     className="mb-2 border p-2"
                     style={{ backgroundColor: el.type === 'notify' ? 'lime' : 'purple' }}>
                     <Text
                       className="font-semibold"
                       style={{ color: el.type === 'notify' ? 'black' : 'white' }}>
-                      {dayjs.unix(el.dateTimeEpoch).format('MM-DD-YY HH:mm:ss')}-({el.numShows})
+                      {dayjs.unix(el?.dateTimeEpoch || 0).format('MM-DD-YY HH:mm:ss')}-(
+                      {el?.numShows || 0})
                     </Text>
                     {el.type === 'notify-ERROR' && (
-                      <Text className="font-semibold">ERROR - {el.detail}</Text>
+                      <Text className="font-semibold">ERROR - {el?.detail || 'Unknown Error'}</Text>
                     )}
                   </View>
                 );
@@ -126,7 +127,7 @@ const NotificationList = () => {
                   <View className="flex-row items-center justify-start">
                     <Text className="text-lg font-semibold">Last Notify Date: </Text>
                     <Text className="text-lg">
-                      {item.dateLastNotify
+                      {item?.dateLastNotify
                         ? dayjs.unix(item.dateLastNotify).format('MM-DD-YYYY HH:mm:ss')
                         : '-----'}
                     </Text>

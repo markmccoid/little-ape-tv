@@ -54,7 +54,7 @@ export default function SettingsLayout() {
       />
       <Stack.Screen
         name="exportdata"
-        options={{ headerShown: true, presentation: 'modal', title: 'Export Data' }}
+        options={{ headerShown: true, presentation: 'modal', title: 'Export/Import Data' }}
       />
       <Stack.Screen
         name="schedulednotifications"

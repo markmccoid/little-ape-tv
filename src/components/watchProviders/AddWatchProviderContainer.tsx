@@ -82,7 +82,7 @@ const AddWatchProviderContainer = () => {
     );
   };
   return (
-    <View className="">
+    <View className="flex-1">
       <View className="flex-row items-center border-b-hairline">
         {/* Text Input START */}
         <View className="items-cneter my-2 w-1/2 px-2">
@@ -144,7 +144,8 @@ const AddWatchProviderContainer = () => {
         data={providers} // Sort by displayPriority
         renderItem={renderItem}
         keyExtractor={(item) => item.providerId.toString()}
-        contentContainerStyle={{ padding: 10 }}
+        contentContainerStyle={{ padding: 10, paddingBottom: 50 }}
+        className="flex-1 "
         numColumns={2}
         itemLayoutAnimation={LinearTransition}
         keyboardDismissMode="on-drag"

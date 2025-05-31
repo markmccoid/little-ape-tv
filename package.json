@@ -37,6 +37,8 @@
     "expo-checkbox": "~4.1.4",
     "expo-constants": "~17.1.5",
     "expo-dev-client": "~5.1.8",
+    "expo-document-picker": "~13.1.5",
+    "expo-file-system": "~18.1.10",
     "expo-font": "~13.3.1",
     "expo-haptics": "~14.1.4",
     "expo-image": "~2.1.7",
@@ -44,6 +46,7 @@
     "expo-linking": "~7.1.5",
     "expo-notifications": "~0.31.2",
     "expo-router": "~5.0.7",
+    "expo-sharing": "~13.1.5",
     "expo-splash-screen": "~0.30.8",
     "expo-status-bar": "~2.2.3",
     "expo-symbols": "~0.4.4",
@@ -74,10 +77,7 @@
     "react-native-vector-icons": "^10.2.0",
     "react-native-web": "^0.20.0",
     "vaul": "^1.1.2",
-    "zeego": "^3.0.5",
-    "expo-file-system": "~18.1.10",
-    "expo-sharing": "~13.1.5",
-    "expo-document-picker": "~13.1.5"
+    "zeego": "^3.0.5"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
@@ -92,6 +92,8 @@
     "jscodeshift": "^0.15.2",
     "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.5.11",
+    "react-query-external-sync": "^2.2.0",
+    "socket.io-client": "^4.8.1",
     "tailwindcss": "^3.4.17",
     "tanstack-query-dev-tools-expo-plugin": "^0.1.1",
     "typescript": "~5.8.3"

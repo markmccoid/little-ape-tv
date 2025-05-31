@@ -28,7 +28,6 @@ const ExportData = () => {
 
       // Check if the user selected a file or cancelled
       if (pickerResult.canceled) {
-        Alert.alert('Cancelled', 'No file was selected.');
         return;
       }
 
@@ -57,7 +56,7 @@ const ExportData = () => {
         importFilterCriteria(filterCriteria);
       }
       // Display a success message
-      Alert.alert('Success', 'JSON file imported successfully! Check console for data.');
+      Alert.alert('Success', 'JSON file imported successfully!');
 
       // Example: Use the jsonData in your app (e.g., update state, store in database, etc.)
       // setData(jsonData); // Example for state management
@@ -68,8 +67,8 @@ const ExportData = () => {
   };
   return (
     <View className="flex-1  gap-2 p-4">
-      <Text className="text-2xl font-bold text-primary">ExportData</Text>
       <View className="mx-2 mb-1 rounded-lg border-hairline px-2 py-1 ">
+        <Text className="text-2xl font-bold text-primary">Export Data</Text>
         <Text className="text-lg text-primary">
           Export your data to a JSON file for backup or sharing. Currently to be able to import
           data, you must save to Files.
@@ -82,6 +81,7 @@ const ExportData = () => {
         </Pressable>
       </View>
       <View className="mx-2 mb-1 rounded-lg border-hairline px-2 py-1 ">
+        <Text className="text-2xl font-bold text-primary">Import Data</Text>
         <Text className="text-lg text-primary">
           You will be prompted to select a JSON file from your device. The app will read the file
           and import the data into the app.
