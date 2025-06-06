@@ -90,7 +90,7 @@ const AnimatedShowItem = ({
 
   return (
     <Animated.View
-      style={[animatedItemStyle, { marginHorizontal: MARGIN / 2, height: IMG_HEIGHT + 26 }]}
+      style={[animatedItemStyle, { marginHorizontal: 0, height: IMG_HEIGHT + 26 }]}
       className="overflow-hidden rounded-lg">
       <View style={{ width: IMG_WIDTH, height: IMG_HEIGHT + 26 }}>
         <ShowItem show={show} showId={showId} />

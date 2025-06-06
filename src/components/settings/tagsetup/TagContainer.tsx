@@ -17,6 +17,18 @@ const TagContainer = () => {
   const { bottom } = useSafeAreaInsets();
   const tags = use$(tags$.tagList);
   const { colors } = useCustomTheme();
+
+  const scrollToEnd = useCallback(() => {
+    setTimeout(() => {
+      scrollableRef.current?.scrollToEnd({ animated: true });
+    }, 300); // Slightly longer delay to ensure UI update
+  }, []);
+  // const scrollToEnd = useCallback(() => {
+  //   // scrollableRef.current?.scrollToEnd({ animated: true });
+  //   const y = tags.length * 55;
+  //   // scrollableRef.current?.scrollTo({ y, animated: true });
+  //   setTimeout(() => scrollableRef.current?.scrollTo({ y, animated: true }), 100);
+  // }, [tags]);
   const handleNewTagPrompt = () => {
     Alert.prompt(
       'Enter New Tag',
@@ -33,6 +45,7 @@ const TagContainer = () => {
             if (name) {
               try {
                 tags$.addTag(name);
+                scrollToEnd();
               } catch (e: any) {
                 // Checking for custom error being thrown
                 if (e?.message?.includes('duplicate')) {

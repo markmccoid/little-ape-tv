@@ -1,6 +1,7 @@
 import { BlurView } from 'expo-blur';
 import { Link, Tabs } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
+import * as Haptics from 'expo-haptics';
 import { Alert, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AddIcon, SettingsIcon, ViewTVShowIcon } from '~/components/common/Icons';
@@ -52,6 +53,7 @@ export default function TabLayout() {
           }}
           listeners={{
             tabPress: (e) => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
               e.preventDefault();
             },
           }}

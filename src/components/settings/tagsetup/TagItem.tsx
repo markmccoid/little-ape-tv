@@ -60,7 +60,7 @@ const TagItem = ({ tagItem }: { tagItem: Tag }) => {
   const { colors } = useCustomTheme();
 
   return (
-    <View className="mb-1 flex-row items-center justify-between overflow-hidden rounded-lg border-hairline bg-white p-3 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+    <View className="mb-[1] h-[45] flex-row items-center justify-between overflow-hidden rounded-lg border-hairline bg-white px-3 py-2 shadow-sm dark:border-slate-700 dark:bg-slate-800">
       <View className="flex-1">
         <Text className="text-xl font-medium text-text dark:text-white">{tagItem.name}</Text>
       </View>

@@ -7,12 +7,14 @@ import { use$ } from '@legendapp/state/react';
 import { filterCriteria$ } from '~/store/store-filterCriteria';
 import { reverse } from 'lodash';
 import { useNavigation, usePathname, useRouter, useSegments } from 'expo-router';
+import { useState } from 'react';
+import { MotiView } from 'moti';
 
 export function QuickFilters() {
   const { colors } = useCustomTheme();
   const router = useRouter();
-  const navigation = useNavigation();
   const segments = useSegments() as string[];
+  const [open, setOpen] = useState(false);
 
   const savedFiltersTemp = use$(filterCriteria$.savedFilters);
   const savedFilters = reverse([...savedFiltersTemp.filter((el) => el.favorite)]);
@@ -29,8 +31,12 @@ export function QuickFilters() {
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger>
-        <Pressable onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)}>
-          <SymbolView name="line.3.horizontal.circle.fill" tintColor={colors.primary} size={30} />
+        <Pressable
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+          }}
+          className="active:scale-90 active:opacity-80">
+          <SymbolView name="line.3.horizontal.circle.fill" tintColor={colors.primary} size={45} />
         </Pressable>
       </DropdownMenu.Trigger>
 
@@ -56,11 +62,3 @@ export function QuickFilters() {
     </DropdownMenu.Root>
   );
 }
-
-const MenuItem = () => {
-  return (
-    <View style={{ padding: 10, backgroundColor: 'white' }}>
-      <Text>Menu Item</Text>
-    </View>
-  );
-};

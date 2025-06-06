@@ -194,7 +194,10 @@ const SettingsContainer = () => {
           </View>
           <View className="flex-col gap-2">
             <Pressable
-              onPress={() => settings$.notificationHistory.set({})}
+              onPress={() => {
+                settings$.notificationHistory.set({});
+                settings$.backgroundRunLog.set([]);
+              }}
               className="border bg-blue-300 p-2">
               <Text>Clear Notification History</Text>
             </Pressable>

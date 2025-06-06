@@ -49,31 +49,31 @@ const PersonProfile = ({ personInfo, scrollY, headerHeight }: Props) => {
     };
   });
   return (
-    <Pressable
-      className="flex-row px-1 pt-[8]"
-      onPress={() => {
-        Linking.openURL(`https://www.imdb.com/name/${personInfo.imdbId}/`);
-      }}>
-      <Animated.View
-        style={[
-          animatedProfileStyle,
-          {
-            borderRadius: 10,
-            borderWidth: StyleSheet.hairlineWidth,
-            overflow: 'hidden',
-          },
-        ]}>
-        <AnimatedImage
-          source={profileURL}
-          style={{ width: '100%', height: '100%' }}
-          contentFit="cover"
-        />
-      </Animated.View>
-
+    <View className="flex-row px-1 pt-[8]">
+      <Pressable
+        onPress={() => {
+          Linking.openURL(`https://www.imdb.com/name/${personInfo.imdbId}/`);
+        }}>
+        <Animated.View
+          style={[
+            animatedProfileStyle,
+            {
+              borderRadius: 10,
+              borderWidth: StyleSheet.hairlineWidth,
+              overflow: 'hidden',
+            },
+          ]}>
+          <AnimatedImage
+            source={profileURL}
+            style={{ width: '100%', height: '100%' }}
+            contentFit="cover"
+          />
+        </Animated.View>
+      </Pressable>
       <ScrollView className="" contentContainerClassName="pb-5">
         <Text className="flex-1 px-1">{personInfo.biography}</Text>
       </ScrollView>
-    </Pressable>
+    </View>
   );
 };
 

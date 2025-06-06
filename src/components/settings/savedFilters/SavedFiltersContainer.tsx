@@ -48,7 +48,7 @@ const SavedFiltersContainer = () => {
     return (
       <View
         key={filter.id}
-        className="mb-2 overflow-hidden rounded-lg border-hairline bg-white p-3 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+        className="mb-[1] overflow-hidden rounded-lg border-hairline bg-white p-3 shadow-sm dark:border-slate-700 dark:bg-slate-800">
         <View className="flex-row items-center justify-between">
           {/* Left side - Favorite and Name */}
           <View className="flex-1 flex-row items-center gap-3">
@@ -133,7 +133,7 @@ const SavedFiltersContainer = () => {
     );
   };
   return (
-    <View className="flex-1">
+    <View className="flex-1 ">
       <View className="mx-3 my-2 flex-row justify-end">
         <Pressable
           onPress={() => {
@@ -151,7 +151,7 @@ const SavedFiltersContainer = () => {
         </Pressable>
       </View>
       <Animated.ScrollView
-        contentContainerClassName="p-2"
+        contentContainerClassName="p-2 pb-5"
         ref={scrollableRef}
         style={{ marginBottom: bottom }}>
         <Sortable.Grid
