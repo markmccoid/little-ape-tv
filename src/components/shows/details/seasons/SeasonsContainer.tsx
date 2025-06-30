@@ -23,7 +23,6 @@ const SeasonsContainer = () => {
   }, [showid, showData]);
   // console.log('SEASONS', seasons);
   const { data, isLoading } = useShowSeasonData(showid as string, seasons);
-  // console.log('SeasonEpisode Data', data[0]);
 
   return (
     <View className={`flex-1`}>

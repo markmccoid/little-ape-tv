@@ -24,6 +24,7 @@ import { settings$ } from '~/store/store-settings';
 import { imdbLinkToEpisode } from '~/utils/imdbLinks';
 import { useEpisodeAttributes } from '~/store/functions-showAttributes';
 import ShowImage from '~/components/common/ShowImage';
+import { at } from 'lodash';
 
 // Define fixed heights for performance
 const ITEM_HEIGHT = 125;
@@ -44,7 +45,10 @@ const EpisodeRow = ({ showId, isStoredLocally, item }: Props) => {
   );
   const attributes = useEpisodeAttributes(showId, item.seasonNumber, item.episodeNumber);
   const showImageFlag = use$(settings$.showImageInEpisode);
-
+  // console.log('attributes', attributes.watched, attributes.favorited);
+  // if (!attributes?.favorited) {
+  //   return null;
+  // }
   return (
     <View
       className={`flex-row items-start border-t px-2 py-1 ${attributes?.watched ? 'bg-[#c5d9c3] dark:bg-[#606b5f]' : ''}`}

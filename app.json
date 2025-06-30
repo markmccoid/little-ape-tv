@@ -2,7 +2,7 @@
   "expo": {
     "name": "Little Ape TV",
     "slug": "little-ape-tv",
-    "version": "0.4.7",
+    "version": "0.4.8",
     "scheme": "little-ape-tv",
     "newArchEnabled": true,
     "web": {
@@ -51,11 +51,14 @@
       "bundleIdentifier": "com.markmccoid.littleapetv",
       "infoPlist": {
         "UIBackgroundModes": [
+          "processing",
           "processing"
         ],
         "NSBackgroundProcessingAPIs": [
+          "BackgroundTask",
           "BackgroundTask"
-        ]
+        ],
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {

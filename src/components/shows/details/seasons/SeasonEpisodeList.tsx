@@ -1,42 +1,40 @@
 import React, { useCallback, useEffect, useRef, memo, useMemo } from 'react';
-import { SectionList, View, Text, StyleSheet, Pressable, Linking, ScrollView } from 'react-native';
+import { SectionList, View, Text, Pressable, ScrollView } from 'react-native';
 
 import getItemLayout from 'react-native-get-item-layout-section-list';
 import { Episode, TVShowSeasonDetails } from '@markmccoid/tmdb_api';
-import { getEpisodeIMDBURL, ShowDetailsData, UseShowDetailsReturn } from '~/data/query.shows';
+import { ShowDetailsData } from '~/data/query.shows';
 import { useLocalSearchParams } from 'expo-router';
 import EpisodeRow from './EpisodeRow';
-import { CheckIcon, TelevisionIcon, TelevisionOffIcon } from '~/components/common/Icons';
+import { CheckIcon } from '~/components/common/Icons';
 import { updateSeasonSummary, useSavedSeasonSummary } from '~/store/functions-showAttributes';
 import SeasonHeader from './SeasonHeader';
-import { useObservable, useObserveEffect } from '@legendapp/state/react';
+import { useObserveEffect } from '@legendapp/state/react';
 import { savedShows$ } from '~/store/store-shows';
 
 // Define fixed heights for performance
 const SECTION_HEADER_HEIGHT = 70;
 const ITEM_HEIGHT = 125;
-const ITEM_SEPARATOR_HEIGHT = 18;
 
 type Props = {
   seasons: TVShowSeasonDetails[];
   showData: ShowDetailsData;
 };
 
-const ItemSeparator = () => (
-  <View className="bg-red-600" style={{ height: ITEM_SEPARATOR_HEIGHT }} />
-);
 export type SeasonsSection = {
   title: string;
   numEpisodes: number;
   seasonNumber: number;
   counts: { watched: number; downloaded: number; allWatched: boolean; allDownloaded: boolean };
+  data: Episode[];
 };
 const SeasonEpisodeList: React.FC<Props> = ({ seasons, showData }) => {
   // const [sectionPadding, setSectionPadding] = React.useState(110);
   const { showid } = useLocalSearchParams();
-  const sectionListRef = useRef<SectionList>(null);
+  const sectionListRef = useRef<SectionList<Episode, SeasonsSection>>(null);
   const seasonScrollRef = useRef<ScrollView>(null);
   const seasonSummary = useSavedSeasonSummary(showid as string);
+  const [showFavs, setShowFavs] = React.useState(false);
 
   //# this legend state hook will fire when a change is made to the showAttributes
   //# which will in turn update the seasonSummary data on the showAttributes[showId] observable
@@ -53,20 +51,34 @@ const SeasonEpisodeList: React.FC<Props> = ({ seasons, showData }) => {
     () =>
       seasons
         .filter((season) => season.episodes.length > 0) //Filter any seasons with no episodes
-        .map((season) => ({
-          title: season.seasonNumber === 0 ? season.name : `Season ${season.seasonNumber}`,
-          numEpisodes: season.episodes.length,
-          seasonNumber: season.seasonNumber,
-          counts: seasonSummary?.[season.seasonNumber] || {
-            favorited: 0,
-            watched: 0,
-            downloaded: 0,
-            allDownloaded: false,
-            allWatched: false,
-          }, //Return watched/download counts if they exists
-          data: season.episodes,
-        })),
-    [seasons, seasonSummary]
+        .map((season) => {
+          // Filter episodes based on showFavs setting
+          const filteredEpisodes = showFavs
+            ? season.episodes.filter((episode) => {
+                // Get episode attributes to check if favorited
+                const episodeAttributes =
+                  savedShows$.showAttributes[showid as string]?.seasons?.[episode.seasonNumber]
+                    ?.episodes?.[episode.episodeNumber];
+                return episodeAttributes?.f?.peek();
+              })
+            : season.episodes;
+
+          return {
+            title: season.seasonNumber === 0 ? season.name : `Season ${season.seasonNumber}`,
+            numEpisodes: filteredEpisodes.length,
+            seasonNumber: season.seasonNumber,
+            counts: seasonSummary?.[season.seasonNumber] || {
+              favorited: 0,
+              watched: 0,
+              downloaded: 0,
+              allDownloaded: false,
+              allWatched: false,
+            }, //Return watched/download counts if they exists
+            data: filteredEpisodes,
+          };
+        })
+        .filter((section) => section.data.length > 0), // Remove sections with no episodes (important when showFavs is true)
+    [seasons, seasonSummary, showFavs, showid]
   );
 
   //~ ----------------------------
@@ -142,7 +154,7 @@ const SeasonEpisodeList: React.FC<Props> = ({ seasons, showData }) => {
       return (
         <SeasonHeader
           showId={showid as string}
-          section={section}
+          section={section as SeasonsSection}
           isStoredLocally={isStoredLocally}
           headerHeight={SECTION_HEADER_HEIGHT}
         />
@@ -156,7 +168,6 @@ const SeasonEpisodeList: React.FC<Props> = ({ seasons, showData }) => {
   //==============================================
   const renderItem = useCallback(
     ({ item }: { item: Episode }) => {
-      // Removed index, not used
       return (
         <EpisodeRow
           item={item}
@@ -175,43 +186,59 @@ const SeasonEpisodeList: React.FC<Props> = ({ seasons, showData }) => {
 
   return (
     <View className="flex-1">
-      <ScrollView
-        ref={seasonScrollRef}
-        horizontal
-        className="my-2 shrink "
-        contentContainerClassName="gap-[8] px-2"
-        showsHorizontalScrollIndicator={false}>
-        {sections.map((section, index) => (
-          <Pressable
-            key={section.title}
-            onPress={() => scrollToLocation(index, 0)}
-            className={`w-[97] flex-row justify-center rounded-lg border bg-button px-[8] py-1 ${section.counts?.allWatched ? 'bg-buttondarker' : ''}`}>
-            <Text
-              className={`font-semibold ${section.counts?.allWatched ? 'text-buttondarkertext' : 'text-buttontext'} `}>
-              {section.title}
-            </Text>
-            {section.counts.allWatched && (
-              <View className="ml-[3]">
-                <CheckIcon size={15} color="white" />
-              </View>
-            )}
-          </Pressable>
-        ))}
-      </ScrollView>
-      <SectionList
+      <View
+        // style={{ height: 44 }}
+        className="my-1 flex-row">
+        <ScrollView
+          ref={seasonScrollRef}
+          horizontal
+          className="shrink"
+          contentContainerClassName="px-2"
+          showsHorizontalScrollIndicator={false}>
+          <View className="flex-row gap-[8] ">
+            {sections.map((section, index) => (
+              <Pressable
+                key={section.title}
+                onPress={() => scrollToLocation(index, 0)}
+                className={`w-[97] flex-row justify-center rounded-lg border bg-button px-[8] py-[2] ${section.counts?.allWatched ? 'bg-buttondarker' : ''}`}>
+                <Text
+                  className={`font-semibold ${section.counts?.allWatched ? 'text-buttondarkertext' : 'text-buttontext'} `}>
+                  {section.title}
+                </Text>
+                {section.counts.allWatched && (
+                  <View className="ml-[3]">
+                    <CheckIcon size={15} color="white" />
+                  </View>
+                )}
+              </Pressable>
+            ))}
+            <Pressable
+              onPress={() => setShowFavs(!showFavs)}
+              className={`w-[97] flex-row justify-center rounded-lg border bg-button px-[8] py-[2] ${showFavs ? 'border-red-700 bg-button' : 'bg-buttondarker'}`}>
+              <Text
+                className={`${showFavs ? 'text-buttondarkertext' : 'text-buttondarkertext'} font-semibold`}>
+                {showFavs ? 'Show All' : 'Show Favs'}
+              </Text>
+            </Pressable>
+          </View>
+        </ScrollView>
+      </View>
+      <SectionList<Episode, SeasonsSection>
         ref={sectionListRef}
-        sections={sections}
+        sections={sections as any}
         stickySectionHeadersEnabled={true}
         renderItem={renderItem}
-        renderSectionHeader={renderSectionHeader}
+        renderSectionHeader={renderSectionHeader as any}
         keyExtractor={keyExtractor}
         contentContainerStyle={{ paddingBottom: 115 }}
         // style={{ width: '100%', paddingBottom: 105, height: '100%' }}
-        getItemLayout={buildGetItemLayout}
-        // initialScrollIndex={seasonSummary?.grandTotalWatched || 0}
-        // onEndReached={() => {
-        //   console.log('End reached');
-        // }}
+        getItemLayout={buildGetItemLayout as any}
+        //optimizations 06/29/2025
+        removeClippedSubviews={true}
+        maxToRenderPerBatch={10}
+        updateCellsBatchingPeriod={50}
+        windowSize={10}
+        initialNumToRender={10}
       />
     </View>
   );
