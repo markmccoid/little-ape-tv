@@ -1,12 +1,12 @@
 import React, { useState, useContext } from "react";
 import { Positions } from "./helperFunctions";
-import Animated from "react-native-reanimated";
+import { type SharedValue } from "react-native-reanimated";
 
-const PositionsObjContext = React.createContext<Animated.SharedValue<Positions>>(undefined!);
+const PositionsObjContext = React.createContext<SharedValue<Positions>>(undefined!);
 // const PositionsSettersContext = React.createContext();
 
 type Props = {
-  positions: Animated.SharedValue<Positions>;
+  positions: SharedValue<Positions>;
 };
 /**======================================================
  * Provider function

@@ -8,7 +8,7 @@ import ThemeSelector, { ThemeOption } from './ThemeSelector';
 type RouteProps = {
   title: string;
   route?: string;
-  LeftSymbol?: () => JSX.Element;
+  LeftSymbol?: () => React.JSX.Element;
   childStyle?: ViewStyle;
   isFirst?: boolean;
   isLast?: boolean;
@@ -18,7 +18,7 @@ type SwitchProps = {
   title: string;
   switchCallback: (val?: boolean) => void;
   switchValue: boolean;
-  LeftSymbol?: () => JSX.Element;
+  LeftSymbol?: () => React.JSX.Element;
   childStyle?: ViewStyle;
 };
 
@@ -26,7 +26,7 @@ type SelectProps = {
   title: string;
   selectCallback: (val: number) => void;
   selectValue: number;
-  LeftSymbol?: () => JSX.Element;
+  LeftSymbol?: () => React.JSX.Element;
   childStyle?: ViewStyle;
 };
 
@@ -43,7 +43,11 @@ export const SettingsItemRoute = ({
 
   return (
     <Pressable
-      onPress={() => router.push(route)}
+      onPress={() => {
+        if (route) {
+          router.push(route);
+        }
+      }}
       className={`flex-row items-center justify-between border-gray-300 p-1 px-2 active:bg-card `}
       style={{
         backgroundColor: `${colors.card}`,
@@ -187,7 +191,7 @@ type CustomProps = {
   title: string;
   selectCallback: (val?: ThemeOption) => void;
   selectValue: ThemeOption;
-  LeftSymbol?: () => JSX.Element;
+  LeftSymbol?: () => React.JSX.Element;
   childStyle?: ViewStyle;
 };
 export const SettingsItemThemeSelect = ({

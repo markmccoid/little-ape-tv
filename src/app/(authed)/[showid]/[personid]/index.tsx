@@ -1,9 +1,5 @@
-import { View, Text } from 'react-native';
-import React from 'react';
-import { Link, useLocalSearchParams } from 'expo-router';
-import ShowDetailContainer from '~/components/shows/details/ShowDetailContainer';
-
-import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
+import { View } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
 import PersonContainer from '~/components/shows/details/personDetails/PersonContainer';
 
 const PersonIdRoute = () => {

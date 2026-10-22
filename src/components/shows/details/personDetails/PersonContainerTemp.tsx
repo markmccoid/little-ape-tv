@@ -7,8 +7,7 @@ import { reTagPersonShows } from '~/store/functions-shows';
 import { savedShows$ } from '~/store/store-shows';
 import { ScrollView } from 'moti';
 import PersonShowItem from './PersonShowItem';
-import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
-import { useNavigation } from 'expo-router';
+import { useNavigation, type NativeStackNavigationOptions } from 'expo-router';
 import BackHeaderButton from '~/components/common/headerButtons/BackHeaderButton';
 import PersonProfile from './PersonProfile';
 

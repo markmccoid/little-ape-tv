@@ -1,8 +1,7 @@
 import React, { useEffect, useLayoutEffect } from 'react';
 import { Text, View, StyleSheet, Pressable } from 'react-native';
 import SPSettingsContainer from '~/components/settings/streamingProviders/SPSettingsContainer';
-import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
-import { Link, useNavigation, useRouter } from 'expo-router';
+import { Link, useNavigation, useRouter, type NativeStackNavigationOptions } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
 
 const WatchProviderSetup = () => {

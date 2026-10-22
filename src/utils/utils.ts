@@ -1,5 +1,5 @@
 import { Share } from 'react-native';
-import * as FileSystem from 'expo-file-system';
+import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { Alert } from 'react-native';
 
@@ -173,12 +173,9 @@ export const saveJSONToFiles = async (dataObject: any) => {
     const jsonString = JSON.stringify(dataObject, null, 2);
 
     // Define the file path in the app's document directory
-    const fileUri = `${FileSystem.documentDirectory}sample-data.json`;
-
-    // Write the JSON string to a file
-    await FileSystem.writeAsStringAsync(fileUri, jsonString, {
-      encoding: FileSystem.EncodingType.UTF8,
-    });
+    const file = new File(Paths.document, 'sample-data.json');
+    file.create({ overwrite: true });
+    await file.write(jsonString);
 
     // Check if sharing is available on the device
     if (!(await Sharing.isAvailableAsync())) {
@@ -187,7 +184,7 @@ export const saveJSONToFiles = async (dataObject: any) => {
     }
 
     // Share the file to the iOS Files app
-    await Sharing.shareAsync(fileUri, {
+    await Sharing.shareAsync(file.uri, {
       UTI: 'public.json', // Universal Type Identifier for JSON files
       mimeType: 'application/json',
     });
@@ -195,6 +192,7 @@ export const saveJSONToFiles = async (dataObject: any) => {
     Alert.alert('Success', 'JSON file saved successfully!');
   } catch (error) {
     console.error('Error saving JSON file:', error);
-    Alert.alert('Error', `Failed to save JSON file: ${error.message}`);
+    const message = error instanceof Error ? error.message : String(error);
+    Alert.alert('Error', `Failed to save JSON file: ${message}`);
   }
 };

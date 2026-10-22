@@ -1,7 +1,7 @@
 import React, { useCallback, useDeferredValue, useLayoutEffect, useState } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View, Dimensions } from 'react-native';
-import { Link, Stack, useNavigation, useRouter } from 'expo-router';
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { Link, Stack, useNavigation, useRouter, type NativeStackNavigationOptions } from 'expo-router';
+import { useBottomTabBarHeight } from 'expo-router/js-tabs';
 import { useFilteredShows } from '~/data/query.shows';
 import Animated, {
   runOnJS,
@@ -22,8 +22,6 @@ import { FilterIcon } from '~/components/common/Icons';
 import { useCustomTheme } from '~/utils/customColorTheme';
 import { search$ } from '~/store/store-search';
 import ShowItemBottom from './ShowItemBottom';
-import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
-
 const { width, height } = Dimensions.get('window');
 const MARGIN = 10;
 const IMG_WIDTH = (width - MARGIN * 3) / 2;

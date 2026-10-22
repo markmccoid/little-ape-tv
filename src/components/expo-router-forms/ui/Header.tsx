@@ -5,7 +5,7 @@ import { Platform, StyleSheet } from "react-native";
 import {
   PlatformPressable,
   type HeaderButtonProps,
-} from "@react-navigation/elements";
+} from "expo-router/react-navigation";
 
 export const HeaderButton = forwardRef<any, HeaderButtonProps>(
   function HeaderButton(

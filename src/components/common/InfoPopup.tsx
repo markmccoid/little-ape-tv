@@ -26,7 +26,7 @@ const InfoPopup = ({ title, infoText }: Props) => {
               toggleIsVisible();
             }}
             style={{
-              ...StyleSheet.absoluteFillObject,
+              ...StyleSheet.absoluteFill,
               backgroundColor: 'rgba(0, 0, 0, 0.5)',
             }}
           />

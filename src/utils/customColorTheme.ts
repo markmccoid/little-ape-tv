@@ -1,4 +1,4 @@
-import { DefaultTheme, DarkTheme, Theme, useTheme } from '@react-navigation/native';
+import { DefaultTheme, DarkTheme, Theme, useTheme } from "expo-router/react-navigation";
 
 //! Custom Hook for typesafe colors
 //~ Usage - const {colors} = useCustomTheme();
@@ -6,34 +6,31 @@ export function useCustomTheme() {
   return useTheme() as CustomTheme;
 }
 
-// Add additional colors outside of react navigation themes
-type CustomTheme = Theme & {
-  colors: Theme['colors'] & {
-    // primaryForeground: string;
-    // secondary: string;
-    // secondaryForeground: string;
-    // muted: string;
-    // mutedForeground: string;
-    primarytext: string;
-    button: string;
-    buttonDarker: string;
-    buttontext: string;
-    buttonDarkerText: string;
-    // textInverted: string;
-    // textInput: string;
-    // cardInverted: string;
-    // cardForeground: string;
-    // colorSelected: string;
-    // destructive: string;
-    // destructiveForeground: string;
-    deleteRed: string;
-    includeGreen: string;
-    imdbYellow: string;
-    tagInclude: string;
-    tagExclude: string;
-    tagIncludeText: string;
-    tagExcludeText: string;
-  };
+// Navigation theme colors are ColorValue. This app's palette is hex strings,
+// including the colors concatenated with an alpha suffix.
+type AppColors = {
+  primary: string;
+  background: string;
+  card: string;
+  text: string;
+  border: string;
+  notification: string;
+  primarytext: string;
+  button: string;
+  buttonDarker: string;
+  buttontext: string;
+  buttonDarkerText: string;
+  deleteRed: string;
+  includeGreen: string;
+  imdbYellow: string;
+  tagInclude: string;
+  tagExclude: string;
+  tagIncludeText: string;
+  tagExcludeText: string;
+};
+
+type CustomTheme = Omit<Theme, 'colors'> & {
+  colors: AppColors;
 };
 
 export const CustomLightTheme: CustomTheme = {

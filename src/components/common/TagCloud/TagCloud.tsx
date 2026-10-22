@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 // import PropTypes from "prop-types";
 import { View, Text, LayoutAnimation, TouchableOpacity } from "react-native";
-import { AntDesign } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useCustomTheme } from "@/lib/colorThemes";
 // import { TagContainer, Tag, TagIcon, TagText } from "./TagCloudStyles";
 type Props = {
@@ -46,9 +46,9 @@ export const TagItem = ({
       //isSelected={isSelected} //used in styled components
     >
       <View className="flex-row items-center">
-        <AntDesign
+        <MaterialCommunityIcons
           style={{ paddingRight: 5 }}
-          name={localState ? "tag" : "tago"}
+          name={localState ? "tag" : "tag-outline"}
           size={size === "s" ? 15 : 20}
         />
         <Text>{tagName}</Text>

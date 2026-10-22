@@ -1,7 +1,6 @@
 // ThemeSelector.tsx
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { styled } from 'nativewind'; // Import styled if you want to pre-style components
 
 // If you defined ThemeOption in a separate file:
 // import { ThemeOption } from './types';

@@ -4,7 +4,6 @@
     "slug": "little-ape-tv",
     "version": "0.4.8",
     "scheme": "little-ape-tv",
-    "newArchEnabled": true,
     "web": {
       "bundler": "metro",
       "output": "static",
@@ -22,42 +21,38 @@
         "expo-build-properties",
         {
           "ios": {
-            "deploymentTarget": "15.1"
+            "deploymentTarget": "16.4"
           }
         }
       ],
       "expo-font",
-      "expo-build-properties",
       "expo-web-browser",
-      "expo-background-task"
+      "expo-background-task",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#1b2829",
+          "image": "./assets/little-ape-tv-splash.png",
+          "resizeMode": "contain",
+          "enableFullScreenImage_legacy": true
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
-      "tsconfigPaths": true
+      "tsconfigPaths": true,
+      "reactCompiler": false
     },
     "orientation": "portrait",
     "icon": "./assets/little-ape-tv-icon.png",
     "userInterfaceStyle": "automatic",
-    "splash": {
-      "image": "./assets/little-ape-tv-splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#1b2829"
-    },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.markmccoid.littleapetv",
       "infoPlist": {
-        "UIBackgroundModes": [
-          "processing",
-          "processing"
-        ],
-        "NSBackgroundProcessingAPIs": [
-          "BackgroundTask",
-          "BackgroundTask"
-        ],
+        "UIBackgroundModes": ["processing"],
+        "NSBackgroundProcessingAPIs": ["BackgroundTask"],
         "ITSAppUsesNonExemptEncryption": false
       }
     },

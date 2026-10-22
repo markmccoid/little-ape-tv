@@ -3,7 +3,7 @@ import {
   DefaultTheme,
   ThemeProvider as RNTheme,
   Theme,
-} from "@react-navigation/native";
+} from "expo-router/react-navigation";
 import { useColorScheme } from "react-native";
 import * as AppleColors from "@bacons/apple-colors";
 

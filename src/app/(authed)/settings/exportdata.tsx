@@ -4,7 +4,7 @@ import { saveJSONToFiles } from '~/utils/utils';
 import { exportFilterCriteria, importFilterCriteria } from '~/store/store-filterCriteria';
 import { exportShowData, importShowData } from '~/store/store-shows';
 import * as DocumentPicker from 'expo-document-picker';
-import * as FileSystem from 'expo-file-system';
+import { File } from 'expo-file-system';
 
 const ExportData = () => {
   const handleExport = async () => {
@@ -35,9 +35,7 @@ const ExportData = () => {
       const uri = assets[0].uri;
 
       // Read the file contents as a string
-      const fileContent = await FileSystem.readAsStringAsync(uri, {
-        encoding: FileSystem.EncodingType.UTF8,
-      });
+      const fileContent = await new File(uri).text();
 
       // Parse the JSON content into a JavaScript object
       const jsonData = JSON.parse(fileContent);
@@ -62,7 +60,8 @@ const ExportData = () => {
       // setData(jsonData); // Example for state management
     } catch (error) {
       console.error('Error importing JSON file:', error);
-      Alert.alert('Error', `Failed to import JSON file: ${error.message}`);
+      const message = error instanceof Error ? error.message : String(error);
+      Alert.alert('Error', `Failed to import JSON file: ${message}`);
     }
   };
   return (

@@ -1,7 +1,6 @@
 import { View, Text } from 'react-native';
 import React, { useLayoutEffect } from 'react';
-import { useLocalSearchParams, useNavigation } from 'expo-router';
-import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
+import { useLocalSearchParams, useNavigation, type NativeStackNavigationOptions } from 'expo-router';
 import AddEditFilter from '~/components/settings/savedFilters/AddEditFilter';
 
 const AddEditFilterModal = () => {

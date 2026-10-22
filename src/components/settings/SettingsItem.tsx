@@ -10,7 +10,7 @@ type Props = {
   route?: string;
   switchCallback?: (val?: boolean) => void;
   switchValue?: boolean;
-  LeftSymbol?: () => JSX.Element;
+  LeftSymbol?: () => React.JSX.Element;
   childStyle?: ViewStyle;
   isFirst?: boolean;
   isLast?: boolean;

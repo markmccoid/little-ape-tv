@@ -11,11 +11,11 @@ import {
   Entypo,
   FontAwesome6,
 } from '@expo/vector-icons';
-import { TextStyle, ViewStyle } from 'react-native';
+import { ColorValue, TextStyle, ViewStyle } from 'react-native';
 
 type Props = {
   size?: number;
-  color?: string;
+  color?: ColorValue;
   style?: TextStyle;
 };
 
@@ -132,7 +132,7 @@ export const EditIcon = ({ size, color = undefined, style = undefined }: Props) 
 };
 
 export const HeartIcon = ({ size, color = undefined, style = undefined }: Props) => {
-  return <AntDesign name="hearto" size={size} color={color} style={style} />;
+  return <AntDesign name="heart" size={size} color={color} style={style} />;
 };
 
 export const ImagesIcon = ({ size, color = undefined, style = undefined }: Props) => {
@@ -148,10 +148,10 @@ export const CaretDownIcon = ({ size, color = undefined, style = undefined }: Pr
 
 //# More (down) Less (up) icons
 export const MoreIcon = ({ size, color = undefined, style = undefined }: Props) => {
-  return <AntDesign name="downcircleo" size={size} color={color} style={style} />;
+  return <AntDesign name="down-circle" size={size} color={color} style={style} />;
 };
 export const LessIcon = ({ size, color = undefined, style = undefined }: Props) => {
-  return <AntDesign name="upcircleo" size={size} color={color} style={style} />;
+  return <AntDesign name="up-circle" size={size} color={color} style={style} />;
 };
 
 export const CheckedBox = ({ size, color = undefined, style = undefined }: Props) => {
@@ -165,7 +165,7 @@ export const UnCheckedBox = ({ size, color = undefined, style = undefined }: Pro
 };
 //# BACK button icon for headers in screens
 export const BackIcon = ({ size, color = undefined, style = undefined }: Props) => {
-  return <AntDesign name="back" size={size} color={color} style={style} />;
+  return <AntDesign name="arrow-left" size={size} color={color} style={style} />;
 };
 //----------------
 //- Drawer Icons
@@ -258,5 +258,5 @@ export const DescOtherIcon = ({ size, color = undefined, style = undefined }: Pr
 };
 
 export const InfinityIcon = ({ size, color = undefined, style = undefined }: Props) => {
-  return <Ionicons name="ios-infinite" size={size} color={color} style={style} />;
+  return <Ionicons name="infinite" size={size} color={color} style={style} />;
 };

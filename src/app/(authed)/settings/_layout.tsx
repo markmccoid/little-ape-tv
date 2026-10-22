@@ -9,14 +9,18 @@ export default function SettingsLayout() {
   const router = useRouter();
   const appVersion = Constants.expoConfig?.version;
   return (
-    <Stack>
+    <Stack
+      screenOptions={{
+        // iOS 26 draws screen content under a translucent bar. An opaque header
+        // makes the stack inset every settings screen below the bar.
+        headerTransparent: false,
+        headerStyle: { backgroundColor: colors.background },
+      }}>
       <Stack.Screen
         name="index"
         options={{
           headerLargeTitle: true,
           headerLargeTitleShadowVisible: true,
-          // headerTransparent: true,
-          // headerShown: true,
           headerLeft: () => (
             <Pressable onPress={() => router.back()}>
               <SymbolView name="house.fill" size={30} tintColor={colors.text} />

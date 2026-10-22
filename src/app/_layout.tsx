@@ -2,14 +2,14 @@ import '~/global.css';
 
 import { Slot } from 'expo-router';
 import { useEffect } from 'react';
-import { Appearance, View, Platform } from 'react-native';
+import { Appearance, View } from 'react-native';
 import { AuthProvider, useAuth } from '~/authentication/AuthProvider';
 import * as SplashScreen from 'expo-splash-screen';
 import { initTMDB } from '@markmccoid/tmdb_api';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { CustomLightTheme, CustomDarkTheme } from '../utils/customColorTheme';
 import { useColorScheme } from 'nativewind';
-import { ThemeProvider } from '@react-navigation/native';
+import { ThemeProvider } from "expo-router/react-navigation";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Asul_400Regular, Asul_700Bold } from '@expo-google-fonts/asul';
 import { Roboto_400Regular, Roboto_500Medium } from '@expo-google-fonts/roboto';
@@ -22,9 +22,6 @@ import { use$ } from '@legendapp/state/react';
 import { initializeWatchProviders, settings$ } from '~/store/store-settings';
 import { askNotificationPermissions } from '~/utils/permissions';
 import useNotificationObserver from '~/utils/notificationObserver';
-import { useSyncQueriesExternal } from 'react-query-external-sync';
-import { useMMKV } from 'react-native-mmkv';
-import { authManager } from '~/authentication/AuthProvider';
 
 const InitialLayout = () => {
   const { currentUser, initialized } = useAuth();
@@ -35,28 +32,6 @@ const InitialLayout = () => {
 
   // Tanstack Query Dev Tools
   useSyncQueries({ queryClient });
-  // Set up the sync hook - automatically disabled in production!
-  const mmkv = useMMKV({ id: authManager.currentUser?.id || '' });
-  useSyncQueriesExternal({
-    queryClient,
-    socketURL: 'http://localhost:42831', // Default port for React Native DevTools
-    deviceName: Platform?.OS || 'web', // Platform detection
-    platform: Platform?.OS || 'web', // Use appropriate platform identifier
-    deviceId: Platform?.OS || 'web', // Use a PERSISTENT identifier (see note below)
-    extraDeviceInfo: {
-      // Optional additional info about your device
-      appVersion: '1.0.0',
-      // Add any relevant platform info
-    },
-    enableLogs: false,
-    envVariables: {
-      NODE_ENV: process.env.NODE_ENV,
-      // Add any private environment variables you want to monitor
-      // Public environment variables are automatically loaded
-    },
-    // Storage monitoring with CRUD operations
-    mmkvStorage: mmkv, // MMKV storage for ['#storage', 'mmkv', 'key'] queries + monitoring
-  });
 
   //~~ ------------------------------------------------------
   //~ Initialize TMDB API

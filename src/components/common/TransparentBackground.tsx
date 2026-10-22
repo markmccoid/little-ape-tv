@@ -15,7 +15,7 @@ const MDBackground = () => {
         },
         shadowOpacity: 0.4,
         shadowRadius: 2,
-        ...StyleSheet.absoluteFillObject,
+        ...StyleSheet.absoluteFill,
         position: 'absolute',
       }}
     />

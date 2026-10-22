@@ -1,0 +1,14 @@
+diff --git a/node_modules/react-native-mmkv/react-native-mmkv.podspec b/node_modules/react-native-mmkv/react-native-mmkv.podspec
+index be617c1..e1e5fcd 100644
+--- a/node_modules/react-native-mmkv/react-native-mmkv.podspec
++++ b/node_modules/react-native-mmkv/react-native-mmkv.podspec
+@@ -25,6 +25,9 @@ Pod::Spec.new do |s|
+     "GCC_PREPROCESSOR_DEFINITIONS" => "$(inherited) FORCE_POSIX",
+   }
+   s.compiler_flags = '-x objective-c++'
++  # MMKV::checkFileCRCValid calls crc32. The prebuilt React Native app
++  # target does not pull libz in on its own.
++  s.libraries = "z"
+ 
+   s.source_files = [
+     # react-native-mmkv

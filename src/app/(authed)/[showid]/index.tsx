@@ -1,9 +1,7 @@
 import { View, Text, ActivityIndicator } from 'react-native';
 import React, { useEffect } from 'react';
-import { Link, useLocalSearchParams, useNavigation } from 'expo-router';
+import { useLocalSearchParams, useNavigation, type NativeStackNavigationOptions } from 'expo-router';
 import ShowDetailContainer from '~/components/shows/details/ShowDetailContainer';
-
-import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
 import { savedShows$ } from '~/store/store-shows';
 import DetailHeader from '~/components/shows/details/DetailHeader';
 

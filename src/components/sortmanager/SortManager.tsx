@@ -23,7 +23,7 @@ const SortManager = ({
   // console.log(sortSettings);
   const renderItem = useCallback<SortableGridRenderItem<SortField>>(({ item, index }) => {
     return (
-      <Sortable.Handle disabled={!item.active}>
+      <Sortable.Handle mode={item.active ? 'draggable' : 'non-draggable'}>
         <SortItem
           key={item.id}
           item={item}

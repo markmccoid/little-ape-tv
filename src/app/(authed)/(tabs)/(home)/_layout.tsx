@@ -9,7 +9,13 @@ export default function HomeLayout() {
   const { colors } = useCustomTheme();
   const router = useRouter();
   return (
-    <Stack>
+    <Stack
+      screenOptions={{
+        // iOS 26 draws screen content under a translucent bar. An opaque header
+        // makes the stack inset the screen below the bar.
+        headerTransparent: false,
+        headerStyle: { backgroundColor: colors.background },
+      }}>
       <Stack.Screen
         name="index"
         options={{

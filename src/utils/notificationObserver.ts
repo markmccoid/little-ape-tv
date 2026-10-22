@@ -12,12 +12,11 @@ export default function useNotificationObserver() {
 
     function redirect(notification: Notifications.Notification) {
       const url = notification?.request?.content?.data?.url;
-      if (url) {
+      if (typeof url === 'string') {
         if (router.canDismiss()) {
           router.dismissAll();
         }
-        // router.push('./(authed)/(tabs)/(home)');
-        router.push(url); // or router.push(url) if you prefer
+        router.push(url);
       }
     }
 

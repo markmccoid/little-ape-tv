@@ -1,11 +1,18 @@
 /** @type {import('tailwindcss').Config} */
 const { hairlineWidth } = require('nativewind/theme');
+const defaultTheme = require('tailwindcss/defaultTheme');
 
 module.exports = {
   content: ['./src/**/*.{js,ts,tsx}'],
 
   presets: [require('nativewind/preset')],
   theme: {
+    // Tailwind's flex-1 is `1 1 0%`. React Native 0.88 drops that percentage
+    // basis, so className="flex-1" no longer fills the screen.
+    flex: {
+      ...defaultTheme.flex,
+      1: '1 1 0px',
+    },
     extend: {
       fontFamily: {
         'Asul-Bold': ['Asul_700Bold', 'sans-serif'],

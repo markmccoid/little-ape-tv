@@ -4,7 +4,6 @@ import {
   ActivityIndicator,
   View,
   Text,
-  InteractionManager,
   Pressable,
 } from 'react-native';
 import showConfirmationPrompt from '@/components/common/showConfirmationPrompt';

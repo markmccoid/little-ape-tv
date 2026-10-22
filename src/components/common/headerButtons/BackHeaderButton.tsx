@@ -9,7 +9,7 @@ const BackHeaderButton = () => {
   const router = useRouter();
   const { colors } = useCustomTheme();
   return (
-    <Pressable onPress={router.back} className="ml-[-20] h-full flex-row items-center px-2 py-2">
+    <Pressable onPress={() => router.back()} className="ml-[-20] h-full flex-row items-center px-2 py-2">
       <SymbolView name="chevron.left" size={22} tintColor={colors.primary} weight="medium" />
       <Text className="pl-1 text-xl" style={{ color: colors.primary }}>
         Back

@@ -12,8 +12,7 @@ import {
 import React, { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { useShowDetails } from '~/data/query.shows';
 import { savedShows$ } from '~/store/store-shows';
-import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
-import { useRouter, useNavigation } from 'expo-router';
+import { useRouter, useNavigation, type NativeStackNavigationOptions } from 'expo-router';
 import BackHeaderButton from '~/components/common/headerButtons/BackHeaderButton';
 import AddShowButton from '~/components/common/headerButtons/AddShowButton';
 import DeleteShowButton from '~/components/common/headerButtons/DeleteShowButton';
@@ -22,7 +21,7 @@ import DetailHeader from './DetailHeader';
 import ShowTagContainer from './tags/ShowTagContainer';
 import { HomeIcon } from '~/components/common/Icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useHeaderHeight } from '@react-navigation/elements';
+import { useHeaderHeight } from 'expo-router/react-navigation';
 import TransparentBackground from '~/components/common/TransparentBackground';
 import UserRatingContainer from './userRating/UserRatingContainer';
 import { UserRatingDetailScreen, MenuItem } from './userRating/UserRatingDetailScreen';

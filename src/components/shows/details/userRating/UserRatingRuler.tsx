@@ -129,6 +129,7 @@ function AnimatedText({
       text: String(Math.round(value.value)),
     };
   });
+  // NativeWind's CSS types reject Reanimated's animated `text` prop.
   return (
     <Pressable
       onPress={onRatingPress}
@@ -139,7 +140,7 @@ function AnimatedText({
         pointerEvents="none"
         editable={false}
         defaultValue={String(initialValue)}
-        animatedProps={animatedPropz}
+        animatedProps={animatedPropz as never}
         style={[
           {
             fontSize: 28,
@@ -263,7 +264,7 @@ export function Ruler({
           })}
         />
         <LinearGradient
-          style={[StyleSheet.absoluteFillObject]}
+          style={[StyleSheet.absoluteFill]}
           colors={[fadeColor, `${fadeColor}00`, `${fadeColor}00`, fadeColor]}
           start={[0, 0.5]}
           end={[1, 0.5]}
