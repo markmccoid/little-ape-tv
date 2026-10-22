@@ -188,9 +188,15 @@ export default function UserRatingDetailScreenRuler({
   ratingWheelInitialState = 'closed',
   onRatingPress = () => {},
 }: RulerProps) {
-  const ticks = settings$.userRatingMax.peek() + 1;
+  // Grow the ruler to fit a stored rating above the current max setting, so the
+  // starting position is always a real tick (an out-of-range initialScrollIndex
+  // made the list settle on a wrong value and save it).
+  // Fixed for the life of the ruler so the range doesn't shrink while it is in use.
+  const [ticks] = useState(() => Math.max(settings$.userRatingMax.peek(), startingTick) + 1);
   const data = useMemo(() => [...Array(ticks).keys()], [ticks]);
   const scrollX = useSharedValue(startingTick);
+  // Only report a change the user made (drag or tap), never layout/initial scrolling
+  const userInitiated = useSharedValue(false);
   const flatListRef = useRef<FlatList>(null);
   const [displayRatingWheel, toggleDisplayRatingWheel] = useReducer(
     (state: boolean) => !state,
@@ -199,6 +205,7 @@ export default function UserRatingDetailScreenRuler({
 
   const handleItemPress = useCallback((index: number) => {
     if (flatListRef.current) {
+      userInitiated.value = true;
       flatListRef.current.scrollToIndex({
         index,
         animated: true,
@@ -223,15 +230,19 @@ export default function UserRatingDetailScreenRuler({
     [data.length]
   );
   const onScroll = useAnimatedScrollHandler({
+    onBeginDrag: () => {
+      userInitiated.value = true;
+    },
     onScroll: (e) => {
       scrollX.value = clamp(e.contentOffset.x / _itemSize, 0, data.length - 1);
       runOnJS(checkHapticFeedback)(Math.floor(scrollX.value));
       // console.log(scrollX.value, e.contentOffset.x);
     },
     onMomentumEnd: (e) => {
-      // set some state here, maybe call a callback
+      if (!userInitiated.value) return;
+      userInitiated.value = false;
       if (onChange) {
-        runOnJS(onChange)(Math.floor(scrollX.value));
+        runOnJS(onChange)(Math.round(scrollX.value));
       }
     },
   });
