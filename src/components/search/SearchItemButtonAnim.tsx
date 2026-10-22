@@ -26,8 +26,8 @@ const SearchItemButtonAnim = ({ searchItem }: Props) => {
   }, [isStoredLocally]);
 
   useEffect(() => {
-    setIsStoredLocally(searchItem?.isStoredLocally);
-  }, [searchItem]);
+    setIsStoredLocally(searchItem.isStoredLocally);
+  }, [searchItem.isStoredLocally]);
 
   const backgroundColor = useAnimatedStyle(() => {
     return {

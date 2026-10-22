@@ -6,13 +6,16 @@ export default function ShowIdLayout() {
   const router = useRouter();
 
   return (
-    <Stack>
+    <Stack
+      screenOptions={{
+        headerTransparent: false,
+        headerStyle: { backgroundColor: colors.background },
+      }}>
       <Stack.Screen
         name="index"
         options={{
           headerShown: true,
           title: '',
-          // headerTransparent: true,
         }}
         // getId={({ params }) => params.personid}
       />

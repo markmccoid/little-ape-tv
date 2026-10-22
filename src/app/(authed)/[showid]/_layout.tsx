@@ -6,13 +6,17 @@ export default function ShowIdLayout() {
   const router = useRouter();
 
   return (
-    <Stack>
+    <Stack
+      screenOptions={{
+        // iOS 26 draws screen content under a translucent bar. An opaque header
+        // makes the stack inset the show detail below the bar.
+        headerTransparent: false,
+        headerStyle: { backgroundColor: colors.background },
+      }}>
       <Stack.Screen
         name="index"
         options={{
           headerShown: true,
-          // headerTransparent: true,
-          // headerBlurEffect: 'systemChromeMaterial',
         }}
         // getId={({ params }) => params.showid}
       />

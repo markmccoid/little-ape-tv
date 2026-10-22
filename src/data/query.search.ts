@@ -2,62 +2,89 @@ import { use$ } from '@legendapp/state/react';
 import {
   movieSearchByTitle,
   tvDiscover,
-  rawTVGetAllGenres,
   tvSearchByTitle,
   getTMDBConsts,
+  TVSearchResultBase,
+  TVSearchResultItem,
 } from '@markmccoid/tmdb_api';
 import { getTMDBConfig, getTVGenres } from '@markmccoid/tmdb_api/config';
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { InfiniteData, useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import { first } from 'lodash';
-import { search$ } from '~/store/store-search';
 import { settings$, WatchProviderAttributes } from '~/store/store-settings';
 import { savedShows$ } from '~/store/store-shows';
+
+type TitleSearchPage = TVSearchResultBase['data'];
+export type TaggedSearchResult = TVSearchResultItem & { isStoredLocally: boolean };
+
+const emptyResults: TaggedSearchResult[] = [];
+
+// Stable select so a fetch-status update does not clone every card.
+function selectTaggedShows(data: InfiniteData<TitleSearchPage>): TaggedSearchResult[] {
+  const seen = new Set<number>();
+  const shows: TVSearchResultItem[] = [];
+
+  for (const page of data.pages) {
+    for (const show of page.results) {
+      if (seen.has(show.id)) continue;
+      seen.add(show.id);
+      shows.push(show);
+    }
+  }
+
+  return savedShows$.tagShows(shows);
+}
 
 //~ ---------------------------------------------------------
 //~ TITLE SEARCH Hook
 //~ ---------------------------------------------------------
 export const useTitleSearch = (searchValue: string) => {
-  const { data, fetchNextPage, hasNextPage, isLoading, error } = useInfiniteQuery({
-    queryKey: ['searchByTitle', search$.searchVal.get() || 'discover'],
-    queryFn: async ({ pageParam = 1 }) => {
-      // If no searchValue passed then discover
-      //! Should allow users to specify what they see here and do a search.  Give them inputs for default search.
-      const { firstAirDateYear, includeGenres, excludeGenres } = settings$.initialQuery.peek();
+  const term = searchValue || 'discover';
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, error } =
+    useInfiniteQuery({
+      queryKey: ['searchByTitle', term],
+      queryFn: async ({ pageParam, queryKey }) => {
+        // Read the term from the key so an in-flight page cannot belong to a newer search.
+        const requestedTerm = queryKey[1] as string;
+        const { firstAirDateYear, includeGenres, excludeGenres } = settings$.initialQuery.peek();
 
-      if (!searchValue) {
-        const discoverResults = await tvDiscover(
-          {
-            firstAirDateYear:
-              parseInt(firstAirDateYear) || parseInt(dayjs().subtract(5, 'month').format('YYYY')),
-            genres: includeGenres || [],
-            withoutGenres: excludeGenres || [],
-            withOriginCountry: ['US'],
-            sortBy: 'popularity.desc',
-          },
-          pageParam
-        );
+        if (requestedTerm === 'discover') {
+          const discoverResults = await tvDiscover(
+            {
+              firstAirDateYear:
+                parseInt(firstAirDateYear) || parseInt(dayjs().subtract(5, 'month').format('YYYY')),
+              genres: includeGenres || [],
+              withoutGenres: excludeGenres || [],
+              withOriginCountry: ['US'],
+              sortBy: 'popularity.desc',
+            },
+            pageParam
+          );
 
-        return discoverResults.data;
-      }
-      const showResults = await tvSearchByTitle(search$.searchVal.get(), pageParam); // Pass pageParam to your API call
-      return showResults.data; // Return the entire data object from API, not just results.
-    },
-    enabled: true, //search$.searchVal.get().length > 1,
-    initialPageParam: 1,
-    staleTime: 0,
-    getNextPageParam: (lastPage) => {
-      if (lastPage && lastPage.page < lastPage.totalPages) {
-        return lastPage.page + 1;
-      }
-      return undefined;
-    },
-  });
+          return discoverResults.data;
+        }
 
-  const allPages = data?.pages?.map((page) => page.results).flat() || [];
-  const taggedShows = savedShows$.tagShows(allPages);
+        const showResults = await tvSearchByTitle(requestedTerm, pageParam);
+        return showResults.data;
+      },
+      initialPageParam: 1,
+      getNextPageParam: (lastPage) => {
+        if (lastPage && lastPage.page < lastPage.totalPages) {
+          return lastPage.page + 1;
+        }
+        return undefined;
+      },
+      select: selectTaggedShows,
+    });
 
-  return { data: taggedShows, fetchNextPage, hasNextPage, isLoading, error };
+  return {
+    data: data ?? emptyResults,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    error,
+  };
 };
 
 //## ----------------------------------------------------------------
