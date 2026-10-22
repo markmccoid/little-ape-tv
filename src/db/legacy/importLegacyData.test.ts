@@ -12,7 +12,12 @@ import {
   showWatchProviders,
   tags,
 } from '../schema';
-import { importLegacyDataOnce, LEGACY_IMPORT_META_KEY, type LegacyData } from './importLegacyData';
+import {
+  importLegacyDataOnce,
+  LEGACY_IMPORT_META_KEY,
+  reimportLegacyData,
+  type LegacyData,
+} from './importLegacyData';
 import { airDateToEpoch } from '../dates';
 import { createTestDb } from '../testing/createTestDb';
 
@@ -237,5 +242,42 @@ describe('importLegacyDataOnce', () => {
     );
     expect(db.select().from(showTags).all()).toEqual([]);
     expect(db.select().from(notificationHistory).all()).toEqual([]);
+  });
+
+  it('re-import replaces all show data with the new legacy data', () => {
+    const { db } = createTestDb();
+    importLegacyDataOnce(db, legacyData);
+
+    const replacement: LegacyData = {
+      savedShows: {
+        shows: { '300': { tmdbId: '300', name: 'Shogun', userTags: ['tag-9'] } },
+        showAttributes: { '300': { seasons: { 1: { episodes: { 4: { w: true } } } } } },
+      },
+      tags: { tagList: [{ id: 'tag-9', name: 'Epic', position: 1 }] },
+    };
+    expect(reimportLegacyData(db, () => replacement)).toMatchObject({
+      shows: 1,
+      episodeStates: 1,
+      tags: 1,
+      showTags: 1,
+    });
+
+    expect(
+      db
+        .select()
+        .from(shows)
+        .all()
+        .map((show) => show.id)
+    ).toEqual(['300']);
+    expect(
+      db
+        .select()
+        .from(tags)
+        .all()
+        .map((tag) => tag.id)
+    ).toEqual(['tag-9']);
+    expect(db.select().from(episodeStates).all()).toHaveLength(1);
+    expect(db.select().from(notificationHistory).all()).toEqual([]);
+    expect(db.select().from(appMeta).all()).toHaveLength(1);
   });
 });

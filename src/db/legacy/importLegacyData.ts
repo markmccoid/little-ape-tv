@@ -114,16 +114,35 @@ export const importLegacyDataOnce = (
   if (marker) return undefined;
 
   const data = loadData();
+  return db.transaction((tx) => writeLegacyDataWithMarker(tx as unknown as Db, data));
+};
+
+//# ------------------------------------------------------
+//# reimportLegacyData - DEV/one-off use
+//# Replaces ALL SQLite show data (shows, Episode States, tags, notification history)
+//# with a fresh import of the legacy data.  Used after loading a backup into the
+//# old store with the v1 import screen.
+//# ------------------------------------------------------
+export const reimportLegacyData = (db: Db, loadData: () => LegacyData): LegacyImportCounts => {
+  const data = loadData();
   return db.transaction((tx) => {
-    const counts = writeLegacyData(tx as unknown as Db, data);
-    tx.insert(appMeta)
-      .values({
-        key: LEGACY_IMPORT_META_KEY,
-        value: JSON.stringify({ importedAt: Math.floor(Date.now() / 1000), counts }),
-      })
-      .run();
-    return counts;
+    // Rows that reference shows/tags are removed by ON DELETE CASCADE
+    tx.delete(shows).run();
+    tx.delete(tags).run();
+    tx.delete(appMeta).where(eq(appMeta.key, LEGACY_IMPORT_META_KEY)).run();
+    return writeLegacyDataWithMarker(tx as unknown as Db, data);
   });
+};
+
+const writeLegacyDataWithMarker = (db: Db, data: LegacyData) => {
+  const counts = writeLegacyData(db, data);
+  db.insert(appMeta)
+    .values({
+      key: LEGACY_IMPORT_META_KEY,
+      value: JSON.stringify({ importedAt: Math.floor(Date.now() / 1000), counts }),
+    })
+    .run();
+  return counts;
 };
 
 //# ------------------------------------------------------

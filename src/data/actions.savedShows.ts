@@ -9,7 +9,9 @@ import uuid from 'react-native-uuid';
 
 import { dbKeys } from './dbKeys';
 
+import { authManager } from '~/authentication/AuthProvider';
 import { getDb } from '~/db/client';
+import { reimportFromMMKV } from '~/db/legacy/migrateFromMMKV';
 import {
   addShowTag,
   deleteShow,
@@ -49,6 +51,15 @@ const write = <A extends unknown[]>(fn: (...args: A) => void) => {
 };
 
 export const isShowSaved = (showId: string) => !!selectShow(getDb(), showId);
+
+//!! Throwaway with src/db/legacy: replaces all SQLite show data with the old store's data
+export const reimportLegacyShows = () => {
+  const userId = authManager.currentUser?.id;
+  if (!userId) throw new Error('No user is logged in.');
+  const counts = reimportFromMMKV(getDb(), userId);
+  refreshQueries();
+  return counts;
+};
 
 //# ======================================================
 //# Saved Shows

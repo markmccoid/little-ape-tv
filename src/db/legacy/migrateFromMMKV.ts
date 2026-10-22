@@ -1,7 +1,7 @@
 import { MMKV } from 'react-native-mmkv';
 
 import type { Db } from '../types';
-import { importLegacyDataOnce, type LegacyData } from './importLegacyData';
+import { importLegacyDataOnce, reimportLegacyData, type LegacyData } from './importLegacyData';
 
 //!! -------------------------------------------------------
 //!! ONE-TIME move of the Legend State / MMKV show data into SQLite.
@@ -28,4 +28,11 @@ const readLegacyMMKV = (userId: string): LegacyData => {
 export const migrateFromMMKV = (db: Db, userId: string) => {
   const counts = importLegacyDataOnce(db, () => readLegacyMMKV(userId));
   if (counts) console.log('[db] Imported legacy MMKV data', counts);
+};
+
+//~ Replace the SQLite show data with whatever is in the old store now
+export const reimportFromMMKV = (db: Db, userId: string) => {
+  const counts = reimportLegacyData(db, () => readLegacyMMKV(userId));
+  console.log('[db] Re-imported legacy MMKV data', counts);
+  return counts;
 };

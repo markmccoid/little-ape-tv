@@ -18,6 +18,7 @@ import {
 } from '~/utils/backgroundTasks';
 import { savedShows$ } from '~/store/store-shows';
 import * as BackgroundTask from 'expo-background-task';
+import { reimportLegacyShows } from '~/data/actions.savedShows';
 
 const SettingsContainer = () => {
   const router = useRouter();
@@ -160,6 +161,35 @@ const SettingsContainer = () => {
           />
         </SettingsGroup>
         <View className="flex-col items-center justify-center gap-2 px-2 py-2">
+          {/* //!! Throwaway: remove with src/db/legacy once the SQLite migration ships */}
+          <Pressable
+            onPress={() =>
+              Alert.alert(
+                'Re-import Old Storage',
+                'Replaces ALL shows, tags and episode data in the new database with what is in the old storage. Changes made since the last import are lost.',
+                [
+                  { text: 'Cancel', style: 'cancel' },
+                  {
+                    text: 'Re-import',
+                    style: 'destructive',
+                    onPress: () => {
+                      try {
+                        const counts = reimportLegacyShows();
+                        Alert.alert(
+                          'Re-import Complete',
+                          `${counts.shows} shows, ${counts.episodeStates} episodes, ${counts.tags} tags, ${counts.showTags} show tags`
+                        );
+                      } catch (error: any) {
+                        Alert.alert('Re-import Failed', error?.message ?? String(error));
+                      }
+                    },
+                  },
+                ]
+              )
+            }
+            className="border bg-red-200 p-2">
+            <Text>Re-import Old Storage → SQLite</Text>
+          </Pressable>
           <View className="mx-2 w-full flex-row justify-between">
             <View className="flex-col gap-2">
               <Pressable onPress={checkForShowUpdatesAndNotify} className="border bg-white p-2">
