@@ -36,7 +36,8 @@
           "resizeMode": "contain",
           "enableFullScreenImage_legacy": true
         }
-      ]
+      ],
+      "expo-sqlite"
     ],
     "experiments": {
       "typedRoutes": true,

@@ -1,6 +1,7 @@
 import { MMKV } from 'react-native-mmkv';
 import { LocalUserStorage } from '~/authentication/LocalUserStorage';
 import uuid from 'react-native-uuid';
+import { closeUserDatabase, deleteUserDatabase, openUserDatabase } from '~/db/client';
 
 export type User = {
   id: string;
@@ -45,6 +46,7 @@ export class AuthManager {
     const currUser = this.getItem('currentUser');
 
     this._localUserStorage = this.initCurrentUserStorage(currUser as User | undefined);
+    if (currUser) openUserDatabase((currUser as User).id);
     this._currentUser = currUser as User | undefined;
     this._allUsers = this.getUsers();
     this._initialized = true;
@@ -85,6 +87,7 @@ export class AuthManager {
   login(user: User) {
     this.setItem('currentUser', user);
     this._localUserStorage = this.initCurrentUserStorage(user);
+    openUserDatabase(user.id);
     this._currentUser = user;
 
     this.notifySubscribers();
@@ -143,11 +146,13 @@ export class AuthManager {
   private deleteUserStorage = (currentUser: User) => {
     const tempStorage = new MMKV({ id: `${currentUser.id}` });
     tempStorage.clearAll();
+    deleteUserDatabase(currentUser.id);
   };
 
   logout() {
     this.removeItem('currentUser');
     this._localUserStorage = this.initCurrentUserStorage(undefined);
+    closeUserDatabase();
     this._currentUser = undefined;
     this.notifySubscribers();
   }

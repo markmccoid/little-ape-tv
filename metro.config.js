@@ -5,5 +5,7 @@ const { withNativeWind } = require('nativewind/metro');
 /** @type {import('expo/metro-config').MetroConfig} */
 // eslint-disable-next-line no-undef
 const config = getDefaultConfig(__dirname);
+// Drizzle migrations are .sql files imported by drizzle/migrations.js
+config.resolver.sourceExts.push('sql');
 
 module.exports = withNativeWind(config, { input: './src/global.css' });

@@ -12,10 +12,13 @@
 
 - Expo loads local environment values from `.env`. The app expects `EXPO_PUBLIC_TMDB_API_KEY` during startup and reads `EXPO_PUBLIC_OMDB_API_KEY` for OMDb requests.
 - Keep `.env` values private. Do not print, commit, or include API key values in logs or source code.
-- Check `package.json` for current start, platform, build, lint, and formatting scripts. There is no configured unit-test script.
+- Check `package.json` for current start, platform, build, lint, and formatting scripts.
+- Show data (Saved Shows, Episode States, Tags) lives in a per-user SQLite database under `src/db/` (expo-sqlite + Drizzle); see `docs/adr/0001-sqlite-react-query-for-show-data.md`. After changing `src/db/schema.ts`, run `npm run db:generate` to add a migration under `drizzle/`.
+- Domain terms are defined in `GLOSSARY.md`.
 
 ## Verification
 
 - Run `npm run lint` for ESLint and Prettier checks.
 - Run `npx tsc --noEmit` for a TypeScript check.
+- Run `npm test` for Jest tests of pure data logic (run against in-memory `better-sqlite3`).
 - For UI changes, use the platform workflow and visual checks available in the current environment.

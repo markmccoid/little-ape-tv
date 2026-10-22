@@ -1,8 +1,8 @@
 import '~/global.css';
 
 import { Slot } from 'expo-router';
-import { useEffect } from 'react';
-import { Appearance, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Appearance, Text, View } from 'react-native';
 import { AuthProvider, useAuth } from '~/authentication/AuthProvider';
 import * as SplashScreen from 'expo-splash-screen';
 import { initTMDB } from '@markmccoid/tmdb_api';
@@ -22,9 +22,32 @@ import { use$ } from '@legendapp/state/react';
 import { initializeWatchProviders, settings$ } from '~/store/store-settings';
 import { askNotificationPermissions } from '~/utils/permissions';
 import useNotificationObserver from '~/utils/notificationObserver';
+import { databaseReady } from '~/db/client';
+
+//~~ ------------------------------------------------------
+//~ Waits for the user's SQLite database to be migrated (and the one-time
+//~ legacy MMKV import to finish) before any screen renders
+//~~ ------------------------------------------------------
+const useDatabaseReady = (userId: string | undefined) => {
+  const [state, setState] = useState<{ ready: boolean; error?: Error }>({ ready: false });
+
+  useEffect(() => {
+    if (!userId) return;
+    setState({ ready: false });
+    databaseReady()
+      .then(() => setState({ ready: true }))
+      .catch((error) => {
+        console.error('[db] Failed to prepare database', error);
+        setState({ ready: false, error });
+      });
+  }, [userId]);
+
+  return state;
+};
 
 const InitialLayout = () => {
   const { currentUser, initialized } = useAuth();
+  const database = useDatabaseReady(currentUser?.id);
   const [fontsLoaded, error] = useFonts({ Asul_700Bold, Roboto_500Medium, Roboto_400Regular });
   //! Notification Observer.  Added because notification links were not
   //! getting through via expo-router defaults.
@@ -79,10 +102,20 @@ const InitialLayout = () => {
   //~~ Hide splashscreen when loaded
   //~~ ------------------------------------------------------
   useEffect(() => {
-    if (initialized && fontsLoaded) {
+    if (initialized && fontsLoaded && (database.ready || database.error)) {
       SplashScreen.hideAsync();
     }
-  }, [initialized, fontsLoaded]);
+  }, [initialized, fontsLoaded, database.ready, database.error]);
+
+  if (database.error) {
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+        <Text>Unable to open the show database.</Text>
+        <Text>{database.error.message}</Text>
+      </View>
+    );
+  }
+  if (!database.ready) return null;
 
   return (
     <View style={{ flex: 1 }}>
