@@ -7,31 +7,27 @@ import Animated, {
   interpolateColor,
 } from 'react-native-reanimated';
 import { useCustomTheme } from '~/utils/customColorTheme';
-import { savedShows$ } from '~/store/store-shows';
 import SetFavoriteButton from '../details/tags/SetFavoriteButton';
 import DeleteShowButton from './DeleteShowButton';
 import { use$ } from '@legendapp/state/react';
-import { useSavedSeasonSummary } from '~/store/functions-showAttributes';
+import type { ShowListItem } from '~/db/showList';
 import { settings$ } from '~/store/store-settings';
-import { useSavedShow } from '~/store/store-shows';
 import { getBGColor } from '~/utils/utils';
 import { useRouter } from 'expo-router';
 
 type Props = {
-  showId: string;
+  show: ShowListItem;
 };
 
-const ShowItemBottom = ({ showId }: Props) => {
+const ShowItemBottom = ({ show }: Props) => {
+  const showId = show.id;
   const { colors } = useCustomTheme();
   const router = useRouter();
-  const { favorite } = useSavedShow(showId);
-  const showInfo = useSavedShow(showId);
-  const [runTimeBGColor, runTimeTextColor] = getBGColor(showInfo.avgEpisodeRunTime) || ['', ''];
+  const favorite = show.favoritedAt;
+  const avgEpisodeRunTime = show.avgEpisodeRunTime ?? 0;
+  const [runTimeBGColor, runTimeTextColor] = getBGColor(avgEpisodeRunTime) || ['', ''];
 
-  const hasAvgTime =
-    showInfo?.avgEpisodeRunTime !== undefined &&
-    !isNaN(showInfo.avgEpisodeRunTime) &&
-    showInfo.avgEpisodeRunTime > 0;
+  const hasAvgTime = avgEpisodeRunTime > 0;
   return (
     <Animated.View
       className="relative z-10 mx-3 my-[-15] h-[25] flex-row items-center justify-center rounded-lg border p-1"
@@ -52,7 +48,7 @@ const ShowItemBottom = ({ showId }: Props) => {
           }
           hitSlop={{ top: 10, bottom: 10, left: 5, right: 5 }}>
           <Text className="font-semibold" style={{ color: runTimeTextColor }}>
-            {`${hasAvgTime ? showInfo.avgEpisodeRunTime : ' ?? '}`} Min
+            {`${hasAvgTime ? avgEpisodeRunTime : ' ?? '}`} Min
           </Text>
         </Pressable>
       </View>

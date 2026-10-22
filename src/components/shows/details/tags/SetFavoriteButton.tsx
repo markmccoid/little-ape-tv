@@ -1,9 +1,8 @@
 import { View, Text, Pressable } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { savedShows$ } from '~/store/store-shows';
+import { toggleFavoriteShow } from '~/data/actions.savedShows';
 import { MotiView } from 'moti';
 import { SymbolView } from 'expo-symbols';
-import { SavedShow } from '~/store/functions-shows';
 import { useCustomTheme } from '~/utils/customColorTheme';
 
 type Props = {
@@ -23,7 +22,7 @@ const SetFavoriteButton = ({ showId, isDisplayed = true, isFavorited }: Props) =
     <Pressable
       onPress={() => {
         setIsFavoritedLocal((prev) => !prev);
-        setTimeout(() => savedShows$.toggleFavoriteShow(showId, 'toggle'), 0);
+        setTimeout(() => toggleFavoriteShow(showId, 'toggle'), 0);
       }}
       className={`${isDisplayed ? 'pointer-events-auto' : 'pointer-events-none opacity-0'} `}>
       <MotiView

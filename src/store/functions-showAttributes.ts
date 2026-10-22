@@ -6,6 +6,10 @@ import { savedShows$ } from './store-shows';
 import { use$, useObserve } from '@legendapp/state/react';
 import { confirmAlert } from '~/utils/alert';
 import { eventDispatcher, EventName } from '~/utils/EventDispatcher';
+import { isShowSaved, saveSeasonSummary } from '~/data/actions.savedShows';
+import { getDb } from '~/db/client';
+import { airDateToEpoch } from '~/db/dates';
+import { selectShow, type ShowSummaryInput } from '~/db/shows';
 // import { useEffect, useMemo, useState } from 'react';
 // import { getShowDetails } from './functions-shows';
 // ====================================================
@@ -345,8 +349,8 @@ type SeasonSummaryVerbose = {
 //# Update Seasons Summary
 //# Called from useObserveEffect in SeasonEpisodeList
 export const updateSeasonSummary = (showId: string, seasons: TVShowSeasonDetails[]) => {
-  //! If the show is not stored locally, don't update the summary
-  if (!savedShows$.shows[showId].peek()?.isStoredLocally) return;
+  //! If the show is not saved, don't update the summary
+  if (!isShowSaved(showId)) return;
 
   // Get the showAttributes for the seasons.  This is will hold the episodes and if they are watched/downloaded/favoriated
   const seasonsAttributeData: { [seasonNumber: number]: Season } =
@@ -354,9 +358,12 @@ export const updateSeasonSummary = (showId: string, seasons: TVShowSeasonDetails
   // Calculate the new summary
   const newSummary = calculateSeasonSummary(showId, seasonsAttributeData, seasons);
   // Update the summary in the observable state
+  //! Legend copy is still read by SeasonEpisodeList until Episode State moves (phase 3)
   savedShows$.showAttributes[showId].summary.set(newSummary);
+  // SQLite copy feeds the library list filters/sorts
+  saveSeasonSummary(showId, toShowSummaryInput(newSummary));
   // Check if the avgEpisodeRunTime is set, if not emit an event to calculate it
-  const avgRunTime = savedShows$.shows[showId].avgEpisodeRunTime.peek();
+  const avgRunTime = selectShow(getDb(), showId)?.avgEpisodeRunTime;
   //! REMOVE START
   //! forcing this everytime until we populate the avgRunTime
   // eventDispatcher.emit(
@@ -365,7 +372,7 @@ export const updateSeasonSummary = (showId: string, seasons: TVShowSeasonDetails
   //   seasons.map((el) => el.seasonNumber)
   // );
   //! REMOVE END
-  if (avgRunTime === 0 || isNaN(Number(avgRunTime))) {
+  if (!avgRunTime) {
     eventDispatcher.emit(
       EventName.UpdateAvgEpisodeRuntime,
       showId,
@@ -373,6 +380,33 @@ export const updateSeasonSummary = (showId: string, seasons: TVShowSeasonDetails
     );
   }
 };
+//~ Convert the short-key Season Summary to the SQLite shape
+const toShowSummaryInput = (summary: SeasonsSummary): ShowSummaryInput => {
+  const seasons = Object.entries(summary)
+    .filter(([key]) => /^\d+$/.test(key))
+    .map(([key, value]) => {
+      const season = value as SeasonSummary;
+      return {
+        season: Number(key),
+        totalEpisodes: season.te ?? 0,
+        watched: season.tw ?? 0,
+        downloaded: season.td ?? 0,
+        favorited: season.tf ?? 0,
+      };
+    });
+  return {
+    allWatched: !!summary.asw,
+    totalEpisodes: summary.tec ?? 0,
+    totalWatched: summary.gtw ?? 0,
+    lastWatchedSeason: summary.lws ?? 0,
+    nextDlSeason: summary.nde?.season ?? null,
+    nextDlEpisode: summary.nde?.episode ?? null,
+    nextDlAirDate: airDateToEpoch(summary.nde?.airDate),
+    nextDlStatus: summary.nde?.status ?? 'n',
+    seasons,
+  };
+};
+
 //# -------------------------------------------------
 //# Calculate Season Summary
 //# -------------------------------------------------

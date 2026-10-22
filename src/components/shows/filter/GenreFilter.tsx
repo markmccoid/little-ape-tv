@@ -1,6 +1,7 @@
 import { View, Text, Pressable } from 'react-native';
 import React from 'react';
-import { fcUpdateTagsGenres, filterCriteria$, useFilterGenres } from '~/store/store-filterCriteria';
+import { useFilterGenres } from '~/data/query.savedShows';
+import { fcUpdateTagsGenres, filterCriteria$ } from '~/store/store-filterCriteria';
 import GenreCloudEnhanced, { GenreItem } from '~/components/common/TagCloud/GenreCloudEnhanced';
 import { EraserIcon } from '~/components/common/Icons';
 

@@ -1,8 +1,5 @@
 import uuid from 'react-native-uuid';
 import { observable } from '@legendapp/state';
-import { tags$ } from './store-shows';
-import { Tag } from './functions-tags';
-import { genres$ } from './store-genres';
 import { use$ } from '@legendapp/state/react';
 import { synced } from '@legendapp/state/sync';
 import { ObservablePersistMMKV } from '@legendapp/state/persist-plugins/mmkv';
@@ -334,46 +331,6 @@ export const useSortSettings = () => {
 // ---------------------------------------
 //-- filterCriteria$ Observable Functions
 // ---------------------------------------
-//~ ------------------------------------------------
-//~ Adds the state property to the tagList items so we know what is off/include/exclude
-//~ so we can set the ui correctly.
-//~ ------------------------------------------------
-export const useFilterTags = () => {
-  const includeTags = use$(filterCriteria$.baseFilters.includeTags) || [];
-  const excludeTags = use$(filterCriteria$.baseFilters.excludeTags) || [];
-  // const { excludeTags = [], includeTags = [] } = filterCriteria$.baseFilters.get();
-  const tagList = tags$.tagList.peek();
-
-  return tagList.map((tag) => {
-    if (includeTags.includes(tag.id)) {
-      return { ...tag, state: 'include' };
-    } else if (excludeTags.includes(tag.id)) {
-      return { ...tag, state: 'exclude' };
-    } else {
-      return { ...tag, state: 'off' };
-    }
-  }) as (Tag & { state: 'off' | 'include' | 'exclude' })[];
-};
-//~ ------------------------------------------------
-//~ Adds the state property to the genresList items so we know what is off/include/exclude
-//~ so we can set the ui correctly.
-//~ ------------------------------------------------
-export const useFilterGenres = () => {
-  const includeGenres = use$(filterCriteria$.baseFilters.includeGenres) || [];
-  const excludeGenres = use$(filterCriteria$.baseFilters.excludeGenres) || [];
-
-  const genreList = genres$.genreList.peek();
-  return genreList.map((genre) => {
-    if (includeGenres.includes(genre)) {
-      return { genre, state: 'include' };
-    }
-    if (excludeGenres.includes(genre)) {
-      return { genre, state: 'exclude' };
-    }
-    return { genre, state: 'off' };
-  }) as { genre: string; state: 'off' | 'include' | 'exclude' }[];
-};
-
 //~ ------------------------------------------------
 //~ Updates both the includeTags and excludeTags arrays in filterCriteria$.baseFilters
 //~ parameters sent in will determine which helper function to call and what action to

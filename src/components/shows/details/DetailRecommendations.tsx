@@ -2,17 +2,17 @@ import { View, Text, ScrollView } from 'react-native';
 import React from 'react';
 import { TVShowRecommendations } from '@markmccoid/tmdb_api';
 import SearchItem from '~/components/search/SearchItem';
-import { savedShows$ } from '~/store/store-shows';
+import { getDb } from '~/db/client';
+import { selectSavedShowIds } from '~/db/shows';
 import useImageSize from '~/utils/useImageSize';
 
 type Props = {
   recommendations: TVShowRecommendations[] | undefined;
 };
 const tagRecommendations = (recommended: TVShowRecommendations[]) => {
-  const savedShowsObj = savedShows$.shows.peek();
-  const savedShows = Object.keys(savedShowsObj).map((key) => savedShowsObj[key].tmdbId);
+  const savedShows = new Set(selectSavedShowIds(getDb()));
   return recommended.map((el) => {
-    if (savedShows.includes(el.id.toString())) {
+    if (savedShows.has(el.id.toString())) {
       return {
         ...el,
         isStoredLocally: true,

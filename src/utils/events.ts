@@ -2,7 +2,9 @@ import { ShowAttributes, updateSeasonSummary } from './../store/functions-showAt
 import { QueryClient } from '@tanstack/react-query';
 import { eventDispatcher, EventName } from './EventDispatcher';
 import { fetchSeasonsData, getWatchProviders, useShowSeasonData } from '~/data/query.shows';
-import { savedShows$ } from '~/store/store-shows';
+import { refreshSavedShowDetails, updateAvgEpisodeRunTime } from '~/data/actions.savedShows';
+import { getDb } from '~/db/client';
+import { selectShow } from '~/db/shows';
 
 //!! -------------------------------------------------------
 //!! setUpEvents
@@ -27,7 +29,7 @@ export const setupEvents = (queryClient: QueryClient) => {
       }, [] as number[])
       .filter((el) => el);
     const avgRunTime = trimmedMean(runTimes, 0.1);
-    savedShows$.shows[showId].avgEpisodeRunTime.set(avgRunTime);
+    updateAvgEpisodeRunTime(showId, avgRunTime);
     // savedShows$.shows[showId].avgEpisodeRunTime.set(Math.trunc(seasonData[0].episodeAvgRunTime));
     // console.log('emitted runtime', Math.trunc(seasonData[0].episodeAvgRunTime));
   });
@@ -37,9 +39,9 @@ export const setupEvents = (queryClient: QueryClient) => {
   //# makes ure the show details are up to date.
   //# --------------------------------------
   eventDispatcher.on(EventName.UpdateSavedShowDetail, async (showId, showDetails) => {
-    savedShows$.updateSavedShowDetail(showId, showDetails);
-    const showRunTime = savedShows$.shows[showId].avgEpisodeRunTime.peek();
-    if (!showRunTime || isNaN(showRunTime)) {
+    refreshSavedShowDetails(showId, showDetails);
+    const showRunTime = selectShow(getDb(), showId)?.avgEpisodeRunTime;
+    if (!showRunTime) {
       eventDispatcher.emit(
         EventName.UpdateAvgEpisodeRuntime,
         showId,

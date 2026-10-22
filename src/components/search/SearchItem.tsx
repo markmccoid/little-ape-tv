@@ -8,7 +8,7 @@ import useImageSize from '~/utils/useImageSize';
 import { search$ } from '~/store/store-search';
 import { use$ } from '@legendapp/state/react';
 import { settings$ } from '~/store/store-settings';
-import { savedShows$ } from '~/store/store-shows';
+import { useSavedPosterUrl } from '~/data/query.savedShows';
 import { getNoImageFound2 } from '~/utils/utils';
 import ShowImage from '../common/ShowImage';
 
@@ -22,7 +22,7 @@ type Props = {
 };
 const SearchItem = ({ searchItem, numColumns }: Props) => {
   const router = useRouter();
-  const posterURL = use$(savedShows$.shows[searchItem.id].posterURL);
+  const posterURL = useSavedPosterUrl(searchItem.id.toString());
   const { imageHeight, imageWidth } = useImageSize(numColumns);
   return (
     <View className="mb-[25]">

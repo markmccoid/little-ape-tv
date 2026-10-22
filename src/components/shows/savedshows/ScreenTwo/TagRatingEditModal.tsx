@@ -9,24 +9,26 @@ import {
 } from 'react-native';
 import React, { useCallback, useEffect, useReducer, useState } from 'react';
 import ScreenTwoTagCloud from './ScreenTwoTagCloud';
-import { observable } from '@legendapp/state';
-import { savedShows$, tags$ } from '~/store/store-shows';
+import { replaceShowTags, updateShowUserRating } from '~/data/actions.savedShows';
+import { useMatchedTags } from '~/data/query.savedShows';
+import type { ShowListItem } from '~/db/showList';
 import { SymbolView } from 'expo-symbols';
 import ShadowBackground from '~/components/common/ShadowBackground';
-import { use$ } from '@legendapp/state/react';
 import { MenuItem, UserRatingDetailScreen } from '../../details/userRating/UserRatingDetailScreen';
 import { Ruler } from '../../details/userRating/UserRatingRuler';
 import UserRatingDetailScreenRuler from '../../details/userRating/UserRatingDetailScreenRuler';
 
 interface TagRatingEditModalProps {
-  showId: string;
+  show: ShowListItem;
 }
-const TagRatingEditModal = ({ showId }: TagRatingEditModalProps) => {
+const TagRatingEditModal = ({ show }: TagRatingEditModalProps) => {
+  const showId = show.id;
   const [isVisible, toggleVisible] = useReducer((prev) => !prev, false);
-  const userRating = use$(savedShows$.shows[showId].userRating);
-  const userTags = use$(savedShows$.shows[showId].userTags);
+  const userRating = show.userRating;
+  const userTags = show.tagIds;
   const [pendingUserRating, setPendingUserRating] = useState(userRating || 0);
   const [pendingTags, setPendingTags] = useState(userTags || []);
+  const pendingMatchedTags = useMatchedTags(pendingTags);
   const handlePendingTags = (tags: any) => {
     setPendingTags(tags);
   };
@@ -40,8 +42,8 @@ const TagRatingEditModal = ({ showId }: TagRatingEditModalProps) => {
   const handleModalClose = useCallback(() => {
     // Save Tags and User Rating before hiding modal.
     // console.log('Saving Tags and User Rating', pendingTags);
-    savedShows$.shows[showId].userTags.set(pendingTags);
-    savedShows$.shows[showId].userRating.set(pendingUserRating);
+    replaceShowTags(showId, pendingTags);
+    updateShowUserRating(showId, pendingUserRating);
     toggleVisible();
   }, [pendingTags, pendingUserRating]);
 
@@ -53,8 +55,7 @@ const TagRatingEditModal = ({ showId }: TagRatingEditModalProps) => {
           <View>
             {/* View of Selected Tags */}
             <View className="flex-row flex-wrap gap-[3]">
-              {tags$
-                .matchTagIds(pendingTags)
+              {pendingMatchedTags
                 .filter((tag) => tag.state === 'include')
                 .map((tag) => (
                   <View className="rounded-sm border-hairline bg-green-300 p-[2]" key={tag.id}>
@@ -105,7 +106,7 @@ const TagRatingEditModal = ({ showId }: TagRatingEditModalProps) => {
               </View>
               {/* TAGS UPDATE */}
               <View className="mb-5 rounded-lg border-hairline py-2">
-                <ScreenTwoTagCloud showId={showId} handlePendingTags={handlePendingTags} />
+                <ScreenTwoTagCloud initialTagIds={userTags} handlePendingTags={handlePendingTags} />
               </View>
               <View className="mt-5 flex-row justify-end">
                 <Pressable

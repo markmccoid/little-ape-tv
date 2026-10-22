@@ -1,9 +1,8 @@
 import { View, Text, Dimensions, Pressable, ScrollView } from 'react-native';
 import React, { useCallback, useState } from 'react';
 import { Image } from 'expo-image';
-import { SavedShow } from '~/store/functions-shows';
 import { Link, router } from 'expo-router';
-import { savedShows$, useSavedShow } from '~/store/store-shows';
+import type { ShowListItem } from '~/db/showList';
 import Animated, {
   Extrapolation,
   FadeIn,
@@ -29,13 +28,12 @@ const IMG_WIDTH = (width - MARGIN * 3) / 2;
 const IMG_HEIGHT = IMG_WIDTH * 1.5;
 
 type Props = {
-  show: SavedShow;
+  show: ShowListItem;
   showId: string;
 };
 
 const ShowItem = ({ show, showId }: Props) => {
   const scrollX = useSharedValue(0);
-  const showInfo = useSavedShow(showId);
 
   const [currIndex, setCurrIndex] = useState(0);
   // const onScroll = useAnimatedScrollHandler((e) => {
@@ -44,7 +42,8 @@ const ShowItem = ({ show, showId }: Props) => {
 
   //~ Types for cardData
   interface Props {
-    showId: string; // Adjust this based on what 'show' actually is
+    show: ShowListItem;
+    showId: string;
     imageWidth: number;
     imageHeight: number;
     index: number;
@@ -102,27 +101,31 @@ const ShowItem = ({ show, showId }: Props) => {
     };
   });
 
-  const renderItem = useCallback(({ item, index }: { item: CardDataItem; index: number }) => {
-    const Comp = item.component;
-    // console.log('INRender', currIndex);
-    if (!show) return null;
-    return (
-      <View
-        style={{
-          width: IMG_WIDTH + 1,
-          height: IMG_HEIGHT + 26,
-          // borderWidth: 1,
-        }}>
-        <Comp
-          showId={showId}
-          imageWidth={IMG_WIDTH}
-          imageHeight={IMG_HEIGHT}
-          index={index}
-          scrollX={scrollX}
-        />
-      </View>
-    );
-  }, []);
+  const renderItem = useCallback(
+    ({ item, index }: { item: CardDataItem; index: number }) => {
+      const Comp = item.component;
+      // console.log('INRender', currIndex);
+      if (!show) return null;
+      return (
+        <View
+          style={{
+            width: IMG_WIDTH + 1,
+            height: IMG_HEIGHT + 26,
+            // borderWidth: 1,
+          }}>
+          <Comp
+            show={show}
+            showId={showId}
+            imageWidth={IMG_WIDTH}
+            imageHeight={IMG_HEIGHT}
+            index={index}
+            scrollX={scrollX}
+          />
+        </View>
+      );
+    },
+    [show]
+  );
 
   // if (!showInfo.isStoredLocally) return null;
 

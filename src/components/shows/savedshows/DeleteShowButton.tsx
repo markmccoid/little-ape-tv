@@ -1,7 +1,7 @@
 import { View, Text, Pressable } from 'react-native';
 import React from 'react';
 import { SymbolView } from 'expo-symbols';
-import { savedShows$ } from '~/store/store-shows';
+import { removeShow } from '~/data/actions.savedShows';
 import showConfirmationPrompt from '~/components/common/showConfirmationPrompt';
 import { useCustomTheme } from '~/utils/customColorTheme';
 
@@ -13,7 +13,7 @@ const DeleteShowButton = ({ showId }: { showId: string }) => {
       'Are you sure you want to delete this show?'
     );
     if (onDelete) {
-      savedShows$.removeShow(showId);
+      removeShow(showId);
     }
   };
   return (

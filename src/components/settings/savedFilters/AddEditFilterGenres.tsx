@@ -2,7 +2,7 @@ import { View, Text } from 'react-native';
 import React from 'react';
 import GenreCloudEnhanced, { GenreItem } from '~/components/common/TagCloud/GenreCloudEnhanced';
 import { use$ } from '@legendapp/state/react';
-import { genres$ } from '~/store/store-genres';
+import { useGenres } from '~/data/query.savedShows';
 import { TagStateArrays } from './useTagManagement';
 
 // Sets up the state of the tags.  If editing a filter, it will merge the tags with the filter's tags
@@ -42,7 +42,7 @@ type Props = {
 };
 
 const AddEditFilterGenres = ({ genreFunctions, genreStateArrays }: Props) => {
-  const genres = use$(genres$.genreList);
+  const genres = useGenres();
   const mappedGenres = mergeGenres(genres, genreStateArrays);
 
   const handleToggleGenre = (genre: string, newGenreState: 'include' | 'exclude' | 'off') => {

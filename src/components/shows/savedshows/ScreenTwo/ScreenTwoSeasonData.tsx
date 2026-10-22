@@ -1,42 +1,33 @@
 import { View, Text } from 'react-native';
 import React from 'react';
-import { useSavedSeasonSummary } from '~/store/functions-showAttributes';
 import { settings$ } from '~/store/store-settings';
 import { use$ } from '@legendapp/state/react';
 import ShadowBackground from '~/components/common/ShadowBackground';
+import type { SeasonSummaryRow } from '~/db/types';
 
 type Props = {
-  showId: string;
+  // Season 0 (specials) is already excluded
+  seasonSummaries: SeasonSummaryRow[];
 };
-const ScreenTwoSeasonData = ({ showId }: Props) => {
-  const seasonsSummary = useSavedSeasonSummary(showId);
+const ScreenTwoSeasonData = ({ seasonSummaries }: Props) => {
   const showDownloaded = use$(settings$.downloadOptions.showNextDownloadInfo);
 
   return (
     <View>
-      {Object.keys(seasonsSummary)
-        .filter((el) => !isNaN(parseInt(el))) // only grab season keys
-        .filter((el) => parseInt(el) !== 0) // Remove the zero'th season
-        .map((key: string) => {
-          return (
-            <View key={key} className="mb-2 px-2 pb-2">
-              <ShadowBackground />
-              <Text className="text-lg font-semibold text-text">Season {key}</Text>
-              <Text className="ml-2 text-text">
-                Episodes - {seasonsSummary[parseInt(key)].totalEpisodes}
-              </Text>
+      {seasonSummaries.map((season) => {
+        return (
+          <View key={season.season} className="mb-2 px-2 pb-2">
+            <ShadowBackground />
+            <Text className="text-lg font-semibold text-text">Season {season.season}</Text>
+            <Text className="ml-2 text-text">Episodes - {season.totalEpisodes}</Text>
 
-              <Text className="ml-2 text-text">
-                Watched - {seasonsSummary[parseInt(key)].watched}
-              </Text>
-              {showDownloaded && (
-                <Text className="ml-2 text-text">
-                  Downloaded - {seasonsSummary[parseInt(key)].downloaded}
-                </Text>
-              )}
-            </View>
-          );
-        })}
+            <Text className="ml-2 text-text">Watched - {season.watched}</Text>
+            {showDownloaded && (
+              <Text className="ml-2 text-text">Downloaded - {season.downloaded}</Text>
+            )}
+          </View>
+        );
+      })}
     </View>
   );
 };

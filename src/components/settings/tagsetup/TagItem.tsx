@@ -2,9 +2,9 @@ import { View, Text, Alert, Pressable } from 'react-native';
 import React from 'react';
 import { SymbolView } from 'expo-symbols';
 import * as Haptics from 'expo-haptics';
-import { Tag } from '~/store/functions-tags';
+import type { TagRow as Tag } from '~/db/types';
 import showConfirmationPrompt from '~/components/common/showConfirmationPrompt';
-import { tags$ } from '~/store/store-shows';
+import { editTag, removeTag } from '~/data/actions.savedShows';
 import Sortable from 'react-native-sortables';
 import { DeleteIcon, EditIcon } from '~/components/common/Icons';
 import { useCustomTheme } from '~/utils/customColorTheme';
@@ -24,7 +24,7 @@ const handleEditTagPrompt = (tag: Tag) => {
         onPress: (name) => {
           if (name) {
             try {
-              tags$.editTag(tag.id, name);
+              editTag(tag.id, name);
             } catch (e: any) {
               // Checking for custom error being thrown
               if (e?.message?.includes('duplicate')) {
@@ -50,7 +50,7 @@ const handleTagRemove = async (tagId: string) => {
       'Deleting this Tag will remove it from all Shows. Are you sure?'
     );
     if (yesDelete) {
-      tags$.removeTag(tagId);
+      removeTag(tagId);
     }
   } catch (error) {
     console.error('Delete operation failed:', error);

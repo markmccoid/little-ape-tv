@@ -15,8 +15,8 @@ import Animated, {
   withSpring,
   interpolate,
 } from 'react-native-reanimated';
-import { savedShows$ } from '~/store/store-shows';
-import { use$ } from '@legendapp/state/react';
+import { updateShowUserRating } from '~/data/actions.savedShows';
+import { useSavedShow } from '~/data/query.savedShows';
 
 const NUMBER_OF_ITEMS = 11;
 const EXPAND_DISTANCE = 34; // Adjust as needed
@@ -31,7 +31,7 @@ const ExpandingTextList = ({ showId }: Props) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const animation = useSharedValue(0);
   const fadeAnimation = useSharedValue(1); // 1 for visible, 0 for hidden
-  const currUserRating = use$(savedShows$.shows[showId].userRating) || 0;
+  const currUserRating = useSavedShow(showId)?.userRating || 0;
 
   const handleLongPress = (event) => {
     if (event.nativeEvent.state === State.ACTIVE) {
@@ -48,7 +48,7 @@ const ExpandingTextList = ({ showId }: Props) => {
   };
 
   const handleTextClick = (newRating: number) => {
-    savedShows$.updateShowUserRating(showId, newRating);
+    updateShowUserRating(showId, newRating);
     fadeAnimation.value = withSpring(0, { duration: FADE_DURATION });
     animation.value = withSpring(0, { duration: ANIMATION_DURATION });
     setIsExpanded(false);

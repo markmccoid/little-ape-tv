@@ -12,12 +12,8 @@ import {
   showWatchProviders,
   tags,
 } from '../schema';
-import {
-  importLegacyDataOnce,
-  LEGACY_IMPORT_META_KEY,
-  parseLegacyAirDate,
-  type LegacyData,
-} from './importLegacyData';
+import { importLegacyDataOnce, LEGACY_IMPORT_META_KEY, type LegacyData } from './importLegacyData';
+import { airDateToEpoch } from '../dates';
 import { createTestDb } from '../testing/createTestDb';
 
 const legacyData = (): LegacyData => ({
@@ -115,7 +111,7 @@ describe('importLegacyDataOnce', () => {
       lastWatchedSeason: 1,
       nextDlSeason: 2,
       nextDlEpisode: 3,
-      nextDlAirDate: parseLegacyAirDate('01-31-2025'),
+      nextDlAirDate: airDateToEpoch('01-31-2025'),
       nextDlStatus: 's',
       trackAndNotify: true,
     });

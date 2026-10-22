@@ -1,4 +1,3 @@
-import { ShowAttributes } from './../store/functions-showAttributes';
 import { use$ } from '@legendapp/state/react';
 import {
   CastTVShows,
@@ -16,168 +15,18 @@ import {
   TVShowDetails,
   TVShowSeasonDetails,
 } from '@markmccoid/tmdb_api';
-import { SavedShow } from '~/store/functions-shows';
 import { useQuery } from '@tanstack/react-query';
-import { savedShows$ } from '~/store/store-shows';
+import { isShowSaved, updateShowWatchProviders } from '~/data/actions.savedShows';
+import { useSavedShow } from '~/data/query.savedShows';
+import type { SavedShowDetail } from '~/db/shows';
 import axios from 'axios';
-import { filterCriteria$, SortField } from '~/store/store-filterCriteria';
 import { orderBy, sortBy } from 'lodash';
 import { queryClient } from '~/utils/queryClient';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { settings$ } from '~/store/store-settings';
 import { eventDispatcher, EventName } from '~/utils/EventDispatcher';
-import { formatEpoch } from '~/utils/utils';
 dayjs.extend(customParseFormat);
-
-//# ------------------------------------------------------
-//# useShows - FILTERED SAVED Shows
-//# ------------------------------------------------------
-export const useFilteredShows = () => {
-  const savedShowsObj = use$(savedShows$.shows);
-  const {
-    includeGenres = [],
-    includeTags = [],
-    excludeGenres = [],
-    excludeTags = [],
-    includeWatchProviders = [],
-  } = use$(filterCriteria$.baseFilters);
-  const filterIsFavorited = use$(filterCriteria$.baseFilters.filterIsFavorited);
-  const filterIsAllWatched = use$(filterCriteria$.baseFilters.filterIsAllWatched);
-  const { showName, ignoreOtherFilters } = use$(filterCriteria$.nameFilter);
-  const sortSettings = use$(filterCriteria$.sortSettings);
-  const savedShows = Object.values(savedShowsObj);
-  //TODO Just doing this to track changes, heavy handed and will cause
-  //TODO a rerender of the list whenever ANY attribute is chnaged
-  const summaryData = use$(savedShows$.showAttributes);
-
-  const nextDLDateSortDir = sortSettings.find(
-    (el) => el.sortField === 'sortNextDLDate'
-  )?.sortDirection;
-
-  const normalizedShowName = showName?.toLowerCase() || '';
-
-  // Filter predicates
-  const matchesName = (show: SavedShow) =>
-    !normalizedShowName || show.name.toLowerCase().includes(normalizedShowName);
-
-  const matchesTags = (show: SavedShow) => {
-    const userTags = show.userTags || [];
-    return (
-      includeTags.every((tag) => userTags.includes(tag)) &&
-      !excludeTags.some((tag) => userTags.includes(tag))
-    );
-  };
-
-  const matchesGenres = (show: SavedShow) => {
-    const showGenres = show.genres || [];
-    return (
-      includeGenres.every((genre) => showGenres.includes(genre)) &&
-      !excludeGenres.some((genre) => showGenres.includes(genre))
-    );
-  };
-
-  const matchesProviders = (show: SavedShow) => {
-    if (includeWatchProviders.length === 0) {
-      // If the filter list is empty, all shows match this criteria
-      return true;
-    }
-    const streamProviders = show.streaming?.providers || [];
-    // console.log(
-    //   'STREAM',
-    //   show.name,
-    //   streamProviders,
-    //   includeWatchProviders,
-    //   includeWatchProviders.some((provider) => streamProviders.includes(parseInt(provider)))
-    // );
-    return includeWatchProviders.some((provider) => streamProviders.includes(provider));
-  };
-
-  const matchesFavorite = (show: SavedShow) => {
-    const isFavorite = !!show.favorite;
-    return filterIsFavorited === 'include'
-      ? isFavorite
-      : filterIsFavorited === 'exclude'
-        ? !isFavorite
-        : true;
-  };
-  const matchesAllWatched = (allWatched: boolean) => {
-    return filterIsAllWatched === 'include'
-      ? allWatched
-      : filterIsAllWatched === 'exclude'
-        ? !allWatched
-        : true;
-  };
-
-  //! Converted to forEach from filter so I could inject the showAttributes summary into the filteredShows
-  const filteredShows: (SavedShow & { nextDLEpisodeDate?: string; sortNextDLDate?: number })[] = [];
-  // Loop through all savedShows checking for matches to our filters
-  // and injecting showAttributes summary into the filteredShows
-  savedShows.forEach((show) => {
-    // Quick name-only filter when ignoring other filters
-    if (ignoreOtherFilters && normalizedShowName) {
-      if (matchesName(show)) {
-        //~ get show Attributes summary and add to filteredShows Also set the sortNextDLDate
-        const { sortDate, workingDate } = handleNullDates(
-          show,
-          nextDLDateSortDir || 'asc',
-          summaryData[show.tmdbId]?.summary?.nde?.airDate
-        );
-        filteredShows.push({
-          ...show,
-          ...{ sortNextDLDate: sortDate, nextDLEpisodeDate: workingDate },
-        });
-      }
-      return;
-    }
-    // Full filter
-    if (
-      matchesName(show) &&
-      matchesTags(show) &&
-      matchesGenres(show) &&
-      matchesFavorite(show) &&
-      matchesProviders(show) &&
-      matchesAllWatched(!!summaryData?.[show.tmdbId]?.summary?.asw)
-    ) {
-      //~ get show Attributes summary and add to filteredShows Also set the sortNextDLDate
-      const { sortDate, workingDate } = handleNullDates(
-        show,
-        nextDLDateSortDir || 'asc',
-        summaryData[show.tmdbId]?.summary?.nde?.airDate
-      );
-      filteredShows.push({
-        ...show,
-        ...{ sortNextDLDate: sortDate, nextDLEpisodeDate: workingDate },
-      });
-    }
-  });
-
-  const { sortFields, sortDirections } = getSort(sortSettings);
-  return orderBy(filteredShows, sortFields, sortDirections);
-};
-//# useShows Attributes helper
-//~ ------------------------------------------------------
-//~ handleNullDates - Handle null dates for sorting
-//~ based on sortDirection passed.
-//~ We always want the undefined dates to show up at the end of the list
-//~ regardless of the sort direction.
-//~ ------------------------------------------------------
-const handleNullDates = (
-  show: SavedShow,
-  sortDirection: 'asc' | 'desc',
-  workingDate: string | undefined
-) => {
-  // const nextDLEpisodeDate = savedShows$.showAttributes[show.tmdbId]?.summary?.nde?.airDate.peek();
-  // const summaryData = savedShows$.showAttributes[show.tmdbId]?.summary.get();
-  // const nextDLEpisodeDate = summaryData?.nde?.airDate;
-  // Set a value for the value to use when the nextDLEpisodeDate is undefined.  This keeps undefined at the end of the list
-  // whether acsending or descending.
-  const dateUndefinedValue = sortDirection === 'asc' ? Infinity : -Infinity;
-  const sortDate = !workingDate ? dateUndefinedValue : dayjs(workingDate, 'MM-DD-YYYY').unix();
-  //! Potentially remove nextDLEpisodeDate from here and just use sortNextDLDate
-  //! will inject summary data in useShows
-  return { sortDate, workingDate };
-};
 
 //# ------------------------------------------------------
 //# useShowDetail - GET DETAILS For a Shows
@@ -185,13 +34,47 @@ const handleNullDates = (
 export type UseShowDetailsReturn = ReturnType<typeof useShowDetails>;
 export type ShowDetailsData = UseShowDetailsReturn['data'];
 
+//~ Fields from the Saved Show merged over the TMDB details.  Names match the TMDB
+//~ details (posterURL, tmdbId) so the detail screens can read either.
+export type SavedShowOverlay = {
+  isStoredLocally: boolean;
+  tmdbId: string;
+  favorite?: number;
+  userRating?: number;
+  posterURL?: string;
+  avgEpisodeRunTime?: number;
+};
+const toSavedShowOverlay = (showId: number, show: SavedShowDetail | null): SavedShowOverlay => {
+  if (!show) return { isStoredLocally: false, tmdbId: showId.toString() };
+  const overlay: SavedShowOverlay = {
+    isStoredLocally: true,
+    tmdbId: show.id,
+    favorite: show.favoritedAt ?? undefined,
+    userRating: show.userRating,
+    posterURL: show.posterUrl ?? undefined,
+    avgEpisodeRunTime: show.avgEpisodeRunTime ?? undefined,
+  };
+  // Drop empty fields so they don't hide the TMDB values when merged
+  return Object.fromEntries(
+    Object.entries(overlay).filter(([, value]) => value !== undefined)
+  ) as SavedShowOverlay;
+};
+
 export const useShowDetails = (showId: number) => {
-  // Load show if saved locally from legend state
-  const localShow = use$(savedShows$.shows[showId]) as SavedShow;
-  // This query will immediately return the placeholder data if available (locally saved show)
-  // Then pull details from tmdb_api and merge with localShow if available.
-  const { data, ...rest } = useQuery<Partial<SavedShow> & Partial<TVShowDetails>, Error>({
-    queryKey: ['showdetails', showId, localShow?.isStoredLocally || false],
+  const savedShow = useSavedShow(showId.toString());
+  const overlay = toSavedShowOverlay(showId, savedShow);
+  // Shown until TMDB answers when the show is saved
+  const placeholder = savedShow
+    ? ({
+        ...overlay,
+        name: savedShow.name,
+        backdropURL: savedShow.backdropUrl ?? undefined,
+        genres: savedShow.genres,
+      } as Partial<TVShowDetails> & SavedShowOverlay)
+    : undefined;
+
+  const { data, ...rest } = useQuery<Partial<TVShowDetails> & Partial<SavedShowOverlay>, Error>({
+    queryKey: ['showdetails', showId, overlay.isStoredLocally],
     queryFn: async () => {
       const showDetails = await tvGetShowDetails(showId, [
         'recommendations',
@@ -199,25 +82,17 @@ export const useShowDetails = (showId: number) => {
         'images',
         'credits',
       ]);
-
-      // const showDetails = await tvGetShowDetails(showId, ['recommendations', 'videos', 'images']);
-      // merge with placeholder data. This type must match the placehodlerData type
       const data = showDetails.data;
-      // console.log('data url', showDetails.apiCall);
-      // emit event to update the saved show details if it is stored locally
-      if (localShow?.isStoredLocally) {
+      // Keep the saved copy of the TMDB fields current
+      if (overlay.isStoredLocally) {
         eventDispatcher.emit(EventName.UpdateSavedShowDetail, showId.toString(), data);
       }
       return { ...data };
     },
-    // if locally saved show
-    placeholderData: localShow,
+    placeholderData: placeholder,
   });
-  // We needed to merge the local data outside of the useQuery function so that
-  // changes to local data update immediately.  Otherwise only cache data is returned
-  // until useQuery reads from API again
-
-  return { data: { ...data, ...localShow }, ...rest };
+  // Merge the saved fields outside the query so local changes show immediately
+  return { data: { ...data, ...overlay }, ...rest };
 };
 
 //# =================================
@@ -418,7 +293,7 @@ const fetchWatchProviders = async (showId: string, region: string = 'US') => {
 
   // If not storedLocallacy just return info.
   // console.log('local', savedShows$.shows[showId]?.isStoredLocally.peek());
-  if (!savedShows$.shows[showId]?.isStoredLocally.peek()) {
+  if (!isShowSaved(showId)) {
     return { watchProviders, justWatchLink: data?.justWatchLink };
   }
 
@@ -456,10 +331,7 @@ const updateShowStreamingProviders = (showId: string, watchProviders: WatchProvi
     ...(watchProviders.find((el) => el.type === 'stream')?.providers || []),
   ] as ProviderInfo[];
   const updatedProviders = streamingProviders.map((el) => el.providerId) || [];
-  savedShows$.shows[showId].streaming.set({
-    providers: updatedProviders,
-    dateUpdatedEpoch: formatEpoch(Date.now()),
-  });
+  updateShowWatchProviders(showId, updatedProviders);
 
   //-- 2.  Update settings$ streamingProvidersLookup data. make sure all are located in this array
   //! NO LONGER USING savedStreamingProviders
@@ -610,24 +482,6 @@ export const useOMDBData = (imdbId: string | undefined) => {
     queryFn: async () => await getOMDBData(imdbId),
     enabled: !!imdbId,
   });
-};
-
-//- --------------------------------------
-// Get active sort in correct order
-//- --------------------------------------
-const getSort = (sortSettings: SortField[]) => {
-  const filteredAndSortedFields = sortSettings
-    .filter((field) => field.active) // Filter for active fields
-    .sort((a, b) => a.position - b.position); // Sort by index in ascending order
-
-  const sortFields = filteredAndSortedFields.map((field) => field.sortField);
-  const sortDirections = filteredAndSortedFields.map((field) => field.sortDirection);
-
-  return {
-    sortedFields: filteredAndSortedFields,
-    sortFields,
-    sortDirections,
-  };
 };
 
 //~~ --------------------------------------------------------------------------------

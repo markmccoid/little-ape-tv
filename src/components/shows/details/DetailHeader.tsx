@@ -1,17 +1,17 @@
 import { View, Dimensions, Pressable } from 'react-native';
 import React from 'react';
-import { SavedShow } from '~/store/functions-shows';
 import { TVShowDetails } from '@markmccoid/tmdb_api';
 import { Image } from 'expo-image';
 import { SymbolView } from 'expo-symbols';
-import { savedShows$ } from '~/store/store-shows';
+import { toggleFavoriteShow } from '~/data/actions.savedShows';
+import type { SavedShowOverlay } from '~/data/query.shows';
 import { AnimatePresence, MotiView } from 'moti';
 import DetailContextMenu from '~/components/zeego/DetailContextMenu';
 import ShowImage from '~/components/common/ShowImage';
 
 const { width, height } = Dimensions.get('window');
 type Props = {
-  showData: (Partial<SavedShow> & Partial<TVShowDetails>) | undefined;
+  showData: (Partial<SavedShowOverlay> & Partial<TVShowDetails>) | undefined;
   isLoading?: boolean;
 };
 const DetailHeader = ({ showData, isLoading = false }: Props) => {
@@ -24,7 +24,7 @@ const DetailHeader = ({ showData, isLoading = false }: Props) => {
           <Pressable
             className="absolute bottom-[-10] right-[-10] z-10"
             onPress={() => {
-              savedShows$.toggleFavoriteShow(showData.tmdbId as string, 'toggle');
+              toggleFavoriteShow(showData.tmdbId as string, 'toggle');
             }}>
             <MotiView
               key="a"

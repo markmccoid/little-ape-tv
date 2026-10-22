@@ -7,27 +7,23 @@ import Animated, {
   interpolateColor,
 } from 'react-native-reanimated';
 import { useCustomTheme } from '~/utils/customColorTheme';
-import { savedShows$ } from '~/store/store-shows';
 import SetFavoriteButton from '../details/tags/SetFavoriteButton';
 import DeleteShowButton from './DeleteShowButton';
 import { use$ } from '@legendapp/state/react';
-import { useSavedSeasonSummary } from '~/store/functions-showAttributes';
+import { epochToAirDate } from '~/db/dates';
+import type { ShowListItem } from '~/db/showList';
 import { settings$ } from '~/store/store-settings';
-import { useSavedShow } from '~/store/store-shows';
 import { SymbolView } from 'expo-symbols';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 type Props = {
-  showId: string;
+  show: ShowListItem;
 };
 
-const ShowItemTop = ({ showId }: Props) => {
+const ShowItemTop = ({ show }: Props) => {
   const { colors } = useCustomTheme();
-  // const { isStoredLocally, favorite } = useSavedShow(showId);
-
-  const savedAttributesSummary = useSavedSeasonSummary(showId);
-  const dlStatus = savedAttributesSummary?.nextDownloadEpisode?.status;
-  const allWatched = savedAttributesSummary?.allSeasonsWatched;
+  const dlStatus = show.nextDlStatus;
+  const allWatched = show.allWatched;
 
   // if (dlStatus === 'n') return null;
   return (
@@ -42,9 +38,7 @@ const ShowItemTop = ({ showId }: Props) => {
           {dlStatus === 'a' ? (
             <SymbolView name="checkmark.seal.fill" size={25} tintColor={colors.primary} />
           ) : (
-            <Text className="font-semibold">
-              {savedAttributesSummary?.nextDownloadEpisode?.airDate}
-            </Text>
+            <Text className="font-semibold">{epochToAirDate(show.nextDlAirDate)}</Text>
           )}
         </View>
       </Animated.View>

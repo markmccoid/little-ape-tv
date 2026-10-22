@@ -8,7 +8,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useCustomTheme } from '~/utils/customColorTheme';
 import { SymbolView } from 'expo-symbols';
-import { savedShows$ } from '~/store/store-shows';
+import { addShow, removeShow } from '~/data/actions.savedShows';
 import { CastTVShows, rawTVGetExternalIds } from '@markmccoid/tmdb_api';
 import { IMDBIcon } from '~/components/common/Icons';
 
@@ -63,12 +63,12 @@ const PersonAddRemoveShow = ({ showItem }: Props) => {
   });
 
   const handleAddPress = () => {
-    savedShows$.addShow(showItem.tvShowId.toString());
+    addShow(showItem.tvShowId.toString());
     setIsStoredLocally(true);
   };
 
   const handleRemovePress = () => {
-    savedShows$.removeShow(showItem.tvShowId.toString());
+    removeShow(showItem.tvShowId.toString());
     setIsStoredLocally(false);
   };
 

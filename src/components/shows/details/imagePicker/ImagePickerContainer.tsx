@@ -12,8 +12,8 @@ import { useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 import { useShowImages } from '~/data/query.shows';
 import { AnimatePresence, MotiView } from 'moti';
-import { savedShows$ } from '~/store/store-shows';
-import { use$ } from '@legendapp/state/react';
+import { updateShowPoster } from '~/data/actions.savedShows';
+import { useSavedShow } from '~/data/query.savedShows';
 
 const { width, height } = Dimensions.get('window');
 const imageWidth = (width - 25) / 2;
@@ -21,11 +21,11 @@ const imageWidth = (width - 25) / 2;
 const ImagePickerContainer = () => {
   const { showid } = useLocalSearchParams();
   const { data: showImages, isLoading } = useShowImages(parseInt(showid as string));
-  const { posterURL } = use$(savedShows$.shows[showid as string]);
+  const posterURL = useSavedShow(showid as string)?.posterUrl;
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const handleSelect = (imageUrl: string) => {
-    savedShows$.shows[showid as string].set((prev) => ({ ...prev, posterURL: imageUrl }));
+    updateShowPoster(showid as string, imageUrl);
     setSelectedImage(null);
   };
 

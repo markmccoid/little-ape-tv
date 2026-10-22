@@ -4,9 +4,9 @@ import React from 'react';
 import TagCloudEnhanced, {
   TagItem as TagItemEnhanced,
 } from '@/components/common/TagCloud/TagCloudEnhanced';
-import { Tag } from '~/store/functions-tags';
+import type { TagRow as Tag } from '~/db/types';
 import { use$ } from '@legendapp/state/react';
-import { tags$ } from '~/store/store-shows';
+import { useTags } from '~/data/query.savedShows';
 import { TagStateArrays } from './useTagManagement';
 
 export type TagState = {
@@ -52,7 +52,7 @@ type Props = {
 //# Tag Select for a Saved Filter
 const SavedFilterTags = ({ tagFunctions, tagStateArrays }: Props) => {
   // Get list of all tags
-  const tagList = use$(tags$.tagList);
+  const tagList = useTags();
   // If editing then initialize with passed tagStateArrays
   // const [mergedTags, setMergedTags] = React.useState<TagState[]>(
   //   mergeTags(tagList, tagStateArrays)

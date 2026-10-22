@@ -9,8 +9,7 @@ import Animated, {
   SharedValue,
   useAnimatedStyle,
 } from 'react-native-reanimated';
-// import { SavedShow, useSavedShow } from '~/store/functions-shows';
-import { savedShows$, useSavedShow } from '~/store/store-shows';
+import type { ShowListItem } from '~/db/showList';
 import dayjs from 'dayjs';
 import { useRouter } from 'expo-router';
 import ScreenTwoSeasonData from './ScreenTwoSeasonData';
@@ -19,14 +18,15 @@ import TagRatingEditModal from './TagRatingEditModal';
 const missingPosterURI = require('../../../../../assets/missingPoster.png');
 
 type Props = {
+  show: ShowListItem;
   showId: string;
   imageWidth: number;
   imageHeight: number;
   index: number;
   scrollX: SharedValue<number>;
 };
-const ShowItemScreenTwo = ({ showId, imageWidth, imageHeight, index, scrollX }: Props) => {
-  const { favorite, posterURL, name, dateAddedEpoch } = useSavedShow(showId);
+const ShowItemScreenTwo = ({ show, imageWidth, imageHeight, index, scrollX }: Props) => {
+  const { posterUrl: posterURL, name, dateAdded } = show;
 
   const animStyle = useAnimatedStyle(() => {
     return {
@@ -77,7 +77,7 @@ const ShowItemScreenTwo = ({ showId, imageWidth, imageHeight, index, scrollX }: 
             <View className="flex-row gap-1">
               <Text className="text-text">Date Added:</Text>
               <Text className="font-semibold text-text">
-                {dayjs.unix(dateAddedEpoch).format('MM/DD/YYYY')}
+                {dayjs.unix(dateAdded).format('MM/DD/YYYY')}
               </Text>
             </View>
 
@@ -86,12 +86,12 @@ const ShowItemScreenTwo = ({ showId, imageWidth, imageHeight, index, scrollX }: 
             {/* -------------------------------------- */}
             {/* MODAL For TAG and USER RATING Editing */}
             {/* -------------------------------------- */}
-            <TagRatingEditModal showId={showId} />
+            <TagRatingEditModal show={show} />
             {/* <Portal>
             {/* -------------------------------------- */}
             {/* SEASONS/EPISODES Data                  */}
             {/* -------------------------------------- */}
-            <ScreenTwoSeasonData showId={showId} />
+            <ScreenTwoSeasonData seasonSummaries={show.seasonSummaries} />
           </ScrollView>
         </View>
       </View>

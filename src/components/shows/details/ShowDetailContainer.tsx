@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import React, { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { useShowDetails } from '~/data/query.shows';
-import { savedShows$ } from '~/store/store-shows';
+import { addShow, updateShowUserRating } from '~/data/actions.savedShows';
 import { useRouter, useNavigation, type NativeStackNavigationOptions } from 'expo-router';
 import BackHeaderButton from '~/components/common/headerButtons/BackHeaderButton';
 import AddShowButton from '~/components/common/headerButtons/AddShowButton';
@@ -60,7 +60,7 @@ const ShowDetailContainer = ({ showId }: Props) => {
   //~ Save Function, make sure to update if data changes.
   const handleSaveShow = useCallback(() => {
     if (!data?.id || !data?.name || !showId) return;
-    savedShows$.addShow(data.id.toString());
+    addShow(data.id.toString());
   }, [data?.id]);
 
   // Set title and left/right header buttons
@@ -188,7 +188,7 @@ const ShowDetailContainer = ({ showId }: Props) => {
                   fadeColor="#E2BE3E" // "#EEF5E9"
                   startingTick={data.userRating || 0}
                   rulerWidth={250}
-                  onChange={(val) => savedShows$.shows[showId].userRating.set(val)}
+                  onChange={(val) => updateShowUserRating(showId, val)}
                 />
               </View>
             )}

@@ -1,8 +1,7 @@
 import { View, Text, StyleSheet, Dimensions, Pressable, FlatList } from 'react-native';
 import React, { useEffect, useLayoutEffect, useRef, useState, useCallback } from 'react';
 import { usePersonDetails } from '~/data/query.shows';
-import { reTagPersonShows } from '~/store/functions-shows';
-import { savedShows$ } from '~/store/store-shows';
+import { reTagPersonShows } from '~/data/actions.savedShows';
 import PersonShowItem from './PersonShowItem';
 import { useNavigation, type NativeStackNavigationOptions } from 'expo-router';
 import BackHeaderButton from '~/components/common/headerButtons/BackHeaderButton';
@@ -125,7 +124,7 @@ const PersonContainer = ({ personId, currentShowId }: Props) => {
     // Get the raw data based on view state
     let rawItems = [];
     if (viewState === 'tv') {
-      rawItems = reTagPersonShows(savedShows$.shows.peek(), data.tvShows);
+      rawItems = reTagPersonShows(data.tvShows);
     } else {
       rawItems = data.movies || [];
     }

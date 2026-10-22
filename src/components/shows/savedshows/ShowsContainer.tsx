@@ -2,7 +2,7 @@ import React, { useCallback, useDeferredValue, useLayoutEffect, useState } from 
 import { FlatList, Pressable, StyleSheet, Text, View, Dimensions } from 'react-native';
 import { Link, Stack, useNavigation, useRouter, type NativeStackNavigationOptions } from 'expo-router';
 import { useBottomTabBarHeight } from 'expo-router/js-tabs';
-import { useFilteredShows } from '~/data/query.shows';
+import { useFilteredShows } from '~/data/query.savedShows';
 import Animated, {
   runOnJS,
   useAnimatedScrollHandler,
@@ -12,7 +12,7 @@ import Animated, {
   interpolate,
   SharedValue,
 } from 'react-native-reanimated';
-import { SavedShow } from '~/store/functions-shows';
+import type { ShowListItem } from '~/db/showList';
 import ShowItem from './ShowItem';
 import ShowNameSearch from './ShowSearch';
 import { use$ } from '@legendapp/state/react';
@@ -34,7 +34,7 @@ const AnimatedShowItem = ({
   index,
   scrollY,
 }: {
-  show: SavedShow;
+  show: ShowListItem;
   showId: string;
   index: number;
   scrollY: SharedValue<number>;
@@ -94,7 +94,7 @@ const AnimatedShowItem = ({
         <ShowItem show={show} showId={showId} />
       </View>
       <View style={{ position: 'absolute', bottom: 15, left: 0, width: '100%' }}>
-        <ShowItemBottom showId={showId} />
+        <ShowItemBottom show={show} />
       </View>
     </Animated.View>
   );
@@ -159,8 +159,8 @@ const ShowsContainer = () => {
   });
 
   const renderShow = useCallback(
-    ({ item, index }: { item: SavedShow; index: number }) => {
-      return <AnimatedShowItem show={item} showId={item.tmdbId} index={index} scrollY={scrollY} />;
+    ({ item, index }: { item: ShowListItem; index: number }) => {
+      return <AnimatedShowItem show={item} showId={item.id} index={index} scrollY={scrollY} />;
     },
     [scrollY]
   );
@@ -214,7 +214,7 @@ const ShowsContainer = () => {
         ref={flatListRef}
         style={[listStyle, { zIndex: 10, paddingHorizontal: MARGIN }]}
         columnWrapperStyle={{ justifyContent: 'space-between' }}
-        keyExtractor={(item) => item.tmdbId}
+        keyExtractor={(item) => item.id}
         renderItem={renderShow}
         numColumns={2}
         onScroll={scrollHandler}

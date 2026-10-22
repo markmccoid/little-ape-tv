@@ -1,7 +1,6 @@
-import type { BaseSQLiteDatabase } from 'drizzle-orm/sqlite-core';
 import { MMKV } from 'react-native-mmkv';
 
-import type * as schema from '../schema';
+import type { Db } from '../types';
 import { importLegacyDataOnce, type LegacyData } from './importLegacyData';
 
 //!! -------------------------------------------------------
@@ -26,10 +25,7 @@ const readLegacyMMKV = (userId: string): LegacyData => {
   };
 };
 
-export const migrateFromMMKV = (
-  db: BaseSQLiteDatabase<'sync', unknown, typeof schema>,
-  userId: string
-) => {
+export const migrateFromMMKV = (db: Db, userId: string) => {
   const counts = importLegacyDataOnce(db, () => readLegacyMMKV(userId));
   if (counts) console.log('[db] Imported legacy MMKV data', counts);
 };

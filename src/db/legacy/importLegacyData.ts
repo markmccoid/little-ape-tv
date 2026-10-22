@@ -1,9 +1,5 @@
-import dayjs from 'dayjs';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { eq } from 'drizzle-orm';
-import type { BaseSQLiteDatabase } from 'drizzle-orm/sqlite-core';
 
-import * as schema from '../schema';
 import {
   appMeta,
   episodeStates,
@@ -15,7 +11,8 @@ import {
   showWatchProviders,
   tags,
 } from '../schema';
-dayjs.extend(customParseFormat);
+import { airDateToEpoch } from '../dates';
+import type { Db } from '../types';
 
 //!! -------------------------------------------------------
 //!! ONE-TIME import of the Legend State / MMKV data into SQLite.
@@ -98,9 +95,6 @@ export type LegacyImportCounts = {
   notificationHistory: number;
 };
 
-// Works with both expo-sqlite (app) and better-sqlite3 (tests)
-type SyncDatabase = BaseSQLiteDatabase<'sync', unknown, typeof schema>;
-
 export const LEGACY_IMPORT_META_KEY = 'legacyMMKVImport';
 const SUMMARY_KEYS = new Set(['tec', 'asw', 'lws', 'gtw', 'nde']);
 // Keeps each multi-row INSERT well under SQLite's bound-variable limit
@@ -113,7 +107,7 @@ const CHUNK_SIZE = 500;
 //# loadData is only called when an import is needed.
 //# ------------------------------------------------------
 export const importLegacyDataOnce = (
-  db: SyncDatabase,
+  db: Db,
   loadData: () => LegacyData
 ): LegacyImportCounts | undefined => {
   const marker = db.select().from(appMeta).where(eq(appMeta.key, LEGACY_IMPORT_META_KEY)).get();
@@ -121,7 +115,7 @@ export const importLegacyDataOnce = (
 
   const data = loadData();
   return db.transaction((tx) => {
-    const counts = writeLegacyData(tx as unknown as SyncDatabase, data);
+    const counts = writeLegacyData(tx as unknown as Db, data);
     tx.insert(appMeta)
       .values({
         key: LEGACY_IMPORT_META_KEY,
@@ -135,7 +129,7 @@ export const importLegacyDataOnce = (
 //# ------------------------------------------------------
 //# Map the legacy shapes to rows and insert them
 //# ------------------------------------------------------
-const writeLegacyData = (db: SyncDatabase, data: LegacyData): LegacyImportCounts => {
+const writeLegacyData = (db: Db, data: LegacyData): LegacyImportCounts => {
   const legacyShows = data.savedShows?.shows ?? {};
   const legacyAttributes = data.savedShows?.showAttributes ?? {};
   const nowEpoch = Math.floor(Date.now() / 1000);
@@ -189,7 +183,7 @@ const writeLegacyData = (db: SyncDatabase, data: LegacyData): LegacyImportCounts
       lastWatchedSeason: summary?.lws ?? 0,
       nextDlSeason: nde?.season ?? null,
       nextDlEpisode: nde?.episode ?? null,
-      nextDlAirDate: parseLegacyAirDate(nde?.airDate),
+      nextDlAirDate: airDateToEpoch(nde?.airDate),
       nextDlStatus: nde?.status ?? 'n',
     });
 
@@ -286,19 +280,12 @@ const writeLegacyData = (db: SyncDatabase, data: LegacyData): LegacyImportCounts
 //# -------------------------------------------------
 //# Helpers
 //# -------------------------------------------------
-const insertChunked = (db: SyncDatabase, table: any, rows: unknown[]) => {
+const insertChunked = (db: Db, table: any, rows: unknown[]) => {
   for (let i = 0; i < rows.length; i += CHUNK_SIZE) {
     db.insert(table)
       .values(rows.slice(i, i + CHUNK_SIZE) as any)
       .run();
   }
-};
-
-// Legacy Next Download Episode air dates were stored as 'MM-DD-YYYY' strings
-export const parseLegacyAirDate = (airDate: string | undefined) => {
-  if (!airDate) return null;
-  const parsed = dayjs(airDate, 'MM-DD-YYYY', true);
-  return parsed.isValid() ? parsed.unix() : null;
 };
 
 const validNumber = (value: number | undefined) =>

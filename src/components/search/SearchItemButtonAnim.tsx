@@ -8,7 +8,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useCustomTheme } from '~/utils/customColorTheme';
 import { SymbolView } from 'expo-symbols';
-import { savedShows$ } from '~/store/store-shows';
+import { addShow, removeShow } from '~/data/actions.savedShows';
 import { TVSearchResultItem } from '@markmccoid/tmdb_api';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -50,12 +50,12 @@ const SearchItemButtonAnim = ({ searchItem }: Props) => {
   });
 
   const handleAddPress = () => {
-    savedShows$.addShow(searchItem.id.toString());
+    addShow(searchItem.id.toString());
     setIsStoredLocally(true);
   };
 
   const handleRemovePress = () => {
-    savedShows$.removeShow(searchItem.id.toString());
+    removeShow(searchItem.id.toString());
     setIsStoredLocally(false);
   };
 

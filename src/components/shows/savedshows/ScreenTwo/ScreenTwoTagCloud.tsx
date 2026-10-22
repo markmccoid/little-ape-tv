@@ -1,20 +1,16 @@
 import { View, Text } from 'react-native';
 import React from 'react';
-import { use$ } from '@legendapp/state/react';
-import { savedShows$, tags$, useShowTags } from '~/store/store-shows';
+import { useMatchedTags } from '~/data/query.savedShows';
 import TagCloudEnhanced, { TagItem } from '~/components/common/TagCloud/TagCloudEnhanced';
-import { set } from 'lodash';
 
 type Props = {
-  showId: string;
+  initialTagIds: string[];
   handlePendingTags: (tags: any) => void;
 };
-const ScreenTwoTagCloud = ({ showId, handlePendingTags }: Props) => {
+const ScreenTwoTagCloud = ({ initialTagIds, handlePendingTags }: Props) => {
   // Must maintain local state for tags and only update the store when the user clicks save.
-  const [selectedTags, setSelectedTags] = React.useState<string[] | undefined>(
-    savedShows$.shows[showId].userTags.peek()
-  );
-  const localMatchedTags = use$(tags$.matchTagIds(selectedTags));
+  const [selectedTags, setSelectedTags] = React.useState<string[] | undefined>(initialTagIds);
+  const localMatchedTags = useMatchedTags(selectedTags);
 
   const toggleTagStateLocal = (tagId: string) => {
     const foundTag = localMatchedTags.find((el) => el.id === tagId);

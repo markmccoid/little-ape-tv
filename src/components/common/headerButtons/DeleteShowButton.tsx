@@ -11,7 +11,7 @@ import showConfirmationPrompt from '@/components/common/showConfirmationPrompt';
 import { SymbolView } from 'expo-symbols';
 import { useRouter } from 'expo-router';
 import { useCustomTheme } from '~/utils/customColorTheme';
-import { savedShows$ } from '~/store/store-shows';
+import { removeShow } from '~/data/actions.savedShows';
 type Props = {
   showId: string | undefined;
 };
@@ -28,7 +28,7 @@ const ShowDeleteButton = ({ showId }: Props) => {
 
       if (yesDelete && showId) {
         setIsProcessing(true);
-        savedShows$.removeShow(showId);
+        removeShow(showId);
         // Navigate back to the desired screen
         router.dismissAll();
       }

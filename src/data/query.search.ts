@@ -12,7 +12,7 @@ import { InfiniteData, useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs';
 import { first } from 'lodash';
 import { settings$, WatchProviderAttributes } from '~/store/store-settings';
-import { savedShows$ } from '~/store/store-shows';
+import { tagShows } from '~/data/actions.savedShows';
 
 type TitleSearchPage = TVSearchResultBase['data'];
 export type TaggedSearchResult = TVSearchResultItem & { isStoredLocally: boolean };
@@ -32,7 +32,7 @@ function selectTaggedShows(data: InfiniteData<TitleSearchPage>): TaggedSearchRes
     }
   }
 
-  return savedShows$.tagShows(shows);
+  return tagShows(shows);
 }
 
 //~ ---------------------------------------------------------

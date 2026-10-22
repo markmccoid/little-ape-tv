@@ -2,10 +2,10 @@ import { View, Text, TextInput, Alert, Pressable } from 'react-native';
 import { SymbolView } from 'expo-symbols';
 import * as Haptics from 'expo-haptics';
 import React, { useCallback, useState } from 'react';
-import { tags$ } from '~/store/store-shows';
-import { use$ } from '@legendapp/state/react';
+import { addTag, updateTagPositions } from '~/data/actions.savedShows';
+import { useTags } from '~/data/query.savedShows';
 import Sortable, { SortableGridRenderItem } from 'react-native-sortables';
-import { Tag } from '~/store/functions-tags';
+import type { TagRow as Tag } from '~/db/types';
 import { useCustomTheme } from '~/utils/customColorTheme';
 import showConfirmationPrompt from '~/components/common/showConfirmationPrompt';
 import TagItem from './TagItem';
@@ -15,7 +15,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 const TagContainer = () => {
   const scrollableRef = useAnimatedRef<Animated.ScrollView>();
   const { bottom } = useSafeAreaInsets();
-  const tags = use$(tags$.tagList);
+  const tags = useTags();
   const { colors } = useCustomTheme();
 
   const scrollToEnd = useCallback(() => {
@@ -44,7 +44,7 @@ const TagContainer = () => {
           onPress: (name) => {
             if (name) {
               try {
-                tags$.addTag(name);
+                addTag(name);
                 scrollToEnd();
               } catch (e: any) {
                 // Checking for custom error being thrown
@@ -95,7 +95,7 @@ const TagContainer = () => {
           renderItem={renderItem}
           rowGap={4}
           columnGap={10}
-          onDragEnd={(parms) => tags$.updateTagPositions(parms.indexToKey)}
+          onDragEnd={(parms) => updateTagPositions(parms.indexToKey)}
           enableActiveItemSnap={false}
           activeItemScale={0.95}
           // showDropIndicator

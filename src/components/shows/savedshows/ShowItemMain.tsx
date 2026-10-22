@@ -10,9 +10,8 @@ import Animated, {
   useAnimatedStyle,
 } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
-import { savedShows$, useSavedShow } from '~/store/store-shows';
 import { use$ } from '@legendapp/state/react';
-import { useSavedSeasonSummary } from '~/store/functions-showAttributes';
+import type { ShowListItem } from '~/db/showList';
 import ShowItemBottom from './ShowItemBottom';
 import ShowItemTop from './ShowItemTop';
 import { settings$ } from '~/store/store-settings';
@@ -20,15 +19,16 @@ import { set } from 'lodash';
 const missingPosterURI = require('../../../../assets/missingPoster.png');
 
 type Props = {
+  show: ShowListItem;
   showId: string;
   imageWidth: number;
   imageHeight: number;
   index: number;
   scrollX: SharedValue<number>;
 };
-const ScrollerMain = ({ showId, imageWidth, imageHeight, index, scrollX }: Props) => {
+const ScrollerMain = ({ show, showId, imageWidth, imageHeight, index, scrollX }: Props) => {
   const router = useRouter();
-  const { posterURL, avgEpisodeRunTime } = useSavedShow(showId);
+  const posterURL = show.posterUrl;
   const showDownloadInfo = use$(settings$.downloadOptions?.showNextDownloadInfo);
   const [localPoster, setLocalPoster] = React.useState(posterURL);
   // Need to store posterURL in local state to prevent flicker when deleting.
@@ -59,7 +59,7 @@ const ScrollerMain = ({ showId, imageWidth, imageHeight, index, scrollX }: Props
     <Animated.View style={[animStyle, { height: imageHeight + 26 }]}>
       {/* {showDownloadInfo && ( */}
       <View className="absolute left-[-5] top-[20]">
-        <ShowItemTop showId={showId} />
+        <ShowItemTop show={show} />
       </View>
       {/* )} */}
       <View

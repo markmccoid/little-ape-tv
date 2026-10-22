@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useReducer, useRef, useState } from 'react';
-import { savedShows$, tags$, useShowTags } from '~/store/store-shows';
-import { use$ } from '@legendapp/state/react';
+import { toggleFavoriteShow } from '~/data/actions.savedShows';
+import { useShowTags } from '~/data/query.savedShows';
 import TagCloudEnhanced, { TagItem } from '~/components/common/TagCloud/TagCloudEnhanced';
 import Animated, {
   BounceIn,
@@ -24,9 +24,8 @@ type Props = {
 };
 const ShowTagContainer = ({ showId }: Props) => {
   if (!showId) return;
-  const isFavorited = use$(savedShows$.shows[showId].favorite);
   const { colors } = useCustomTheme();
-  const { matchedTags, toggleTagState } = useShowTags(showId);
+  const { matchedTags, toggleTagState, isFavorited } = useShowTags(showId);
   const [showTags, toggleShowTags] = useReducer((el) => !el, false);
   const [containerHeight, setContainerHeight] = useState(0);
   const [isMeasured, setIsMeasured] = useState(false);
@@ -153,7 +152,7 @@ const ShowTagContainer = ({ showId }: Props) => {
         <SetFavoriteButton showId={showId} isFavorited={!!isFavorited} isDisplayed={showTags} />
       </View>
       {/* <Pressable
-        onPress={() => savedShows$.toggleFavoriteShow(showId, 'toggle')}
+        onPress={() => toggleFavoriteShow(showId, 'toggle')}
         className={`absolute bottom-[-20] z-30 ${showTags ? 'pointer-events-auto' : 'pointer-events-none'} `}
         disabled={!showTags}>
         <MotiView
