@@ -7,10 +7,12 @@ import { ShowDetailsData } from '~/data/query.shows';
 import { useLocalSearchParams } from 'expo-router';
 import EpisodeRow from './EpisodeRow';
 import { CheckIcon } from '~/components/common/Icons';
-import { updateSeasonSummary, useSavedSeasonSummary } from '~/store/functions-showAttributes';
 import SeasonHeader from './SeasonHeader';
-import { useObserveEffect } from '@legendapp/state/react';
-import { savedShows$ } from '~/store/store-shows';
+import { persistSeasonSummary } from '~/data/actions.episodes';
+import { useEpisodeStates } from '~/data/query.savedShows';
+import { episodeKey } from '~/db/episodes';
+import { calculateSeasonSummary, summaryBySeason } from '~/db/seasonSummary';
+import type { ShowSummaryInput } from '~/db/shows';
 
 // Define fixed heights for performance
 const SECTION_HEADER_HEIGHT = 70;
@@ -28,24 +30,54 @@ export type SeasonsSection = {
   counts: { watched: number; downloaded: number; allWatched: boolean; allDownloaded: boolean };
   data: Episode[];
 };
+//~ Save the Season Summary a moment after the last change (marking a whole season
+//~ is many changes), and straight away when leaving the screen.
+const SUMMARY_SAVE_DELAY_MS = 500;
+const useSaveSeasonSummary = (
+  showId: string,
+  summary: ShowSummaryInput,
+  seasons: TVShowSeasonDetails[],
+  enabled: boolean
+) => {
+  const pendingSave = useRef<(() => void) | null>(null);
+
+  useEffect(() => {
+    if (!enabled) return;
+    const save = () => {
+      pendingSave.current = null;
+      persistSeasonSummary(
+        showId,
+        summary,
+        seasons.map((season) => season.seasonNumber)
+      );
+    };
+    pendingSave.current = save;
+    const timer = setTimeout(save, SUMMARY_SAVE_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, [showId, summary, enabled]);
+
+  useEffect(() => () => pendingSave.current?.(), []);
+};
+
 const SeasonEpisodeList: React.FC<Props> = ({ seasons, showData }) => {
   // const [sectionPadding, setSectionPadding] = React.useState(110);
   const { showid } = useLocalSearchParams();
   const sectionListRef = useRef<SectionList<Episode, SeasonsSection>>(null);
   const seasonScrollRef = useRef<ScrollView>(null);
-  const seasonSummary = useSavedSeasonSummary(showid as string);
   const [showFavs, setShowFavs] = React.useState(false);
-
-  //# this legend state hook will fire when a change is made to the showAttributes
-  //# which will in turn update the seasonSummary data on the showAttributes[showId] observable
-  // This makes sure our summary object is updated when items are marked as watched/downloaded/etc.
-  useObserveEffect(() => {
-    savedShows$.showAttributes[showid as string].get();
-    // updateSeasonSummary will not update anything if the show is not stored locally
-    updateSeasonSummary(showid as string, seasons);
-  });
-
   const isStoredLocally = showData.isStoredLocally;
+
+  // The summary is calculated here from the Episode States so the counts update as
+  // soon as an episode is tapped; the saved copy (used by the library list) follows.
+  const episodeStates = useEpisodeStates(showid as string);
+  const summary = useMemo(
+    () => calculateSeasonSummary(seasons, episodeStates),
+    [seasons, episodeStates]
+  );
+  const seasonSummary = useMemo(() => summaryBySeason(summary), [summary]);
+  const lastWatchedSeason = summary.lastWatchedSeason;
+  useSaveSeasonSummary(showid as string, summary, seasons, isStoredLocally);
+
   // Map seasons to SectionList sections
   const sections = useMemo(
     () =>
@@ -54,31 +86,37 @@ const SeasonEpisodeList: React.FC<Props> = ({ seasons, showData }) => {
         .map((season) => {
           // Filter episodes based on showFavs setting
           const filteredEpisodes = showFavs
-            ? season.episodes.filter((episode) => {
-                // Get episode attributes to check if favorited
-                const episodeAttributes =
-                  savedShows$.showAttributes[showid as string]?.seasons?.[episode.seasonNumber]
-                    ?.episodes?.[episode.episodeNumber];
-                return episodeAttributes?.f?.peek();
-              })
+            ? season.episodes.filter(
+                (episode) =>
+                  episodeStates[episodeKey(episode.seasonNumber, episode.episodeNumber)]?.favorited
+              )
             : season.episodes;
+          const seasonCounts = seasonSummary[season.seasonNumber];
 
           return {
             title: season.seasonNumber === 0 ? season.name : `Season ${season.seasonNumber}`,
             numEpisodes: filteredEpisodes.length,
             seasonNumber: season.seasonNumber,
-            counts: seasonSummary?.[season.seasonNumber] || {
-              favorited: 0,
-              watched: 0,
-              downloaded: 0,
-              allDownloaded: false,
-              allWatched: false,
-            }, //Return watched/download counts if they exists
+            counts: seasonCounts
+              ? {
+                  favorited: seasonCounts.favorited,
+                  watched: seasonCounts.watched,
+                  downloaded: seasonCounts.downloaded,
+                  allWatched: seasonCounts.watched === seasonCounts.totalEpisodes,
+                  allDownloaded: seasonCounts.downloaded === seasonCounts.totalEpisodes,
+                }
+              : {
+                  favorited: 0,
+                  watched: 0,
+                  downloaded: 0,
+                  allDownloaded: false,
+                  allWatched: false,
+                },
             data: filteredEpisodes,
           };
         })
         .filter((section) => section.data.length > 0), // Remove sections with no episodes (important when showFavs is true)
-    [seasons, seasonSummary, showFavs, showid]
+    [seasons, seasonSummary, showFavs, episodeStates]
   );
 
   //~ ----------------------------
@@ -90,9 +128,8 @@ const SeasonEpisodeList: React.FC<Props> = ({ seasons, showData }) => {
     seasonScrollRef.current?.scrollTo({ x: seasonIndex * 105, y: 0, animated: true });
   };
   useEffect(() => {
-    // seasonSummary.lastWatchedSeason;
-    scrollSeasons(seasonSummary?.lastWatchedSeason || 0);
-  }, [seasonSummary?.lastWatchedSeason]);
+    scrollSeasons(lastWatchedSeason || 0);
+  }, [lastWatchedSeason]);
   //!! ----- DEBUG GET ITEM LAYOUT ---
   const buildGetItemLayout = getItemLayout({
     getItemHeight: ITEM_HEIGHT,
@@ -113,10 +150,8 @@ const SeasonEpisodeList: React.FC<Props> = ({ seasons, showData }) => {
   // Scroll to the last watched season and episode
   //==============================================
   useEffect(() => {
-    if (seasonSummary?.lastWatchedSeason === undefined) return;
-
     // Get the last watched season
-    const lastSeasonNumberWatched = seasonSummary.lastWatchedSeason;
+    const lastSeasonNumberWatched = lastWatchedSeason;
     let episodeIndex = 0;
     // Find the next season with episodes, if it exists
     let nextSeasonNumber = lastSeasonNumberWatched + 1;
@@ -144,7 +179,7 @@ const SeasonEpisodeList: React.FC<Props> = ({ seasons, showData }) => {
 
     // Scroll to specific episode after a slight delay
     setTimeout(() => scrollToLocation(seasonIndexToScroll, episodeIndex), 100);
-  }, [seasonSummary?.lastWatchedSeason, seasons.length, seasonSummary?.lastWatchedSeason == 0]);
+  }, [lastWatchedSeason, seasons.length]);
 
   //==============================================
   // Render section header (season name)

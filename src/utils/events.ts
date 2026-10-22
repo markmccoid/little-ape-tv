@@ -1,7 +1,7 @@
-import { ShowAttributes, updateSeasonSummary } from './../store/functions-showAttributes';
 import { QueryClient } from '@tanstack/react-query';
 import { eventDispatcher, EventName } from './EventDispatcher';
 import { fetchSeasonsData, getWatchProviders, useShowSeasonData } from '~/data/query.shows';
+import { refreshSeasonSummary } from '~/data/actions.episodes';
 import { refreshSavedShowDetails, updateAvgEpisodeRunTime } from '~/data/actions.savedShows';
 import { getDb } from '~/db/client';
 import { selectShow } from '~/db/shows';
@@ -14,7 +14,7 @@ export const setupEvents = (queryClient: QueryClient) => {
   //- Update AvgEpisode Runtime based on season episode data
   //# --------------------------------------
   //# UpdateAvgEpisodeRuntime -> Is called from functions-shows.ts addShow
-  //# and useSeasonSummary in functions-showAttributes.ts
+  //# and persistSeasonSummary in actions.episodes.ts
   //#  updates the average runtime on the saved show object
   //# --------------------------------------
   eventDispatcher.on(EventName.UpdateAvgEpisodeRuntime, async (showId, seasonsArray) => {
@@ -55,7 +55,7 @@ export const setupEvents = (queryClient: QueryClient) => {
   //# --------------------------------------
   eventDispatcher.on(EventName.UpdateSeasonSummary, async (showId, seasonsArray) => {
     const seasonData = await fetchSeasonsData(parseInt(showId), seasonsArray);
-    updateSeasonSummary(showId, seasonData);
+    refreshSeasonSummary(showId, seasonData);
   });
 
   //# --------------------------------------

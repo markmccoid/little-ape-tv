@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
 import { getDb } from '~/db/client';
+import { selectEpisodeStateMap, episodeKey, type EpisodeFlags } from '~/db/episodes';
 import { selectShowList, type ShowListCriteria } from '~/db/showList';
 import {
   selectGenres,
@@ -156,4 +157,25 @@ export const useFilterGenres = () => {
     genre,
     state: filterState(genre, includeGenres, excludeGenres),
   }));
+};
+
+//# ------------------------------------------------------
+//# Episode State for a show, keyed by episodeKey(season, episode)
+//# ------------------------------------------------------
+export const useEpisodeStates = (showId: string) => {
+  const { data } = useQuery(
+    dbQuery(dbKeys.episodeStates(showId), () => selectEpisodeStateMap(getDb(), showId))
+  );
+  return data;
+};
+
+const NO_FLAGS: EpisodeFlags = { watched: false, downloaded: false, favorited: false };
+//~ One episode's flags.  The select means a row only re-renders when its own flags change.
+export const useEpisodeState = (showId: string, season: number, episode: number) => {
+  const { data } = useQuery({
+    ...dbQuery(dbKeys.episodeStates(showId), () => selectEpisodeStateMap(getDb(), showId)),
+    select: (states: Record<string, EpisodeFlags>) =>
+      states[episodeKey(season, episode)] ?? NO_FLAGS,
+  });
+  return data;
 };

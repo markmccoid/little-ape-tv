@@ -6,6 +6,7 @@ export const dbKeys = {
   showList: (criteria: ShowListCriteria) => ['db', 'showList', criteria] as const,
   show: (showId: string) => ['db', 'show', showId] as const,
   seasonSummaries: (showId: string) => ['db', 'seasonSummaries', showId] as const,
+  episodeStates: (showId: string) => ['db', 'episodeStates', showId] as const,
   savedShowPosters: () => ['db', 'savedShowPosters'] as const,
   genres: () => ['db', 'genres'] as const,
   tags: () => ['db', 'tags'] as const,

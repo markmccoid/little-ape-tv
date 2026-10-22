@@ -8,12 +8,12 @@ import {
   TelevisionIcon,
   ViewTVShowIcon,
 } from '~/components/common/Icons';
-import { savedShows$ } from '~/store/store-shows';
 import {
   toggleEpisodeDownloaded,
   toggleEpisodeFavorited,
   toggleEpisodeWatched,
-} from '~/store/functions-showAttributes';
+} from '~/data/actions.episodes';
+import { useEpisodeState } from '~/data/query.savedShows';
 import { Episode } from '@markmccoid/tmdb_api';
 import { getEpisodeIMDBURL } from '~/data/query.shows';
 import { use$ } from '@legendapp/state/react';
@@ -22,7 +22,6 @@ import { useCustomTheme } from '~/utils/customColorTheme';
 import { MotiView } from 'moti';
 import { settings$ } from '~/store/store-settings';
 import { imdbLinkToEpisode } from '~/utils/imdbLinks';
-import { useEpisodeAttributes } from '~/store/functions-showAttributes';
 import ShowImage from '~/components/common/ShowImage';
 import { at } from 'lodash';
 
@@ -38,12 +37,7 @@ type Props = {
 //~~ Component EpisodeRow
 const EpisodeRow = ({ showId, isStoredLocally, item }: Props) => {
   const { colors } = useCustomTheme();
-  //!! CREATE a hook that will return (isWatched, isDownloaded, isFavorited fields for season/episode
-  //!!  Need to keep details of where this info is stored OUT OF components
-  const attributesold = use$(
-    savedShows$.showAttributes[showId].seasons[item.seasonNumber].episodes[item.episodeNumber]
-  );
-  const attributes = useEpisodeAttributes(showId, item.seasonNumber, item.episodeNumber);
+  const attributes = useEpisodeState(showId, item.seasonNumber, item.episodeNumber);
   const showImageFlag = use$(settings$.showImageInEpisode);
   // console.log('attributes', attributes.watched, attributes.favorited);
   // if (!attributes?.favorited) {

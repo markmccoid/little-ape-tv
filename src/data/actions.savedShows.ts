@@ -31,7 +31,6 @@ import {
   type ShowSummaryInput,
 } from '~/db/shows';
 import { deleteTag, insertTag, renameTag, reorderTags } from '~/db/tags';
-import { savedShows$ } from '~/store/store-shows';
 import { search$ } from '~/store/store-search';
 import { settings$ } from '~/store/store-settings';
 import { eventDispatcher, EventName } from '~/utils/EventDispatcher';
@@ -78,8 +77,7 @@ export const addShow = async (showId: string) => {
 
 export const removeShow = (showId: string) => {
   deleteShow(getDb(), showId);
-  //! Episode State and notification history still live in Legend State until phases 3 & 4
-  savedShows$.showAttributes[showId].delete();
+  //! Notification history still lives in Legend State until phase 4
   settings$.notificationHistory[showId].delete();
   refreshQueries();
   reTagSearch();

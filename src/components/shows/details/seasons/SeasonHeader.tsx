@@ -6,7 +6,7 @@ import {
   removeSeasonFromWatched,
   setSeasonToDownloaded,
   setSeasonToWatched,
-} from '~/store/functions-showAttributes';
+} from '~/data/actions.episodes';
 import {
   EyeNotWatchedIcon,
   EyeWatchedIcon,
