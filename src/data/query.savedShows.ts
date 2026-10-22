@@ -11,6 +11,7 @@ import {
   selectSeasonSummaries,
   selectShow,
 } from '~/db/shows';
+import { selectNotificationHistory } from '~/db/notifications';
 import { selectTags } from '~/db/tags';
 import { dbKeys } from './dbKeys';
 import { updateShowTags } from './actions.savedShows';
@@ -177,5 +178,13 @@ export const useEpisodeState = (showId: string, season: number, episode: number)
     select: (states: Record<string, EpisodeFlags>) =>
       states[episodeKey(season, episode)] ?? NO_FLAGS,
   });
+  return data;
+};
+
+//~ Last notification check/send per show, most recently checked first
+export const useNotificationHistory = () => {
+  const { data } = useQuery(
+    dbQuery(dbKeys.notificationHistory(), () => selectNotificationHistory(getDb()))
+  );
   return data;
 };

@@ -1,11 +1,10 @@
 import { View, Text, FlatList, Pressable, TextInput } from 'react-native';
 import React, { useEffect, useMemo, useState } from 'react';
-import { NotificationRecord, settings$ } from '~/store/store-settings';
+import { settings$ } from '~/store/store-settings';
+import { useNotificationHistory } from '~/data/query.savedShows';
 import dayjs from 'dayjs';
 import { use$ } from '@legendapp/state/react';
-import { orderBy, sortBy } from 'lodash';
 import { ScrollView } from 'moti';
-import { savedShows$ } from '~/store/store-shows';
 import { useRouter } from 'expo-router';
 
 type Filter = {
@@ -15,22 +14,18 @@ type Filter = {
 };
 const NotificationList = () => {
   const router = useRouter();
-  const notificationHistory = use$(settings$.notificationHistory);
-  const shows = use$(savedShows$.shows);
+  // Already ordered by dateChecked, newest first
+  const notificationHistory = useNotificationHistory();
   const [filter, setFilter] = useState<{ name: string; hasSent: boolean | undefined }>({
     name: '',
     hasSent: undefined,
   });
 
   const notificationData = useMemo(() => {
-    let filteredData = orderBy(
-      Object.keys(notificationHistory).map((key) => notificationHistory[key]),
-      ['dateChecked'],
-      ['desc']
-    );
+    let filteredData = notificationHistory;
     if (filter.hasSent !== undefined) {
       filteredData = filteredData.filter((el) =>
-        filter.hasSent ? el.dateSent !== undefined : el.dateSent === undefined
+        filter.hasSent ? el.dateSent !== null : el.dateSent === null
       );
     }
     if (filter.name !== '') {
@@ -39,7 +34,7 @@ const NotificationList = () => {
       );
     }
     return filteredData;
-  }, [filter]);
+  }, [filter, notificationHistory]);
   // const [notificationData, setNotificationData] = useState<NotificationRecord[]>(
   //   orderBy(
   //     Object.keys(notificationHistory).map((key) => notificationHistory[key]),
@@ -108,20 +103,20 @@ const NotificationList = () => {
           </View>
           <FlatList
             data={notificationData}
-            keyExtractor={(item) => item.Id.toString()}
+            keyExtractor={(item) => item.showId}
             className="mb-10"
             renderItem={({ item }) => {
               return (
-                <View key={item.Id} className="flex-col border-b-hairline bg-white p-2">
+                <View key={item.showId} className="flex-col border-b-hairline bg-white p-2">
                   <Pressable
                     onPress={() => {
-                      router.replace({ pathname: `/[showid]`, params: { showid: item.Id } });
+                      router.replace({ pathname: `/[showid]`, params: { showid: item.showId } });
                     }}
                     className="flex-row items-center justify-between">
                     <Text className="text-lg font-semibold">{item.name}</Text>
-                    <Text>Offset-{shows[item.Id]?.nextNotifyOffset}</Text>
+                    <Text>Offset-{item.nextNotifyOffset}</Text>
                     <Text className="rounded-lg border bg-slate-200 px-3 py-1 text-blue-800">
-                      {item.Id}
+                      {item.showId}
                     </Text>
                   </Pressable>
                   <View className="flex-row items-center justify-start">

@@ -12,6 +12,7 @@ import {
   tags,
 } from '../schema';
 import { airDateToEpoch } from '../dates';
+import { insertChunked } from '../insertChunked';
 import type { Db } from '../types';
 
 //!! -------------------------------------------------------
@@ -97,8 +98,6 @@ export type LegacyImportCounts = {
 
 export const LEGACY_IMPORT_META_KEY = 'legacyMMKVImport';
 const SUMMARY_KEYS = new Set(['tec', 'asw', 'lws', 'gtw', 'nde']);
-// Keeps each multi-row INSERT well under SQLite's bound-variable limit
-const CHUNK_SIZE = 500;
 
 //# ------------------------------------------------------
 //# importLegacyDataOnce
@@ -299,14 +298,6 @@ const writeLegacyData = (db: Db, data: LegacyData): LegacyImportCounts => {
 //# -------------------------------------------------
 //# Helpers
 //# -------------------------------------------------
-const insertChunked = (db: Db, table: any, rows: unknown[]) => {
-  for (let i = 0; i < rows.length; i += CHUNK_SIZE) {
-    db.insert(table)
-      .values(rows.slice(i, i + CHUNK_SIZE) as any)
-      .run();
-  }
-};
-
 const validNumber = (value: number | undefined) =>
   typeof value === 'number' && Number.isFinite(value) ? Math.round(value) : null;
 

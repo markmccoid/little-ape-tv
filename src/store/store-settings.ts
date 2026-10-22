@@ -34,18 +34,6 @@ type DownloadOptions = {
   showNextDownloadInfo: boolean;
 };
 
-export type NotificationRecord = {
-  Id: string;
-  name: string;
-  season: number; // Season of last notification
-  episode: number; // episode of last notification
-  dateSent?: number; // Unix epoch time
-  dateChecked?: number; // check date
-  dateLastNotify?: number; // stored in savedShows[] records
-  text: string;
-  otherInfo?: string;
-};
-
 export type BackgroundRunLog = {
   dateTimeEpoch: number;
   numShows: number;
@@ -66,7 +54,7 @@ export type WatchProviderAttributes = {
   isHidden?: boolean; //is this provider hidden from search/filter lists
   isSearchOnly: boolean; // true indicates it will NOT show up on settings screen.  It can be found in search and turned "on"
 };
-type Settings = {
+export type Settings = {
   searchNumColumns: 2 | 3;
   showImageInEpisode: boolean;
   downloadOptions: DownloadOptions;
@@ -76,8 +64,6 @@ type Settings = {
   userRatingMax: number;
   // The user can set when notifications will be sent out
   notificationTime: { hour: number; minute: number };
-  // Each show will only store the LAST notification sent to the user
-  notificationHistory: Record<string, NotificationRecord>;
   // history of when the background code runs and how many show
   backgroundRunLog?: BackgroundRunLog[];
   // list of watch providers with
@@ -98,7 +84,6 @@ const initialState: Settings = {
   defaultTheme: 'auto',
   userRatingMax: 10,
   notificationTime: { hour: 16, minute: 0 },
-  notificationHistory: {},
   initialQuery: { firstAirDateYear: dayjs().format('YYYY'), includeGenres: [], excludeGenres: [] },
 };
 export const settings$ = observable<Settings>(

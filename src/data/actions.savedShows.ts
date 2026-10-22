@@ -30,9 +30,9 @@ import {
   type ShowDetailsInput,
   type ShowSummaryInput,
 } from '~/db/shows';
+import { clearNotificationHistory, resetNotifySchedule } from '~/db/notifications';
 import { deleteTag, insertTag, renameTag, reorderTags } from '~/db/tags';
 import { search$ } from '~/store/store-search';
-import { settings$ } from '~/store/store-settings';
 import { eventDispatcher, EventName } from '~/utils/EventDispatcher';
 import { queryClient } from '~/utils/queryClient';
 
@@ -77,8 +77,6 @@ export const addShow = async (showId: string) => {
 
 export const removeShow = (showId: string) => {
   deleteShow(getDb(), showId);
-  //! Notification history still lives in Legend State until phase 4
-  settings$.notificationHistory[showId].delete();
   refreshQueries();
   reTagSearch();
 };
@@ -130,6 +128,12 @@ export const addTag = write((name: string) => insertTag(getDb(), uuid.v4() as st
 export const editTag = write((tagId: string, name: string) => renameTag(getDb(), tagId, name));
 export const removeTag = write((tagId: string) => deleteTag(getDb(), tagId));
 export const updateTagPositions = write((tagIdOrder: string[]) => reorderTags(getDb(), tagIdOrder));
+
+//# ======================================================
+//# Notifications (testing aids on the Settings screen)
+//# ======================================================
+export const resetNotificationSchedule = write(() => resetNotifySchedule(getDb()));
+export const clearAllNotificationHistory = write(() => clearNotificationHistory(getDb()));
 
 //# ======================================================
 //# Marking TMDB results that are already saved

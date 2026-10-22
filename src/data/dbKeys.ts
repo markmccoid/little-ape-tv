@@ -10,4 +10,5 @@ export const dbKeys = {
   savedShowPosters: () => ['db', 'savedShowPosters'] as const,
   genres: () => ['db', 'genres'] as const,
   tags: () => ['db', 'tags'] as const,
+  notificationHistory: () => ['db', 'notificationHistory'] as const,
 };

@@ -15,7 +15,7 @@ import { Asul_400Regular, Asul_700Bold } from '@expo-google-fonts/asul';
 import { Roboto_400Regular, Roboto_500Medium } from '@expo-google-fonts/roboto';
 import { useFonts } from '@expo-google-fonts/asul';
 import { setupEvents } from '~/utils/events';
-import { queryClient } from '~/utils/queryClient';
+import { queryClient, setupAppStateRefresh } from '~/utils/queryClient';
 import { useSyncQueries } from 'tanstack-query-dev-tools-expo-plugin';
 import { checkForShowUpdatesAndNotify, registerBackgroundTask } from '~/utils/backgroundTasks';
 import { use$ } from '@legendapp/state/react';
@@ -55,6 +55,8 @@ const InitialLayout = () => {
 
   // Tanstack Query Dev Tools
   useSyncQueries({ queryClient });
+
+  useEffect(() => setupAppStateRefresh(), []);
 
   //~~ ------------------------------------------------------
   //~ Initialize TMDB API

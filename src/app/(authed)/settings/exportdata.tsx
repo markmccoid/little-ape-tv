@@ -1,23 +1,15 @@
 import { View, Text, Pressable, Alert } from 'react-native';
 import React from 'react';
 import { saveJSONToFiles } from '~/utils/utils';
-import { exportFilterCriteria, importFilterCriteria } from '~/store/store-filterCriteria';
-import { exportShowData, importShowData } from '~/store/store-shows';
+import { backupFileName, createBackup, restoreBackup } from '~/data/backup';
 import * as DocumentPicker from 'expo-document-picker';
 import { File } from 'expo-file-system';
 
 const ExportData = () => {
   const handleExport = async () => {
-    const filterCriteriaData = exportFilterCriteria();
-    const showData = exportShowData();
-    const dataToExport = {
-      filterCriteria: filterCriteriaData,
-      ...showData,
-    };
-    // Call the function to save JSON data to files
-    await saveJSONToFiles(dataToExport);
+    await saveJSONToFiles(createBackup(), backupFileName());
   };
-  //# IMPORT Data
+  //# IMPORT Data (v2 backups only)
   const importJSONFromFiles = async () => {
     try {
       // Prompt the user to pick a JSON file from the Files app
@@ -25,39 +17,29 @@ const ExportData = () => {
         type: 'application/json', // Restrict to JSON files
         copyToCacheDirectory: true, // Copy the file to the app's cache for reading
       });
-
-      // Check if the user selected a file or cancelled
       if (pickerResult.canceled) {
         return;
       }
-
-      const { assets } = pickerResult;
-      const uri = assets[0].uri;
-
-      // Read the file contents as a string
-      const fileContent = await new File(uri).text();
-
-      // Parse the JSON content into a JavaScript object
+      const fileContent = await new File(pickerResult.assets[0].uri).text();
       const jsonData = JSON.parse(fileContent);
 
-      // Log the parsed data (replace with your own logic)
+      const confirmed = await new Promise<boolean>((resolve) =>
+        Alert.alert(
+          'Replace All Data?',
+          'Importing replaces all shows, episodes, tags, settings and saved filters with the backup.',
+          [
+            { text: 'Cancel', style: 'cancel', onPress: () => resolve(false) },
+            { text: 'Import', style: 'destructive', onPress: () => resolve(true) },
+          ]
+        )
+      );
+      if (!confirmed) return;
 
-      const filterCriteria = jsonData?.filterCriteria;
-      const shows = jsonData?.shows;
-      const showAttributes = jsonData?.showAttributes;
-      const tags = jsonData?.tags;
-      if (shows || showAttributes || tags) {
-        importShowData({ shows, showAttributes, tags });
-      }
-
-      if (filterCriteria) {
-        importFilterCriteria(filterCriteria);
-      }
-      // Display a success message
-      Alert.alert('Success', 'JSON file imported successfully!');
-
-      // Example: Use the jsonData in your app (e.g., update state, store in database, etc.)
-      // setData(jsonData); // Example for state management
+      const counts = restoreBackup(jsonData);
+      Alert.alert(
+        'Success',
+        `Imported ${counts.shows} shows, ${counts.episodeStates} episodes and ${counts.tags} tags.`
+      );
     } catch (error) {
       console.error('Error importing JSON file:', error);
       const message = error instanceof Error ? error.message : String(error);
@@ -89,7 +71,7 @@ const ExportData = () => {
           onPress={importJSONFromFiles}
           className="rounded-md bg-green-500 p-4"
           android_ripple={{ color: '#fff' }}>
-          <Text className="text-lg font-semibold text-white">Imort Data</Text>
+          <Text className="text-lg font-semibold text-white">Import Data</Text>
         </Pressable>
       </View>
     </View>

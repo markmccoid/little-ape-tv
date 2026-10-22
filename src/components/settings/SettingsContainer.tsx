@@ -16,9 +16,12 @@ import {
   registerBackgroundTask,
   removeBackgroundTask,
 } from '~/utils/backgroundTasks';
-import { savedShows$ } from '~/store/store-shows';
 import * as BackgroundTask from 'expo-background-task';
-import { reimportLegacyShows } from '~/data/actions.savedShows';
+import {
+  clearAllNotificationHistory,
+  reimportLegacyShows,
+  resetNotificationSchedule,
+} from '~/data/actions.savedShows';
 
 const SettingsContainer = () => {
   const router = useRouter();
@@ -198,13 +201,8 @@ const SettingsContainer = () => {
 
               <Pressable
                 onPress={() => {
-                  const shows = savedShows$.shows.peek();
-                  Object.keys(shows).forEach((key) => {
-                    savedShows$.shows[key]?.lastNotifySeasonEpisode.set(undefined);
-                    savedShows$.shows[key]?.dateLastNotifyCheckedEpoch.set(undefined);
-                    savedShows$.shows[key]?.nextNotifyOffset.set(undefined);
-                    settings$.backgroundRunLog.set([]);
-                  });
+                  resetNotificationSchedule();
+                  settings$.backgroundRunLog.set([]);
                   Alert.alert(
                     `DONE Reset -> lastNotifySeasonEpisode\ndateLastNotifyCheckedEpoch\nnextNotifyOffset `
                   );
@@ -225,7 +223,7 @@ const SettingsContainer = () => {
           <View className="flex-col gap-2">
             <Pressable
               onPress={() => {
-                settings$.notificationHistory.set({});
+                clearAllNotificationHistory();
                 settings$.backgroundRunLog.set([]);
               }}
               className="border bg-blue-300 p-2">

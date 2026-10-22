@@ -167,13 +167,13 @@ export const priorityMergeArrays = <T extends { id: string }>(arr1: T[], arr2: T
 //# --------------------------------------
 //# Save JSON to Files
 //# --------------------------------------
-export const saveJSONToFiles = async (dataObject: any) => {
+export const saveJSONToFiles = async (dataObject: any, fileName = 'sample-data.json') => {
   try {
     // Convert the JavaScript object to a JSON string
     const jsonString = JSON.stringify(dataObject, null, 2);
 
     // Define the file path in the app's document directory
-    const file = new File(Paths.document, 'sample-data.json');
+    const file = new File(Paths.document, fileName);
     file.create({ overwrite: true });
     await file.write(jsonString);
 
