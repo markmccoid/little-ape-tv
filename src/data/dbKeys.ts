@@ -3,6 +3,8 @@ import type { ShowListCriteria } from '~/db/showList';
 //~ React Query keys for SQLite-backed data.  Writes invalidate dbKeys.all.
 export const dbKeys = {
   all: ['db'] as const,
+  // Prefix of every showList key, for updating all cached filter results at once
+  showLists: () => ['db', 'showList'] as const,
   showList: (criteria: ShowListCriteria) => ['db', 'showList', criteria] as const,
   show: (showId: string) => ['db', 'show', showId] as const,
   seasonSummaries: (showId: string) => ['db', 'seasonSummaries', showId] as const,

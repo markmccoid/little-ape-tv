@@ -31,6 +31,7 @@ import {
   type ShowSummaryInput,
 } from '~/db/shows';
 import { clearNotificationHistory, resetNotifySchedule } from '~/db/notifications';
+import type { ShowListItem } from '~/db/showList';
 import { deleteTag, insertTag, renameTag, reorderTags } from '~/db/tags';
 import { search$ } from '~/store/store-search';
 import { eventDispatcher, EventName } from '~/utils/EventDispatcher';
@@ -75,7 +76,12 @@ export const addShow = async (showId: string) => {
   eventDispatcher.emit(EventName.UpdateWatchProviders, showId);
 };
 
+//~ Optimistic: the show leaves every cached library list before the database write,
+//~ so the list updates on the same frame as the tap.
 export const removeShow = (showId: string) => {
+  queryClient.setQueriesData<ShowListItem[]>({ queryKey: dbKeys.showLists() }, (shows) =>
+    shows?.filter((show) => show.id !== showId)
+  );
   deleteShow(getDb(), showId);
   refreshQueries();
   reTagSearch();

@@ -1,11 +1,8 @@
 import { MMKV } from 'react-native-mmkv';
-import type { SavedShows } from '@/store/functions-shows';
-import type { Tag } from '@/store/functions-tags';
-
+// Show data now lives in SQLite (src/db); the legacy MMKV show data is read directly
+// by src/db/legacy/migrateFromMMKV.ts
 type LocalStorageKeys = {
   mmkvid: string;
-  tags: Tag[];
-  savedshows: SavedShows;
 };
 
 export class LocalUserStorage {
