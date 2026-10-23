@@ -17,6 +17,7 @@ import Animated, {
   withTiming,
   interpolate,
   SharedValue,
+  LinearTransition,
 } from 'react-native-reanimated';
 import { AnimatedLegendList } from '@legendapp/list/reanimated';
 import type { ShowListItem } from '~/db/showList';
@@ -253,6 +254,7 @@ const ShowsContainer = () => {
           onScroll={scrollHandler}
           showsVerticalScrollIndicator={false}
           keyboardDismissMode="on-drag"
+          itemLayoutAnimation={LinearTransition.duration(280)}
           // The wrapper's translateY pushes the list's bottom off-screen while the search is open,
           // so add the same amount here to keep the last row reachable.
           contentContainerStyle={{
