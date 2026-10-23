@@ -40,26 +40,26 @@ export const useFilteredShows = () => {
   const { showName, ignoreOtherFilters } = use$(filterCriteria$.nameFilter);
   const sortSettings = use$(filterCriteria$.sortSettings);
 
-  const criteria: ShowListCriteria = useMemo(
-    () => ({
-      showName,
-      ignoreOtherFilters,
-      includeTags: baseFilters.includeTags,
-      excludeTags: baseFilters.excludeTags,
-      includeGenres: baseFilters.includeGenres,
-      excludeGenres: baseFilters.excludeGenres,
-      includeWatchProviders: baseFilters.includeWatchProviders,
-      filterIsFavorited: baseFilters.filterIsFavorited,
-      filterIsAllWatched: baseFilters.filterIsAllWatched,
-      sort: sortSettings.map(({ sortField, sortDirection, active, position }) => ({
-        sortField,
-        sortDirection,
-        active,
-        position,
-      })),
-    }),
-    [baseFilters, showName, ignoreOtherFilters, sortSettings]
-  );
+  // Built every render, not memoized: Legend State updates these objects in place
+  // (e.g. baseFilters.assign from the filter screen), so their identity doesn't change.
+  // React Query hashes the key by value, so an unchanged criteria reuses the cache.
+  const criteria: ShowListCriteria = {
+    showName,
+    ignoreOtherFilters,
+    includeTags: baseFilters.includeTags,
+    excludeTags: baseFilters.excludeTags,
+    includeGenres: baseFilters.includeGenres,
+    excludeGenres: baseFilters.excludeGenres,
+    includeWatchProviders: baseFilters.includeWatchProviders,
+    filterIsFavorited: baseFilters.filterIsFavorited,
+    filterIsAllWatched: baseFilters.filterIsAllWatched,
+    sort: sortSettings.map(({ sortField, sortDirection, active, position }) => ({
+      sortField,
+      sortDirection,
+      active,
+      position,
+    })),
+  };
 
   const { data } = useQuery(
     dbQuery(dbKeys.showList(criteria), () => selectShowList(getDb(), criteria))
