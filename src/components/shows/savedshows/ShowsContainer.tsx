@@ -1,6 +1,12 @@
-import React, { useCallback, useDeferredValue, useLayoutEffect, useState } from 'react';
-import { FlatList, Pressable, StyleSheet, Text, View, Dimensions } from 'react-native';
-import { Link, Stack, useNavigation, useRouter, type NativeStackNavigationOptions } from 'expo-router';
+import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import { Pressable, StyleSheet, Text, View, Dimensions } from 'react-native';
+import {
+  Link,
+  Stack,
+  useNavigation,
+  useRouter,
+  type NativeStackNavigationOptions,
+} from 'expo-router';
 import { useBottomTabBarHeight } from 'expo-router/js-tabs';
 import { useFilteredShows } from '~/data/query.savedShows';
 import Animated, {
@@ -12,6 +18,7 @@ import Animated, {
   interpolate,
   SharedValue,
 } from 'react-native-reanimated';
+import { AnimatedLegendList } from '@legendapp/list/reanimated';
 import type { ShowListItem } from '~/db/showList';
 import ShowItem from './ShowItem';
 import ShowNameSearch from './ShowSearch';
@@ -26,6 +33,8 @@ const { width, height } = Dimensions.get('window');
 const MARGIN = 10;
 const IMG_WIDTH = (width - MARGIN * 3) / 2;
 const IMG_HEIGHT = IMG_WIDTH * 1.5;
+// How far the list moves down to make room for the open name search.
+const SEARCH_SHIFT = 43;
 
 // Component to handle animated ShowItem
 const AnimatedShowItem = ({
@@ -102,60 +111,89 @@ const AnimatedShowItem = ({
 
 const ShowsContainer = () => {
   const tabBarHeight = useBottomTabBarHeight();
-  const showsInit = useFilteredShows();
+  const shows = useFilteredShows();
   const router = useRouter();
   const navigation = useNavigation();
   const { colors } = useCustomTheme();
 
-  const shows = useDeferredValue(showsInit);
   const titleSearchValue = use$(filterCriteria$.nameFilter.showName);
-  const flatListRef = React.useRef<FlatList>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const scrollY = useSharedValue(0);
-  const animHeight = useSharedValue(0);
-  const searchY = useSharedValue(-40);
+  const searchY = useSharedValue(-50);
+  const listShift = useSharedValue(0);
 
   useLayoutEffect(() => {
     const options: NativeStackNavigationOptions = {
-      title: `Shows (${showsInit.length})`,
+      title: `Shows (${shows.length})`,
     };
     navigation.setOptions(options);
-  }, [showsInit]);
+  }, [shows]);
 
+  // The open flag and "search is empty" live in shared values so the scroll worklet reads current
+  // values on the UI thread instead of React state captured at its last render.
+  const searchOpenSV = useSharedValue(false);
+  const titleSearchEmpty = useSharedValue(titleSearchValue?.length === 0);
+  useEffect(() => {
+    titleSearchEmpty.value = titleSearchValue?.length === 0;
+  }, [titleSearchValue]);
+
+  // True while searchY is following the finger during a pull that hasn't opened the search yet.
+  const searchTracking = useSharedValue(false);
+
+  // The list itself never moves during a pull: shifting it under an active pan shrinks the
+  // overscroll and fights the gesture. Only the absolutely positioned search bar follows the
+  // finger; the list slides down once, when the search opens.
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
-      scrollY.value = event.contentOffset.y;
-      animHeight.value = event.contentOffset.y * -1;
+      const offsetY = event.contentOffset.y;
+      scrollY.value = offsetY;
 
-      if (event.contentOffset.y < -30) {
-        runOnJS(setSearchOpen)(true);
-      } else if (event.contentOffset.y > 25 && titleSearchValue?.length === 0) {
-        runOnJS(setSearchOpen)(false);
-        searchY.value = withTiming(-50);
+      if (offsetY < -18) {
+        if (!searchOpenSV.value) {
+          searchOpenSV.value = true;
+          searchTracking.value = false;
+          searchY.value = withTiming(3, { duration: 220 });
+          listShift.value = withTiming(SEARCH_SHIFT, { duration: 220 });
+          runOnJS(setSearchOpen)(true);
+        }
         return;
       }
 
-      searchY.value = searchOpen ? withTiming(3) : -50 + animHeight.value;
+      if (offsetY > 10 && titleSearchEmpty.value && searchOpenSV.value) {
+        searchOpenSV.value = false;
+        searchY.value = withTiming(-50, { duration: 200 });
+        listShift.value = withTiming(0, { duration: 200 });
+        runOnJS(setSearchOpen)(false);
+        return;
+      }
+
+      if (!searchOpenSV.value) {
+        if (offsetY < 0) {
+          searchTracking.value = true;
+          searchY.value = Math.min(3, -50 - offsetY);
+        } else if (searchTracking.value) {
+          searchTracking.value = false;
+          searchY.value = -50;
+        }
+      }
     },
   });
 
   const handleSetVisible = (opening: boolean) => {
     setSearchOpen(opening);
-    if (!opening) {
-      searchY.value = withTiming(-50);
-    } else {
-      searchY.value = withTiming(0);
-    }
+    searchOpenSV.value = opening;
+    searchTracking.value = false;
+    searchY.value = withTiming(opening ? 3 : -50, { duration: 220 });
+    listShift.value = withTiming(opening ? SEARCH_SHIFT : 0, { duration: 220 });
   };
 
   const hStyle = useAnimatedStyle(() => {
     return { transform: [{ translateY: searchY.value }] };
   });
 
+  // translateY rather than paddingTop: no layout pass (or Legend List onLayout) per frame.
   const listStyle = useAnimatedStyle(() => {
-    return {
-      paddingTop: searchY.value + 40,
-    };
+    return { transform: [{ translateY: listShift.value }] };
   });
 
   const renderShow = useCallback(
@@ -164,17 +202,6 @@ const ShowsContainer = () => {
     },
     [scrollY]
   );
-
-  const getItemLayout = (_: any, index: number) => {
-    const rowNumber = Math.floor(index);
-    return {
-      length: IMG_HEIGHT + 26,
-      offset: rowNumber * (IMG_HEIGHT + 26), // Offset based on row
-      // length: IMG_HEIGHT + 26,
-      // offset: rowNumber * (IMG_HEIGHT + 26), // Offset based on row
-      index,
-    };
-  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -209,20 +236,30 @@ const ShowsContainer = () => {
         </View>
       )}
 
-      <Animated.FlatList
-        data={shows}
-        ref={flatListRef}
-        style={[listStyle, { zIndex: 10, paddingHorizontal: MARGIN }]}
-        columnWrapperStyle={{ justifyContent: 'space-between' }}
-        keyExtractor={(item) => item.id}
-        renderItem={renderShow}
-        numColumns={2}
-        onScroll={scrollHandler}
-        getItemLayout={getItemLayout}
-        showsVerticalScrollIndicator={false}
-        keyboardDismissMode="on-drag"
-        contentContainerStyle={{ paddingBottom: tabBarHeight + 20 }}
-      />
+      {/* Legend List keys each card (not each row) by show id, so removing a show only
+          unmounts that card instead of remounting every row after it. */}
+      {/* The animated shift lives on a wrapper: Legend List reads `style` in JS to position
+          items, so it can't take a Reanimated style. */}
+      <Animated.View style={[listStyle, { flex: 1, zIndex: 10 }]}>
+        <AnimatedLegendList
+          data={shows}
+          style={{ paddingHorizontal: MARGIN }}
+          columnWrapperStyle={{ columnGap: MARGIN }}
+          keyExtractor={(item) => item.id}
+          renderItem={renderShow}
+          numColumns={2}
+          estimatedItemSize={IMG_HEIGHT + 26}
+          recycleItems={false}
+          onScroll={scrollHandler}
+          showsVerticalScrollIndicator={false}
+          keyboardDismissMode="on-drag"
+          // The wrapper's translateY pushes the list's bottom off-screen while the search is open,
+          // so add the same amount here to keep the last row reachable.
+          contentContainerStyle={{
+            paddingBottom: tabBarHeight + 20 + (searchOpen ? SEARCH_SHIFT : 0),
+          }}
+        />
+      </Animated.View>
     </View>
   );
 };
